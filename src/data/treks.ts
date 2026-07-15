@@ -114,7 +114,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["March", "April", "May", "June", "September", "October", "November", "December"],
     departures: ["2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13"],
     createdAt: "2025-11-02",
-    popularity: 99,
+    popularity: 100,
   },
   {
     id: "trek-hampta",
@@ -182,7 +182,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["March", "April", "May", "June", "September", "October", "November"],
     departures: ["2026-08-14", "2026-08-21", "2026-08-28", "2026-09-04"],
     createdAt: "2026-01-12",
-    popularity: 97,
+    popularity: 98,
   },
   {
     id: "trek-bhrigu",
@@ -250,7 +250,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["April", "May", "June", "September", "October", "November", "December"],
     departures: ["2026-08-18", "2026-08-25", "2026-09-01", "2026-09-08"],
     createdAt: "2026-02-04",
-    popularity: 96,
+    popularity: 99,
   },
   {
     id: "trek-snowline",
@@ -352,7 +352,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["December", "January", "February", "March", "April"],
     departures: ["2026-12-12", "2026-12-19", "2026-12-26", "2027-01-02"],
     createdAt: "2025-07-01",
-    popularity: 99,
+    popularity: 90,
   },
   {
     id: "trek-sar-pass",
