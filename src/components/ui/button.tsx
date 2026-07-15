@@ -19,17 +19,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border border-[#d0d5cc] bg-white text-[#1A1A1A] shadow-sm hover:bg-[#F7F8F6] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
+          "border border-[#244820] bg-[#2D5A27] text-white shadow-sm hover:bg-[#244820] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
         secondary:
           "border border-[#d0d5cc] bg-white text-[#1A1A1A] shadow-sm hover:bg-[#F7F8F6] hover:scale-[1.02] active:scale-[0.98]",
         accent:
-          "border border-[#d0d5cc] bg-white text-[#1A1A1A] shadow-sm hover:bg-[#F7F8F6] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
+          "border border-[#244820] bg-[#2D5A27] text-white shadow-sm hover:bg-[#244820] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
         outline:
           "border border-border bg-transparent text-foreground hover:bg-muted hover:scale-[1.02] active:scale-[0.98]",
         ghost: "bg-transparent text-foreground hover:bg-muted",
         link: "rounded-none bg-transparent px-0 text-primary underline-offset-4 hover:underline",
         gradient:
-          "border border-[#d0d5cc] bg-white text-[#1A1A1A] shadow-sm hover:bg-[#F7F8F6] hover:scale-[1.02] active:scale-[0.98]",
+          "border border-[#244820] bg-[#2D5A27] text-white shadow-sm hover:bg-[#244820] hover:scale-[1.02] active:scale-[0.98]",
         glass:
           "glass text-foreground shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
       },

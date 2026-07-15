@@ -1,5 +1,6 @@
 import { BLUR_DATA_URL } from "@/constants/media";
 import { img } from "@/lib/media";
+import { weekendTrekDetails } from "@/data/weekend-trek-details";
 import type { TrekDetail } from "@/types/trek-detail";
 import type { FAQ } from "@/types";
 
@@ -1008,6 +1009,7 @@ export const trekDetails: TrekDetail[] = [
     ],
     relatedSlugs: ["hampta-pass-trek", "beas-kund-trek", "triund-trek"],
   },
+  ...weekendTrekDetails,
 ];
 
 export function getTrekDetailBySlug(slug: string): TrekDetail | undefined {

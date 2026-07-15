@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Bell, Heart, Menu, Search, X } from "lucide-react";
+import { ArrowRight, Heart, Menu, Search, UserRound, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -104,17 +104,10 @@ export function Navbar({ overlayHero = false }: NavbarProps) {
               ) : null}
             </Link>
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Notifications, 3 new"
-            className="relative h-10 w-10 text-[#1A1A1A]"
-            onClick={() => setSearchOpen(true)}
-          >
-            <Bell className="h-[1.15rem] w-[1.15rem]" />
-            <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2D5A27] px-1 text-[10px] font-bold text-white">
-              3
-            </span>
+          <Button asChild variant="ghost" size="icon" className="relative h-10 w-10 text-[#1A1A1A]">
+            <Link href="/login" aria-label="Login or create account">
+              <UserRound className="h-[1.15rem] w-[1.15rem]" />
+            </Link>
           </Button>
         </div>
       </div>
@@ -189,13 +182,16 @@ export function Navbar({ overlayHero = false }: NavbarProps) {
               ) : null}
             </Link>
           </Button>
+          <Button asChild variant="ghost" size="icon" className={cn("relative h-9 w-9", dark ? "text-white hover:bg-white/10 hover:text-white" : "text-foreground")}>
+            <Link href="/login" aria-label="Login or create account">
+              <UserRound className="h-4 w-4" />
+            </Link>
+          </Button>
           <Link
             href="/booking"
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-bold transition hover:brightness-105 lg:px-4 lg:text-[13px]",
-              dark
-                ? "border border-white/40 bg-white text-[#1A1A1A]"
-                : "border border-[#d0d5cc] bg-white text-[#1A1A1A]",
+              "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-bold !text-white transition hover:brightness-110 lg:px-4 lg:text-[13px]",
+              "border border-[#244820] bg-[#2D5A27]",
             )}
           >
             Book Your Trek

@@ -146,7 +146,7 @@ export function TreksExplorer() {
 
         <div className="mt-5 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px]">
           <div className="hidden lg:block">
-            <div className="sticky top-24">
+            <div>
               <TrekFiltersPanel
                 filters={filters}
                 onChange={pushFilters}
@@ -216,7 +216,7 @@ export function TreksExplorer() {
           </div>
 
           <div className="hidden xl:block">
-            <div className="sticky top-24">
+            <div>
               <TreksHelpPanel />
             </div>
           </div>

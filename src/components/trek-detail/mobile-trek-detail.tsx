@@ -291,7 +291,7 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
             <Button
               asChild
               size="lg"
-              className="w-full rounded-xl border border-[#d0d5cc] bg-white text-base text-[#1A1A1A] hover:bg-[#F7F8F6]"
+              className="w-full rounded-xl text-base"
             >
               <Link href={`/booking?trek=${trek.slug}`}>Book This Trek</Link>
             </Button>
@@ -526,10 +526,10 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
           </div>
           <Link
             href={`/booking?trek=${trek.slug}`}
-            className="inline-flex min-w-[8.5rem] flex-col items-center justify-center rounded-xl border border-[#d0d5cc] bg-white px-4 py-2.5 text-[#1A1A1A] shadow-sm"
+            className="inline-flex min-w-[8.5rem] flex-col items-center justify-center rounded-xl border border-[#244820] bg-[#2D5A27] px-4 py-2.5 !text-white shadow-sm"
           >
             <span className="text-sm font-bold">Book Now</span>
-            <span className="mt-0.5 inline-flex items-center gap-1 text-[9px] font-medium text-[#555]">
+            <span className="mt-0.5 inline-flex items-center gap-1 text-[9px] font-medium text-white/85">
               <BadgeCheck className="h-3 w-3" aria-hidden />
               Best Price Guaranteed
             </span>

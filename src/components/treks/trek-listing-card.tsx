@@ -7,6 +7,7 @@ import {
   Clock3,
   Heart,
   Mountain,
+  Scale,
   Star,
 } from "lucide-react";
 import Image from "next/image";
@@ -16,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 import { getDiscountPercent } from "@/lib/trek-filters";
-import { useRecentlyViewedStore, useWishlistStore } from "@/lib/store";
+import { useCompareStore, useRecentlyViewedStore, useUiStore, useWishlistStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { TrekListingItem, TrekViewMode } from "@/types/trek-listing";
 import { formatCurrency, formatTrekDuration } from "@/utils";
@@ -61,8 +62,11 @@ function formatDeparture(iso: string): string {
 function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps) {
   const hydrated = useHasHydrated();
   const { toggle: toggleWish, has: hasWish } = useWishlistStore();
+  const { toggle: toggleCompare, has: hasCompare } = useCompareStore();
+  const setTrekCompareOpen = useUiStore((s) => s.setTrekCompareOpen);
   const { add: addRecent } = useRecentlyViewedStore();
   const saved = hydrated && hasWish(trek.id);
+  const comparing = hydrated && hasCompare(trek.id);
   const discount = getDiscountPercent(trek.basePriceInr, trek.originalPriceInr);
   const primaryBadge = trek.badges[0];
   const nextDeparture = trek.departures[0];
@@ -77,6 +81,32 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
     >
       <Heart className={cn("h-4 w-4", saved && "fill-destructive text-destructive")} />
     </button>
+  );
+
+  const compareButton = (
+    <button
+      type="button"
+      aria-label={comparing ? "Remove from compare" : "Add to compare"}
+      aria-pressed={comparing}
+      onClick={() => {
+        const adding = !hasCompare(trek.id);
+        toggleCompare(trek.id);
+        if (adding) setTrekCompareOpen(true);
+      }}
+      className={cn(
+        "inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-muted-foreground shadow-sm transition hover:text-[#2D5A27]",
+        comparing && "bg-[#E8F5E9] text-[#2D5A27]",
+      )}
+    >
+      <Scale className="h-4 w-4" />
+    </button>
+  );
+
+  const actionButtons = (
+    <div className="flex items-center gap-1.5">
+      {compareButton}
+      {wishButton}
+    </div>
   );
 
   /* —— Mobile card (mockup) —— */
@@ -102,7 +132,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
             {badgeCopy[primaryBadge]}
           </span>
         ) : null}
-        <div className="absolute right-3 top-3">{wishButton}</div>
+        <div className="absolute right-3 top-3">{actionButtons}</div>
       </div>
 
       <div className="space-y-3 p-4">
@@ -179,7 +209,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
             asChild
             variant="primary"
             size="sm"
-            className="rounded-full border border-[#d0d5cc] bg-white text-[#1A1A1A] hover:bg-[#F7F8F6]"
+            className="rounded-full"
           >
             <Link href={`/booking?trek=${trek.slug}`} onClick={() => addRecent(trek.id)}>
               Book Now
@@ -220,7 +250,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
             </div>
 
             <div className="relative flex flex-col gap-2.5 p-4 md:p-5">
-              <div className="absolute right-4 top-4">{wishButton}</div>
+              <div className="absolute right-4 top-4">{actionButtons}</div>
 
               <div className="pr-10">
                 <h3 className="font-heading text-xl font-bold tracking-tight text-[#1A1A1A]">
@@ -301,12 +331,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                     View Details
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="primary"
-                  size="sm"
-                  className="w-full border border-[#d0d5cc] bg-white text-[#1A1A1A] hover:bg-[#F7F8F6]"
-                >
+                <Button asChild variant="primary" size="sm" className="w-full">
                   <Link href={`/booking?trek=${trek.slug}`} onClick={() => addRecent(trek.id)}>
                     Book Now
                   </Link>
@@ -344,7 +369,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
               {badgeCopy[primaryBadge]}
             </span>
           ) : null}
-          <div className="absolute right-3 top-3">{wishButton}</div>
+          <div className="absolute right-3 top-3">{actionButtons}</div>
         </div>
 
         <div className="space-y-3 p-4">
@@ -376,7 +401,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                 <p className="text-xs font-semibold text-[#2D5A27]">{discount}% OFF</p>
               ) : null}
             </div>
-            <Button asChild variant="primary" size="sm" className="border border-[#d0d5cc] bg-white text-[#1A1A1A] hover:bg-[#F7F8F6]">
+            <Button asChild variant="primary" size="sm">
               <Link href={`/booking?trek=${trek.slug}`}>Book Now</Link>
             </Button>
           </div>

@@ -78,11 +78,7 @@ export function TrekDetailSidebar({ trek }: { trek: TrekDetail }) {
         ) : null}
 
         <div className="mt-4 space-y-2.5">
-          <Button
-            asChild
-            size="lg"
-            className="w-full border border-[#d0d5cc] bg-white text-base text-[#1A1A1A] hover:bg-[#F7F8F6]"
-          >
+          <Button asChild size="lg" className="w-full text-base">
             <Link href={`/booking?trek=${trek.slug}`}>Book This Trek</Link>
           </Button>
           {brochure ? (
@@ -114,7 +110,7 @@ export function TrekDetailSidebar({ trek }: { trek: TrekDetail }) {
           Talk to our trek experts for free advice on dates, fitness, and packing.
         </p>
         <div className="mt-4 space-y-2">
-          <Button asChild className="w-full border border-[#d0d5cc] bg-white text-[#1A1A1A] hover:bg-[#F7F8F6]">
+          <Button asChild className="w-full">
             <a href={whatsapp} target="_blank" rel="noreferrer">
               <MessageCircle className="h-4 w-4" aria-hidden />
               Chat on WhatsApp

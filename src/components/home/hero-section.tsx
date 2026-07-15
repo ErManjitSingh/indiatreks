@@ -60,7 +60,7 @@ export function HeroSection() {
             <div className="mt-5 flex flex-wrap items-center gap-3 md:mt-7 md:gap-4">
               <Link
                 href="/treks"
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white px-5 py-2.5 text-xs font-bold !text-[#1A1A1A] transition hover:bg-white/90 md:px-6 md:py-3 md:text-sm"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#244820] bg-[#2D5A27] px-5 py-2.5 text-xs font-bold !text-white transition hover:bg-[#244820] md:px-6 md:py-3 md:text-sm"
               >
                 Explore Treks
                 <ArrowRight className="h-3.5 w-3.5 md:h-4 md:w-4" aria-hidden />
