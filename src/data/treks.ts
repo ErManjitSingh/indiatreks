@@ -2,11 +2,12 @@ import { BLUR_DATA_URL } from "@/constants/media";
 import { img } from "@/lib/media";
 import type { TrekListingItem } from "@/types/trek-listing";
 
-export const TREK_PRICE_BOUNDS = { min: 1999, max: 45000 } as const;
+export const TREK_PRICE_BOUNDS = { min: 500, max: 45000 } as const;
 export const TREK_ALTITUDE_BOUNDS = { min: 5000, max: 21000 } as const;
 
 export const trekListingDestinations = [
   "McLeod Ganj",
+  "Dharamshala",
   "Manali",
   "Kasol",
   "Sankri",
@@ -27,12 +28,12 @@ export const trekListingRegions = [
 
 export const popularTrekSearches = [
   { label: "Triund", href: "/treks?q=Triund" },
+  { label: "Kheerganga", href: "/treks?q=Kheerganga" },
+  { label: "Kareri Lake", href: "/treks?q=Kareri" },
+  { label: "Snowline", href: "/treks?q=Snowline" },
   { label: "Hampta Pass", href: "/treks?q=Hampta" },
   { label: "Kedarkantha", href: "/treks?q=Kedarkantha" },
-  { label: "Sar Pass", href: "/treks?q=Sar+Pass" },
   { label: "Bhrigu Lake", href: "/treks?q=Bhrigu" },
-  { label: "Kareri Lake", href: "/treks?q=Kareri" },
-  { label: "Beas Kund", href: "/treks?q=Beas+Kund" },
 ] as const;
 
 export const trekCollections = [
@@ -113,7 +114,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["March", "April", "May", "June", "September", "October", "November", "December"],
     departures: ["2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13"],
     createdAt: "2025-11-02",
-    popularity: 98,
+    popularity: 99,
   },
   {
     id: "trek-hampta",
@@ -181,7 +182,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["March", "April", "May", "June", "September", "October", "November"],
     departures: ["2026-08-14", "2026-08-21", "2026-08-28", "2026-09-04"],
     createdAt: "2026-01-12",
-    popularity: 94,
+    popularity: 97,
   },
   {
     id: "trek-bhrigu",
@@ -249,7 +250,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["April", "May", "June", "September", "October", "November", "December"],
     departures: ["2026-08-18", "2026-08-25", "2026-09-01", "2026-09-08"],
     createdAt: "2026-02-04",
-    popularity: 88,
+    popularity: 96,
   },
   {
     id: "trek-snowline",
@@ -283,7 +284,7 @@ export const allTreks: TrekListingItem[] = [
     months: ["March", "April", "May", "September", "October", "November", "December"],
     departures: ["2026-08-20", "2026-08-27", "2026-09-03", "2026-09-10"],
     createdAt: "2026-03-01",
-    popularity: 90,
+    popularity: 95,
   },
   {
     id: "trek-beas",
