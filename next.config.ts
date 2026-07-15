@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "eegoitaly.in",
       },
+      {
+        protocol: "https",
+        hostname: "images.stockcake.com",
+      },
     ],
   },
   experimental: {

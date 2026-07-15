@@ -29,7 +29,7 @@ import { BLUR_DATA_URL } from "@/constants/media";
 import { featuredTreks, destinationShowcases, heroSearchOptions } from "@/data/homepage";
 import { trekImages } from "@/constants/trek-images";
 
-const heroImage = trekImages.hero;
+const heroImage = trekImages.heroMobile;
 const serviceChips: Array<{ title: string; icon: LucideIcon }> = [
   { title: "Expert Trek Leaders", icon: UserRound },
   { title: "Safety First", icon: ShieldCheck },
@@ -72,7 +72,7 @@ function MobileHero() {
         quality={65}
         placeholder="blur"
         blurDataURL={BLUR_DATA_URL}
-        className="object-cover object-[center_40%]"
+        className="object-cover object-[center_35%]"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.35)_0%,rgba(8,12,20,0.25)_40%,rgba(8,12,20,0.82)_100%)]" />
 
