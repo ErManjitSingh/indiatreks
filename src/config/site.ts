@@ -4,12 +4,12 @@ export const siteConfig = {
   tagline: "Explore India's Most Incredible Treks",
   description:
     "India's premium trekking platform for Himalayan adventures, weekend getaways, winter expeditions, and curated camping experiences.",
-  url: "https://treks.indiaholidaydestinations.com",
+  url: "https://treks.indiaholidaydestination.com",
   ogImage: "/images/og-default.jpg",
   locale: "en_IN",
   currency: "INR",
   phone: "+91 98765 43210",
-  email: "treks@indiaholidaydestinations.com",
+  email: "treks@indiaholidaydestination.com",
   whatsapp: "919876543210",
   address: {
     line1: "India Holiday Destinations",
