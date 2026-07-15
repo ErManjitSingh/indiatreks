@@ -14,6 +14,7 @@ import {
   MessageCircle,
   MoreVertical,
   Mountain,
+  Phone,
   Play,
   Route,
   Share2,
@@ -127,7 +128,7 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
       : trek.overview;
 
   return (
-    <div className="bg-white pb-28 md:hidden">
+    <div className="bg-white pb-32 md:hidden">
       {/* Hero */}
       <section className="relative">
         <div className="relative aspect-[4/3] overflow-hidden rounded-b-3xl">
@@ -502,14 +503,16 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
         ) : null}
       </div>
 
-      {/* Sticky book bar — mockup style */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e8ece6] bg-white px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+      {/* Sticky booking + contact bar */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e8ece6] bg-white/95 px-3 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_28px_rgba(20,40,20,0.12)] backdrop-blur-md">
+        <div className="mx-auto flex max-w-lg items-center gap-2.5">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-muted-foreground">From</p>
+            <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              Starting from
+            </p>
             <p className="font-heading text-lg font-extrabold leading-tight text-[#1A1A1A]">
               {formatCurrency(trek.basePriceInr)}
-              <span className="ml-1 text-xs font-medium text-muted-foreground">/person</span>
+              <span className="ml-1 text-[11px] font-medium text-muted-foreground">/person</span>
             </p>
             <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
               {trek.originalPriceInr ? (
@@ -518,20 +521,37 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
                 </span>
               ) : null}
               {discount ? (
-                <span className="rounded bg-[#E8F5E9] px-1.5 py-0.5 text-[10px] font-bold text-[#2D5A27]">
+                <span className="rounded-md bg-[#E8F5E9] px-1.5 py-0.5 text-[10px] font-bold text-[#2D5A27]">
                   {discount}% OFF
                 </span>
               ) : null}
             </div>
           </div>
+
+          <a
+            href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+            aria-label="Call us"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#d0d5cc] bg-[#F7F8F6] text-[#2D5A27] transition hover:bg-white"
+          >
+            <Phone className="h-5 w-5" aria-hidden />
+          </a>
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="WhatsApp"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#25D366]/35 bg-[#25D366] text-white shadow-sm transition hover:brightness-95"
+          >
+            <MessageCircle className="h-5 w-5" aria-hidden />
+          </a>
           <BookNowButton
             trekSlug={trek.slug}
-            className="inline-flex min-w-[8.5rem] flex-col items-center justify-center rounded-xl px-4 py-2.5 !text-white shadow-sm"
+            className="inline-flex min-h-11 min-w-[7.25rem] flex-col items-center justify-center rounded-xl px-3.5 py-2 !text-white shadow-md"
           >
-            <span className="text-sm font-bold">Book Now</span>
-            <span className="mt-0.5 inline-flex items-center gap-1 text-[9px] font-medium text-white/85">
+            <span className="text-sm font-bold leading-none">Book Now</span>
+            <span className="mt-1 inline-flex items-center gap-1 text-[9px] font-medium text-white/85">
               <BadgeCheck className="h-3 w-3" aria-hidden />
-              Best Price Guaranteed
+              Best price
             </span>
           </BookNowButton>
         </div>

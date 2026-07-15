@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.indiaholidaydestinations.com",
       },
+      {
+        protocol: "https",
+        hostname: "eegoitaly.in",
+      },
     ],
   },
   experimental: {

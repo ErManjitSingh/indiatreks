@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 import { BookingFlow } from "@/components/booking/booking-flow";
+import { QuickEnquiryForm } from "@/components/booking/quick-enquiry-form";
 import { Container } from "@/components/ui/container";
 import { getTrekBySlug } from "@/data/treks";
 import { getTrekDetailBySlug } from "@/data/trek-details";
@@ -15,6 +17,8 @@ interface BookingTrekClientProps {
 export function BookingTrekClient({ trekSlug }: BookingTrekClientProps) {
   const searchParams = useSearchParams();
   const initialDate = searchParams.get("date") ?? undefined;
+  const [stage, setStage] = useState<"enquiry" | "advance">("enquiry");
+
   const detail = getTrekDetailBySlug(trekSlug);
   const listing = getTrekBySlug(trekSlug);
 
@@ -38,15 +42,24 @@ export function BookingTrekClient({ trekSlug }: BookingTrekClientProps) {
             ← Back to trek
           </Link>
         </p>
-        <div className="rounded-2xl border border-[#e8ece6] bg-white p-4 md:p-6">
-          <BookingFlow
-            trekSlug={trekSlug}
-            trekTitle={title}
-            basePriceInr={basePriceInr}
-            departures={departures}
-            mode="page"
-            initialDate={initialDate}
-          />
+        <div className="min-h-[28rem] rounded-2xl border border-[#e8ece6] bg-white p-4 md:p-6">
+          {stage === "advance" ? (
+            <BookingFlow
+              trekSlug={trekSlug}
+              trekTitle={title}
+              basePriceInr={basePriceInr}
+              departures={departures}
+              mode="page"
+              initialDate={initialDate}
+            />
+          ) : (
+            <QuickEnquiryForm
+              trekSlug={trekSlug}
+              trekTitle={title}
+              basePriceInr={basePriceInr}
+              onAdvanceBooking={() => setStage("advance")}
+            />
+          )}
         </div>
       </Container>
     </section>

@@ -16,6 +16,7 @@ const HIDDEN_PREFIXES = [
 ] as const;
 
 function shouldHide(pathname: string) {
+  if (/^\/treks\/.+/.test(pathname)) return true;
   return HIDDEN_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );

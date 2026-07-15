@@ -6,17 +6,48 @@ import { emptyTraveller, type BookingDraft, type SavedBooking } from "@/lib/book
 interface BookingUiState {
   sheetOpen: boolean;
   activeSlug: string | null;
-  openSheet: (slug: string) => void;
+  /** Enquiry first; advance unlocks full booking flow */
+  stage: "enquiry" | "advance";
+  departureDateHint: string | null;
+  openSheet: (slug: string, options?: { departureDate?: string }) => void;
   closeSheet: () => void;
   setSheetOpen: (open: boolean) => void;
+  startAdvanceBooking: () => void;
+  resetStage: () => void;
 }
 
 export const useBookingUiStore = create<BookingUiState>((set) => ({
   sheetOpen: false,
   activeSlug: null,
-  openSheet: (slug) => set({ sheetOpen: true, activeSlug: slug }),
-  closeSheet: () => set({ sheetOpen: false }),
-  setSheetOpen: (open) => set({ sheetOpen: open, ...(open ? {} : { activeSlug: null }) }),
+  stage: "enquiry",
+  departureDateHint: null,
+  openSheet: (slug, options) =>
+    set({
+      sheetOpen: true,
+      activeSlug: slug,
+      stage: "enquiry",
+      departureDateHint: options?.departureDate ?? null,
+    }),
+  closeSheet: () =>
+    set({
+      sheetOpen: false,
+      activeSlug: null,
+      stage: "enquiry",
+      departureDateHint: null,
+    }),
+  setSheetOpen: (open) =>
+    set(
+      open
+        ? { sheetOpen: true }
+        : {
+            sheetOpen: false,
+            activeSlug: null,
+            stage: "enquiry",
+            departureDateHint: null,
+          },
+    ),
+  startAdvanceBooking: () => set({ stage: "advance" }),
+  resetStage: () => set({ stage: "enquiry" }),
 }));
 
 interface BookingDraftState {

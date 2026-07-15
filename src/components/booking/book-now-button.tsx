@@ -26,6 +26,7 @@ function isDesktopViewport() {
   return window.matchMedia("(min-width: 768px)").matches;
 }
 
+/** Opens quick enquiry first. Full booking starts only after Advance Booking. */
 export function BookNowButton({
   trekSlug,
   departureDate,
@@ -49,10 +50,7 @@ export function BookNowButton({
         : "";
 
       if (isDesktopViewport()) {
-        openSheet(trekSlug);
-        if (departureDate) {
-          sessionStorage.setItem(`ihd-booking-date:${trekSlug}`, departureDate);
-        }
+        openSheet(trekSlug, { departureDate });
       } else {
         router.push(`/booking/${trekSlug}${query}`);
       }

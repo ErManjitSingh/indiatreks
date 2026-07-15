@@ -27,7 +27,7 @@ export function HeroSection() {
           blurDataURL={BLUR_DATA_URL}
           sizes="(max-width: 768px) 100vw, 1400px"
           quality={65}
-          className="object-cover object-[center_28%]"
+          className="object-cover object-[center_40%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(8,12,20,0.82)_0%,rgba(8,12,20,0.45)_50%,rgba(8,12,20,0.25)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.2)_0%,transparent_40%,rgba(8,12,20,0.75)_100%)]" />

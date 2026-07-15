@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 
 import { BookingFlow } from "@/components/booking/booking-flow";
+import { QuickEnquiryForm } from "@/components/booking/quick-enquiry-form";
 import {
   Drawer,
   DrawerContent,
@@ -14,7 +15,15 @@ import { getTrekDetailBySlug } from "@/data/trek-details";
 import { useBookingUiStore } from "@/lib/booking/store";
 
 export function BookingDrawer() {
-  const { sheetOpen, activeSlug, setSheetOpen, closeSheet } = useBookingUiStore();
+  const {
+    sheetOpen,
+    activeSlug,
+    stage,
+    departureDateHint,
+    setSheetOpen,
+    closeSheet,
+    startAdvanceBooking,
+  } = useBookingUiStore();
 
   const trek = useMemo(() => {
     if (!activeSlug) return null;
@@ -52,20 +61,35 @@ export function BookingDrawer() {
         side="right"
         className="w-[min(100vw,32rem)] max-w-full gap-0 overflow-hidden p-0 sm:p-0"
       >
-        <DrawerTitle className="sr-only">Book trek</DrawerTitle>
+        <DrawerTitle className="sr-only">
+          {stage === "advance" ? "Advance booking" : "Trek enquiry"}
+        </DrawerTitle>
         <DrawerDescription className="sr-only">
-          Complete booking steps and proceed to payment
+          {stage === "advance"
+            ? "Complete booking steps and proceed to payment"
+            : "Send a quick enquiry to our trek team"}
         </DrawerDescription>
         <div className="flex h-full flex-col p-5 md:p-6">
           {trek ? (
-            <BookingFlow
-              trekSlug={trek.slug}
-              trekTitle={trek.title}
-              basePriceInr={trek.basePriceInr}
-              departures={trek.departures}
-              mode="drawer"
-              onClose={closeSheet}
-            />
+            stage === "advance" ? (
+              <BookingFlow
+                trekSlug={trek.slug}
+                trekTitle={trek.title}
+                basePriceInr={trek.basePriceInr}
+                departures={trek.departures}
+                mode="drawer"
+                onClose={closeSheet}
+                initialDate={departureDateHint ?? undefined}
+              />
+            ) : (
+              <QuickEnquiryForm
+                trekSlug={trek.slug}
+                trekTitle={trek.title}
+                basePriceInr={trek.basePriceInr}
+                onAdvanceBooking={startAdvanceBooking}
+                onClose={closeSheet}
+              />
+            )
           ) : (
             <p className="text-sm text-muted-foreground">Select a trek to start booking.</p>
           )}
