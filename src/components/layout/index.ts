@@ -1,0 +1,12 @@
+export { SiteShell } from "@/components/layout/site-shell";
+export { AnnouncementBar } from "@/components/layout/announcement-bar";
+export { TopBar } from "@/components/layout/top-bar";
+export { Navbar } from "@/components/layout/navbar";
+export { MegaMenu } from "@/components/layout/mega-menu";
+export { MobileNavigation } from "@/components/layout/mobile-navigation";
+export { Footer } from "@/components/layout/footer";
+export { ScrollProgress } from "@/components/layout/scroll-progress";
+export { BackToTop } from "@/components/layout/back-to-top";
+export { FloatingWhatsApp } from "@/components/layout/floating-whatsapp";
+export { StickyBookingButton } from "@/components/layout/sticky-booking-button";
+export { GlobalSearch } from "@/components/layout/global-search";

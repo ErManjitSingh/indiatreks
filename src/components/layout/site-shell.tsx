@@ -1,0 +1,113 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { Footer } from "@/components/layout/footer";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { Navbar } from "@/components/layout/navbar";
+import { TopBar } from "@/components/layout/top-bar";
+import { cn } from "@/lib/utils";
+
+const ScrollProgress = dynamic(
+  () => import("@/components/layout/scroll-progress").then((m) => m.ScrollProgress),
+  { ssr: false },
+);
+
+const GlobalSearch = dynamic(
+  () => import("@/components/layout/global-search").then((m) => m.GlobalSearch),
+  { ssr: false },
+);
+
+const EnquireModal = dynamic(
+  () => import("@/components/layout/enquire-modal").then((m) => m.EnquireModal),
+  { ssr: false },
+);
+
+const FloatingWhatsApp = dynamic(
+  () => import("@/components/layout/floating-whatsapp").then((m) => m.FloatingWhatsApp),
+  { ssr: false },
+);
+
+const BackToTop = dynamic(
+  () => import("@/components/layout/back-to-top").then((m) => m.BackToTop),
+  { ssr: false },
+);
+
+const StickyBookingButton = dynamic(
+  () =>
+    import("@/components/layout/sticky-booking-button").then((m) => m.StickyBookingButton),
+  { ssr: false },
+);
+
+interface SiteShellProps {
+  children: ReactNode;
+  showAnnouncement?: boolean;
+  showTopBar?: boolean;
+  showStickyBooking?: boolean;
+}
+
+export function SiteShell({
+  children,
+  showAnnouncement = true,
+  showTopBar = true,
+  showStickyBooking = true,
+}: SiteShellProps) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const isTreksListing = pathname === "/treks";
+  const isTrekDetail = /^\/treks\/.+/.test(pathname);
+  const hideGlobalStickyBooking = isHome || isTreksListing || isTrekDetail;
+
+  return (
+    <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <ScrollProgress />
+      {showAnnouncement && !isHome ? (
+        <div className="hidden md:block">
+          <AnnouncementBar />
+        </div>
+      ) : null}
+      {showTopBar && !isHome ? (
+        <div className="hidden md:block">
+          <TopBar />
+        </div>
+      ) : null}
+      <Navbar overlayHero={isHome} />
+      <main
+        id="main-content"
+        className={cn(
+          "min-h-[60vh] pb-24 md:pb-0",
+          isTreksListing && "pb-28",
+          isTrekDetail && "pb-0",
+          !hideGlobalStickyBooking && "md:pb-0",
+        )}
+      >
+        {children}
+      </main>
+      <div className="hidden md:block">
+        <Footer />
+      </div>
+      <GlobalSearch />
+      <EnquireModal />
+      <div className="hidden md:block">
+        <FloatingWhatsApp
+          label={isHome ? "Chat with Trek Expert" : "Chat on WhatsApp - Get Instant Help"}
+        />
+      </div>
+      <div className="hidden md:block">
+        <BackToTop />
+      </div>
+      {showStickyBooking && !hideGlobalStickyBooking ? (
+        <div className="hidden md:block">
+          <StickyBookingButton />
+        </div>
+      ) : null}
+      {!isTreksListing && !isTrekDetail ? <MobileBottomNav /> : null}
+    </>
+  );
+}
