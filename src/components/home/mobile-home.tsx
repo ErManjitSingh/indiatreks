@@ -93,7 +93,7 @@ function MobileHero() {
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Link
             href="/treks"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white px-5 py-2.5 text-xs font-bold text-[#1A1A1A]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white px-5 py-2.5 text-xs font-bold !text-[#1A1A1A]"
           >
             Explore Treks
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
