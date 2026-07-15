@@ -1,6 +1,7 @@
 import { MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
@@ -27,16 +28,16 @@ export function TrekDetailCta({ trek }: { trek: TrekDetail }) {
             plans.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button asChild variant="accent" size="lg">
-              <Link href="#booking">Book Now</Link>
-            </Button>
+            <BookNowButton trekSlug={trek.slug} variant="accent" size="lg">
+              Book Now
+            </BookNowButton>
             <Button
               asChild
               variant="outline"
               size="lg"
               className="border-white/25 bg-transparent text-white hover:bg-white/10"
             >
-              <Link href="/contact">Talk To Expert</Link>
+              <Link href={`mailto:${siteConfig.enquiryEmail}`}>Talk To Expert</Link>
             </Button>
             <Button
               asChild

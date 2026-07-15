@@ -21,16 +21,19 @@ const items = [
     match: (p: string) => p.startsWith("/destinations"),
   },
   {
-    href: "/booking",
+    href: "/my-bookings",
     label: "Bookings",
     icon: ClipboardList,
-    match: (p: string) => p.startsWith("/booking"),
+    match: (p: string) => p.startsWith("/booking") || p.startsWith("/my-bookings"),
   },
   {
-    href: "/wishlist",
-    label: "Profile",
+    href: "/my-account",
+    label: "Account",
     icon: User,
-    match: (p: string) => p.startsWith("/wishlist") || p.startsWith("/profile"),
+    match: (p: string) =>
+      p.startsWith("/wishlist") ||
+      p.startsWith("/profile") ||
+      p.startsWith("/my-account"),
   },
 ] as const;
 

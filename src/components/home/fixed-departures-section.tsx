@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -28,15 +26,10 @@ export function FixedDeparturesSection() {
               >
                 {index + 1}
               </span>
-              <article className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg md:flex-row md:items-center md:justify-between md:p-6">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                    {formatDate(departure.departureDate, {
-                      weekday: "short",
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
+              <article className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-xs md:flex-row md:items-center md:justify-between md:p-5">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                    {formatDate(departure.departureDate)}
                   </p>
                   <h3 className="mt-1 font-heading text-xl font-bold text-foreground">
                     {departure.trekName}
@@ -49,11 +42,13 @@ export function FixedDeparturesSection() {
                   <p className="font-heading text-xl font-bold text-foreground">
                     {formatCurrency(departure.priceInr)}
                   </p>
-                  <Button asChild variant="accent">
-                    <Link href={`/booking?trek=${departure.trekSlug}&date=${departure.departureDate}`}>
-                      Join Group
-                    </Link>
-                  </Button>
+                  <BookNowButton
+                    trekSlug={departure.trekSlug}
+                    departureDate={departure.departureDate}
+                    variant="accent"
+                  >
+                    Join Group
+                  </BookNowButton>
                 </div>
               </article>
             </li>

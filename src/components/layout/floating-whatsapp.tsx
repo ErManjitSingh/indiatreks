@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useMemo } from "react";
 
 import { siteConfig } from "@/config/site";
+import { getTrekBySlug } from "@/data/treks";
+import { buildTrekWhatsAppMessage } from "@/lib/booking/whatsapp";
 import { cn } from "@/lib/utils";
 
 interface FloatingWhatsAppProps {
@@ -9,12 +15,59 @@ interface FloatingWhatsAppProps {
   label?: string;
 }
 
-export function FloatingWhatsApp({
+export function FloatingWhatsApp(props: FloatingWhatsAppProps) {
+  return (
+    <Suspense fallback={<FloatingWhatsAppLink {...props} resolvedMessage={props.message} />}>
+      <FloatingWhatsAppWithTrekContext {...props} />
+    </Suspense>
+  );
+}
+
+function FloatingWhatsAppWithTrekContext({
   className,
   message = "Hi! I want to know more about your treks.",
   label = "Chat on WhatsApp - Get Instant Help",
 }: FloatingWhatsAppProps) {
-  const href = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(message)}`;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const resolvedMessage = useMemo(() => {
+    const trekParam = searchParams.get("trek") ?? searchParams.get("trekTitle");
+    const departure = searchParams.get("departure") ?? undefined;
+    const priceParam = searchParams.get("price");
+    const price = priceParam ? Number(priceParam) || priceParam : undefined;
+
+    const slugMatch = pathname.match(/^\/treks\/([^/]+)\/?$/);
+    const slug = slugMatch?.[1];
+    const listing = slug ? getTrekBySlug(slug) : undefined;
+    const trekTitle = trekParam || listing?.title;
+
+    if (trekTitle) {
+      return buildTrekWhatsAppMessage(
+        trekTitle,
+        departure,
+        price ?? listing?.basePriceInr,
+      );
+    }
+
+    return message;
+  }, [pathname, searchParams, message]);
+
+  return (
+    <FloatingWhatsAppLink
+      className={className}
+      label={label}
+      resolvedMessage={resolvedMessage}
+    />
+  );
+}
+
+function FloatingWhatsAppLink({
+  className,
+  label = "Chat on WhatsApp - Get Instant Help",
+  resolvedMessage = "Hi! I want to know more about your treks.",
+}: FloatingWhatsAppProps & { resolvedMessage?: string }) {
+  const href = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(resolvedMessage)}`;
 
   return (
     <Link

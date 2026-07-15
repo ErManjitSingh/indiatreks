@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -111,11 +112,14 @@ export function TrekPreviewDrawer() {
                   View Details
                 </Link>
               </Button>
-              <Button asChild variant="accent" className="flex-1">
-                <Link href={`/booking?trek=${trek.slug}`} onClick={() => setTrekPreviewId(null)}>
-                  Book Now
-                </Link>
-              </Button>
+              <BookNowButton
+                trekSlug={trek.slug}
+                variant="accent"
+                className="flex-1"
+                onClick={() => setTrekPreviewId(null)}
+              >
+                Book Now
+              </BookNowButton>
             </div>
           </>
         ) : null}

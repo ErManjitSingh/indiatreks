@@ -3,14 +3,14 @@ import { persist } from "zustand/middleware";
 
 interface UiState {
   mobileMenuOpen: boolean;
-  bookingDrawerOpen: boolean;
+  enquireModalOpen: boolean;
   searchOpen: boolean;
   trekFiltersOpen: boolean;
   trekSortOpen: boolean;
   trekPreviewId: string | null;
   trekCompareOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
-  setBookingDrawerOpen: (open: boolean) => void;
+  setEnquireModalOpen: (open: boolean) => void;
   setSearchOpen: (open: boolean) => void;
   setTrekFiltersOpen: (open: boolean) => void;
   setTrekSortOpen: (open: boolean) => void;
@@ -21,14 +21,14 @@ interface UiState {
 
 export const useUiStore = create<UiState>((set) => ({
   mobileMenuOpen: false,
-  bookingDrawerOpen: false,
+  enquireModalOpen: false,
   searchOpen: false,
   trekFiltersOpen: false,
   trekSortOpen: false,
   trekPreviewId: null,
   trekCompareOpen: false,
   setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
-  setBookingDrawerOpen: (open) => set({ bookingDrawerOpen: open }),
+  setEnquireModalOpen: (open) => set({ enquireModalOpen: open }),
   setSearchOpen: (open) => set({ searchOpen: open }),
   setTrekFiltersOpen: (open) => set({ trekFiltersOpen: open }),
   setTrekSortOpen: (open) => set({ trekSortOpen: open }),

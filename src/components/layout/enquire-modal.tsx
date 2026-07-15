@@ -18,7 +18,7 @@ import { toast } from "@/components/ui/toast";
 import { useUiStore } from "@/lib/store";
 
 export function EnquireModal() {
-  const { bookingDrawerOpen, setBookingDrawerOpen } = useUiStore();
+  const { enquireModalOpen, setEnquireModalOpen } = useUiStore();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -49,7 +49,7 @@ export function EnquireModal() {
     }
 
     toast.success(result.message);
-    setBookingDrawerOpen(false);
+    setEnquireModalOpen(false);
     setForm({
       name: "",
       email: "",
@@ -61,7 +61,7 @@ export function EnquireModal() {
   };
 
   return (
-    <Modal open={bookingDrawerOpen} onOpenChange={setBookingDrawerOpen}>
+    <Modal open={enquireModalOpen} onOpenChange={setEnquireModalOpen}>
       <ModalContent>
         <ModalHeader>
           <ModalTitle>Enquire about a trek</ModalTitle>
@@ -115,7 +115,7 @@ export function EnquireModal() {
             placeholder="Tell us which trek you’re interested in…"
           />
           <ModalFooter>
-            <Button type="button" variant="outline" onClick={() => setBookingDrawerOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setEnquireModalOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" variant="accent" loading={loading}>

@@ -176,3 +176,71 @@ export function blogJsonLd(input: {
     },
   };
 }
+
+export function bookingJsonLd(input: {
+  name: string;
+  description: string;
+  image: string;
+  url: string;
+  priceInr: number;
+  departureDate?: string;
+  availability?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    description: input.description,
+    image: absoluteUrl(input.image),
+    url: absoluteUrl(input.url),
+    brand: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "INR",
+      price: input.priceInr,
+      availability: input.availability ?? "https://schema.org/InStock",
+      url: absoluteUrl(input.url),
+      ...(input.departureDate
+        ? {
+            validFrom: input.departureDate,
+            availabilityStarts: input.departureDate,
+          }
+        : {}),
+      seller: {
+        "@type": "Organization",
+        name: siteConfig.name,
+      },
+    },
+    ...(input.departureDate
+      ? {
+          event: {
+            "@type": "Event",
+            name: input.name,
+            startDate: input.departureDate,
+            eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+            eventStatus: "https://schema.org/EventScheduled",
+            location: {
+              "@type": "Place",
+              name: "Himalayas, India",
+            },
+            organizer: {
+              "@type": "Organization",
+              name: siteConfig.name,
+              url: siteConfig.url,
+            },
+            offers: {
+              "@type": "Offer",
+              price: input.priceInr,
+              priceCurrency: "INR",
+              url: absoluteUrl(input.url),
+              availability: input.availability ?? "https://schema.org/InStock",
+            },
+          },
+        }
+      : {}),
+  };
+}

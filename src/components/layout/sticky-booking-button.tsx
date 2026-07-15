@@ -17,7 +17,7 @@ export function StickyBookingButton({
   label = "Book Now",
   className,
 }: StickyBookingButtonProps) {
-  const { setBookingDrawerOpen } = useUiStore();
+  const { setEnquireModalOpen } = useUiStore();
 
   return (
     <div
@@ -30,7 +30,7 @@ export function StickyBookingButton({
         <Button
           variant="outline"
           className="flex-1"
-          onClick={() => setBookingDrawerOpen(true)}
+          onClick={() => setEnquireModalOpen(true)}
         >
           Enquire
         </Button>

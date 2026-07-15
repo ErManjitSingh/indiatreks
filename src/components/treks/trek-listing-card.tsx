@@ -13,6 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Button } from "@/components/ui/button";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
@@ -205,16 +206,15 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
               View Details
             </Link>
           </Button>
-          <Button
-            asChild
+          <BookNowButton
+            trekSlug={trek.slug}
             variant="primary"
             size="sm"
             className="rounded-full"
+            onClick={() => addRecent(trek.id)}
           >
-            <Link href={`/booking?trek=${trek.slug}`} onClick={() => addRecent(trek.id)}>
-              Book Now
-            </Link>
-          </Button>
+            Book Now
+          </BookNowButton>
         </div>
       </div>
     </article>
@@ -331,11 +331,15 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                     View Details
                   </Link>
                 </Button>
-                <Button asChild variant="primary" size="sm" className="w-full">
-                  <Link href={`/booking?trek=${trek.slug}`} onClick={() => addRecent(trek.id)}>
-                    Book Now
-                  </Link>
-                </Button>
+                <BookNowButton
+                  trekSlug={trek.slug}
+                  variant="primary"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => addRecent(trek.id)}
+                >
+                  Book Now
+                </BookNowButton>
               </div>
             </div>
           </div>
@@ -401,9 +405,9 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                 <p className="text-xs font-semibold text-[#2D5A27]">{discount}% OFF</p>
               ) : null}
             </div>
-            <Button asChild variant="primary" size="sm">
-              <Link href={`/booking?trek=${trek.slug}`}>Book Now</Link>
-            </Button>
+            <BookNowButton trekSlug={trek.slug} variant="primary" size="sm">
+              Book Now
+            </BookNowButton>
           </div>
         </div>
       </article>

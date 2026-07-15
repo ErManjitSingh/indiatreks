@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { getDiscountPercent } from "@/lib/trek-filters";
@@ -78,9 +79,9 @@ export function TrekDetailSidebar({ trek }: { trek: TrekDetail }) {
         ) : null}
 
         <div className="mt-4 space-y-2.5">
-          <Button asChild size="lg" className="w-full text-base">
-            <Link href={`/booking?trek=${trek.slug}`}>Book This Trek</Link>
-          </Button>
+          <BookNowButton trekSlug={trek.slug} size="lg" className="w-full text-base">
+            Book This Trek
+          </BookNowButton>
           {brochure ? (
             <Button asChild variant="outline" size="lg" className="w-full border-[#d0d5cc] bg-white">
               <a href={brochure.href} download>

@@ -9,7 +9,8 @@ export const siteConfig = {
   locale: "en_IN",
   currency: "INR",
   phone: "+91 98765 43210",
-  email: "treks@indiaholidaydestination.com",
+  email: "indiaholidaydestinations.in@gmail.com",
+  enquiryEmail: "indiaholidaydestinations.in@gmail.com",
   whatsapp: "919876543210",
   address: {
     line1: "India Holiday Destinations",

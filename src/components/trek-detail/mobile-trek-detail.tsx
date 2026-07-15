@@ -24,9 +24,9 @@ import {
   XSquare,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { BookNowButton } from "@/components/booking/book-now-button";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { BLUR_DATA_URL } from "@/constants/media";
@@ -288,13 +288,13 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
           ) : null}
 
           <div className="mt-3 space-y-2.5">
-            <Button
-              asChild
+            <BookNowButton
+              trekSlug={trek.slug}
               size="lg"
               className="w-full rounded-xl text-base"
             >
-              <Link href={`/booking?trek=${trek.slug}`}>Book This Trek</Link>
-            </Button>
+              Book This Trek
+            </BookNowButton>
             <Button
               asChild
               variant="outline"
@@ -524,16 +524,16 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
               ) : null}
             </div>
           </div>
-          <Link
-            href={`/booking?trek=${trek.slug}`}
-            className="inline-flex min-w-[8.5rem] flex-col items-center justify-center rounded-xl border border-[#244820] bg-[#2D5A27] px-4 py-2.5 !text-white shadow-sm"
+          <BookNowButton
+            trekSlug={trek.slug}
+            className="inline-flex min-w-[8.5rem] flex-col items-center justify-center rounded-xl px-4 py-2.5 !text-white shadow-sm"
           >
             <span className="text-sm font-bold">Book Now</span>
             <span className="mt-0.5 inline-flex items-center gap-1 text-[9px] font-medium text-white/85">
               <BadgeCheck className="h-3 w-3" aria-hidden />
               Best Price Guaranteed
             </span>
-          </Link>
+          </BookNowButton>
         </div>
       </div>
     </div>

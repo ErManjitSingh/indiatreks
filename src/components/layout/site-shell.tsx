@@ -42,6 +42,18 @@ const StickyBookingButton = dynamic(
   { ssr: false },
 );
 
+const ConversionLayer = dynamic(
+  () =>
+    import("@/components/conversion/conversion-layer").then((m) => m.ConversionLayer),
+  { ssr: false },
+);
+
+const BookingDrawer = dynamic(
+  () =>
+    import("@/components/booking/booking-drawer").then((m) => m.BookingDrawer),
+  { ssr: false },
+);
+
 interface SiteShellProps {
   children: ReactNode;
   showAnnouncement?: boolean;
@@ -108,6 +120,8 @@ export function SiteShell({
         </div>
       ) : null}
       {!isTreksListing && !isTrekDetail ? <MobileBottomNav /> : null}
+      <ConversionLayer />
+      <BookingDrawer />
     </>
   );
 }
