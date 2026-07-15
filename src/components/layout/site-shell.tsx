@@ -77,7 +77,7 @@ export function SiteShell({
           <TopBar />
         </div>
       ) : null}
-      <Navbar overlayHero={isHome} />
+      <Navbar overlayHero={isHome} sticky={!isTreksListing} />
       <main
         id="main-content"
         className={cn(

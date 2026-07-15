@@ -26,9 +26,11 @@ const MobileNavigation = dynamic(
 interface NavbarProps {
   /** Dark charcoal header matching the desktop home mockup */
   overlayHero?: boolean;
+  /** When false, header scrolls away with the page (mobile treks listing). */
+  sticky?: boolean;
 }
 
-export function Navbar({ overlayHero = false }: NavbarProps) {
+export function Navbar({ overlayHero = false, sticky = true }: NavbarProps) {
   const pathname = usePathname();
   const hydrated = useHasHydrated();
   const { mobileMenuOpen, setMobileMenuOpen, setSearchOpen } = useUiStore();
@@ -40,8 +42,11 @@ export function Navbar({ overlayHero = false }: NavbarProps) {
     <header
       className={cn(
         "z-50 w-full",
-        // Mobile: always sticky white. Desktop home: fixed dark overlay.
-        overlayHero ? "sticky top-0 md:fixed md:inset-x-0 md:top-0" : "sticky top-0",
+        sticky
+          ? overlayHero
+            ? "sticky top-0 md:fixed md:inset-x-0 md:top-0"
+            : "sticky top-0"
+          : "relative",
         "border-b border-[#e8ece6] bg-white text-foreground",
         dark
           ? "md:border-white/10 md:bg-[#0b1220] md:text-white"
