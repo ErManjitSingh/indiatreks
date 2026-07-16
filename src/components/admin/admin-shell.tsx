@@ -9,7 +9,6 @@ import {
   Bell,
   BookOpen,
   ChevronLeft,
-  ExternalLink,
   FileText,
   FolderTree,
   HelpCircle,
@@ -203,35 +202,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </a>
       </nav>
 
-      {!collapsed ? (
-        <div className="mx-3 mb-3 overflow-hidden rounded-2xl bg-[#0B1220] text-white shadow-lg">
-          <div className="relative h-28">
-            <Image
-              src="/images/admin/explore-photo.jpg"
-              alt=""
-              fill
-              sizes="240px"
-              className="object-cover"
-            />
-          </div>
-          <div className="space-y-2 p-3.5">
-            <p className="text-sm font-bold">Explore The World</p>
-            <p className="text-[11px] leading-relaxed text-white/70">
-              Manage treks, destinations and content all from one place.
-            </p>
-            <Link
-              href="/"
-              target="_blank"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#22C55E] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#16A34A]"
-            >
-              Visit Website
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            </Link>
-          </div>
-        </div>
-      ) : null}
-
-      <div className="border-t border-[#E8ECF1] p-3">
+      <div className="mt-auto border-t border-[#E8ECF1] p-3">
         <button
           type="button"
           onClick={onLogout}
