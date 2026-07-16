@@ -9,10 +9,11 @@ import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaButton } from "@/components/ui/cta-button";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
-import { galleryPhotos } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 import { cn } from "@/lib/utils";
 
 export function GallerySection() {
+  const { galleryPhotos } = useSiteContent();
   return (
     <Section className="bg-muted/30" spacing="md">
       <Container>

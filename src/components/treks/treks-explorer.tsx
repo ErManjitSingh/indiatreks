@@ -22,7 +22,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { TrekCardSkeleton } from "@/components/ui/skeleton";
-import { allTreks } from "@/data/treks";
+import { allTreks as staticTreks } from "@/data/treks";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 import {
   countActiveFilters,
@@ -33,7 +33,12 @@ import {
 } from "@/lib/trek-filters";
 import { useCompareStore, useUiStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { TrekFiltersState, TrekSortOption, TrekViewMode } from "@/types/trek-listing";
+import type {
+  TrekFiltersState,
+  TrekListingItem,
+  TrekSortOption,
+  TrekViewMode,
+} from "@/types/trek-listing";
 
 const TrekPreviewDrawer = dynamic(
   () => import("@/components/treks/trek-preview-drawer").then((m) => m.TrekPreviewDrawer),
@@ -61,7 +66,11 @@ const sortLabels: Record<TrekSortOption, string> = {
   duration: "Duration",
 };
 
-export function TreksExplorer() {
+interface TreksExplorerProps {
+  initialTreks?: TrekListingItem[];
+}
+
+export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -70,6 +79,7 @@ export function TreksExplorer() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
+  const treks = initialTreks?.length ? initialTreks : staticTreks;
 
   const {
     trekFiltersOpen,
@@ -87,7 +97,7 @@ export function TreksExplorer() {
   );
 
   const activeFilterCount = countActiveFilters(filters);
-  const results = useMemo(() => filterTreks(allTreks, filters), [filters]);
+  const results = useMemo(() => filterTreks(treks, filters), [filters, treks]);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
   const visibleTreks = results.slice(0, visibleCount);
   const hasMore = visibleCount < results.length;
@@ -132,7 +142,7 @@ export function TreksExplorer() {
   return (
     <div className="relative bg-white pb-28 md:bg-[#F7F8F6] md:pb-12">
       <TreksHero
-        totalTreks={allTreks.length}
+        totalTreks={treks.length}
         sort={filters.sort}
         onSortChange={(sort: TrekSortOption) => pushFilters({ ...filters, sort })}
         onOpenSort={() => setTrekSortOpen(true)}

@@ -16,6 +16,16 @@ export function getApiClient(): AxiosInstance {
     withCredentials: true,
   });
 
+  client.interceptors.request.use((config) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("ihd_access_token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  });
+
   client.interceptors.response.use(
     (res) => res,
     async (error: AxiosError) => {

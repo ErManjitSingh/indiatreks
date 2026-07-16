@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Clock } from "lucide-react";
@@ -8,10 +10,11 @@ import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaButton } from "@/components/ui/cta-button";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
-import { latestBlogs } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 import { formatDate } from "@/utils";
 
 export function BlogsSection() {
+  const { latestBlogs } = useSiteContent();
   const [featured, ...rest] = latestBlogs;
 
   return (

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Backpack,
   Headphones,
@@ -13,9 +15,9 @@ import type { ComponentType } from "react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
-import { whyChooseItems } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
-const iconMap: Record<(typeof whyChooseItems)[number]["icon"], ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   shield: ShieldCheck,
   heart: HeartPulse,
   users: Users,
@@ -27,6 +29,7 @@ const iconMap: Record<(typeof whyChooseItems)[number]["icon"], ComponentType<{ c
 };
 
 export function WhyChooseSection() {
+  const { whyChooseItems } = useSiteContent();
   return (
     <Section className="relative overflow-hidden bg-dark text-white" spacing="md">
       <div className="why-choose-glow pointer-events-none absolute inset-0 opacity-40" aria-hidden />
@@ -40,7 +43,7 @@ export function WhyChooseSection() {
 
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {whyChooseItems.map((item) => {
-            const Icon = iconMap[item.icon];
+            const Icon = iconMap[item.icon] ?? ShieldCheck;
             return (
               <li
                 key={item.id}

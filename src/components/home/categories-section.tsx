@@ -9,9 +9,10 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
-import { trekCategoryCards } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function CategoriesSection() {
+  const { trekCategoryCards } = useSiteContent();
   return (
     <Section spacing="md">
       <Container>

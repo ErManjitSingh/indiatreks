@@ -10,9 +10,10 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaButton } from "@/components/ui/cta-button";
-import { homeFaqs } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function FaqSection() {
+  const { homeFaqs } = useSiteContent();
   return (
     <Section spacing="md">
       <Container className="max-w-4xl">

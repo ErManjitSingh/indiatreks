@@ -21,11 +21,13 @@ import analyticsRoutes from "./analytics.routes";
 import settingsRoutes from "./settings.routes";
 import notificationsRoutes from "./notifications.routes";
 import searchRoutes from "./search.routes";
+import contentRoutes from "./content.routes";
 import healthRoutes from "./health.routes";
 
 const router = Router();
 
 router.use("/health", healthRoutes);
+router.use("/content", contentRoutes);
 router.use("/auth", authRoutes);
 router.use("/users", usersRoutes);
 router.use("/treks", treksRoutes);

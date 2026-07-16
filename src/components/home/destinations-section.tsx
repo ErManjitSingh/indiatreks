@@ -16,10 +16,10 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 import { Container } from "@/components/ui/container";
-import { siteConfig } from "@/config/site";
 import { trekImages } from "@/constants/trek-images";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { destinationShowcases, type DestinationShowcase } from "@/data/homepage";
+import { destinationShowcases as staticShowcases, type DestinationShowcase } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 import { cn } from "@/lib/utils";
 
 function RegionIcon({ type }: { type: DestinationShowcase["icon"] }) {
@@ -32,6 +32,8 @@ function RegionIcon({ type }: { type: DestinationShowcase["icon"] }) {
 }
 
 export function DestinationsSection() {
+  const { destinationShowcases, site } = useSiteContent();
+  const showcases = destinationShowcases.length ? destinationShowcases : staticShowcases;
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: true,
@@ -110,7 +112,7 @@ export function DestinationsSection() {
 
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex touch-pan-y">
-            {destinationShowcases.map((dest, index) => {
+            {showcases.map((dest, index) => {
               const isActive = index === selected;
               return (
                 <div
@@ -237,7 +239,8 @@ function CarouselBtn({
 }
 
 function DestinationHelpBanner() {
-  const waHref = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(
+  const { site } = useSiteContent();
+  const waHref = `https://wa.me/${String(site.whatsapp ?? "").replace(/\D/g, "")}?text=${encodeURIComponent(
     "Hi! I need help choosing a trekking destination.",
   )}`;
 
@@ -298,10 +301,10 @@ function DestinationHelpBanner() {
           <p className="text-[11px] text-[#6b7668]">
             or Call:{" "}
             <a
-              href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+              href={`tel:${String(site.phone ?? "").replace(/\s/g, "")}`}
               className="font-semibold text-[#14201a]"
             >
-              {siteConfig.phone}
+              {String(site.phone ?? "")}
             </a>
           </p>
         </div>

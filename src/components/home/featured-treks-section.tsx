@@ -1,11 +1,14 @@
+"use client";
+
 import { ArrowRight, Mountain } from "lucide-react";
 import Link from "next/link";
 
 import { TrekCard } from "@/components/home/trek-card";
 import { Container } from "@/components/ui/container";
-import { featuredTreks } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function FeaturedTreksSection() {
+  const { featuredTreks } = useSiteContent();
   const treks = featuredTreks.slice(0, 4);
 
   return (

@@ -14,6 +14,20 @@ PORT=3010
 cd "$APP_DIR"
 git fetch origin
 git reset --hard origin/master
+
+if [[ -f "$ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+else
+  echo "WARNING: $ENV_FILE missing — enquiry emails / API URL may fail until env is set."
+fi
+
+# Ensure public API base is available at Next.js build time (SSR + client).
+export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-https://treks.indiaholidaydestination.com/api/v1}"
+export API_URL="${API_URL:-$NEXT_PUBLIC_API_URL}"
+
 npm ci
 npm run build
 
@@ -25,14 +39,8 @@ cp -a "$APP_DIR/.next/static" "$PUBLIC_HTML/.next-deploy/.next/static"
 cp -a "$APP_DIR/public" "$PUBLIC_HTML/.next-deploy/public"
 
 if [[ -f "$ENV_FILE" ]]; then
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
   cp "$ENV_FILE" "$PUBLIC_HTML/.next-deploy/.env"
   chmod 600 "$PUBLIC_HTML/.next-deploy/.env"
-else
-  echo "WARNING: $ENV_FILE missing — enquiry emails will fail until SMTP env is set."
 fi
 
 chown -R www-data:www-data "$SITE_ROOT"
@@ -47,6 +55,8 @@ export SMTP_HOST="${SMTP_HOST:-smtp.gmail.com}"
 export SMTP_PORT="${SMTP_PORT:-465}"
 export SMTP_USER="${SMTP_USER:-indiaholidaydestinations.in@gmail.com}"
 export SMTP_PASS="${SMTP_PASS:-}"
+export NEXT_PUBLIC_API_URL
+export API_URL
 
 pm2 delete indiatreks >/dev/null 2>&1 || true
 pm2 start server.js --name indiatreks --cwd "$PUBLIC_HTML/.next-deploy"

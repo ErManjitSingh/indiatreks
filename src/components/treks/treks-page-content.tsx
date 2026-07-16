@@ -4,10 +4,14 @@ import { TreksExplorer } from "@/components/treks/treks-explorer";
 import { Seo } from "@/components/seo";
 import { TrekCardSkeleton } from "@/components/ui/skeleton";
 import { Container } from "@/components/ui/container";
-import { allTreks } from "@/data/treks";
 import { siteConfig } from "@/config/site";
+import type { TrekListingItem } from "@/types/trek-listing";
 
-export function TreksPageContent() {
+interface TreksPageContentProps {
+  treks: TrekListingItem[];
+}
+
+export function TreksPageContent({ treks }: TreksPageContentProps) {
   return (
     <>
       <Seo
@@ -33,8 +37,8 @@ export function TreksPageContent() {
             },
             mainEntity: {
               "@type": "ItemList",
-              numberOfItems: allTreks.length,
-              itemListElement: allTreks.map((trek, index) => ({
+              numberOfItems: treks.length,
+              itemListElement: treks.map((trek, index) => ({
                 "@type": "ListItem",
                 position: index + 1,
                 url: `${siteConfig.url}/treks/${trek.slug}`,
@@ -60,7 +64,7 @@ export function TreksPageContent() {
           </div>
         }
       >
-        <TreksExplorer />
+        <TreksExplorer initialTreks={treks} />
       </Suspense>
     </>
   );

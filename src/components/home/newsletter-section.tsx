@@ -8,9 +8,10 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { toast } from "@/components/ui/toast";
 import { BLUR_DATA_URL, IMAGE_SIZES } from "@/constants/media";
-import { heroMedia } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function NewsletterSection() {
+  const { heroMedia } = useSiteContent();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 

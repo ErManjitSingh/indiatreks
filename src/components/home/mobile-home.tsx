@@ -24,10 +24,9 @@ import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
 import { TrekCard } from "@/components/home/trek-card";
-import { siteConfig } from "@/config/site";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { featuredTreks, destinationShowcases, heroSearchOptions } from "@/data/homepage";
 import { trekImages } from "@/constants/trek-images";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 const heroImage = trekImages.heroMobile;
 const serviceChips: Array<{ title: string; icon: LucideIcon }> = [
@@ -115,6 +114,7 @@ function MobileHero() {
 
 function MobileSearchCard() {
   const router = useRouter();
+  const { heroSearchOptions } = useSiteContent();
   const [destination, setDestination] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [duration, setDuration] = useState("");
@@ -272,6 +272,7 @@ function MobileServiceRow() {
 }
 
 function MobilePopularTreks() {
+  const { featuredTreks } = useSiteContent();
   const treks = featuredTreks.slice(0, 4);
   return (
     <section className="px-4 pt-7">
@@ -296,6 +297,7 @@ function MobilePopularTreks() {
 }
 
 function MobileDestinations() {
+  const { destinationShowcases } = useSiteContent();
   return (
     <section className="px-4 pt-7" aria-labelledby="mobile-destinations-heading">
       <div className="mb-4 flex items-end justify-between gap-3">
@@ -414,7 +416,8 @@ function MobileWhyStats() {
 }
 
 function MobileExpertCta() {
-  const wa = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(
+  const { site } = useSiteContent();
+  const wa = `https://wa.me/${String(site.whatsapp ?? "").replace(/\D/g, "")}?text=${encodeURIComponent(
     "Hi! I need help choosing a trek.",
   )}`;
 

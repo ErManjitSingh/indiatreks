@@ -2,6 +2,7 @@ import { SiteShell } from "@/components/layout";
 import { Seo } from "@/components/seo";
 import { fontBody, fontBrush, fontDisplay, fontHeading } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
+import { fetchBootstrap } from "@/lib/api/content";
 import { createMetadata } from "@/lib/seo";
 import { AppProviders } from "@/providers";
 import "@/styles/globals.css";
@@ -27,18 +28,20 @@ export const viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const bootstrap = await fetchBootstrap();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${fontHeading.variable} ${fontBody.variable} ${fontDisplay.variable} ${fontBrush.variable} font-body antialiased`}
         suppressHydrationWarning
       >
-        <AppProviders>
+        <AppProviders bootstrap={bootstrap}>
           <Seo />
           <SiteShell>{children}</SiteShell>
         </AppProviders>

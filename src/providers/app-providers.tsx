@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 
+import type { SiteBootstrap } from "@/lib/api/content";
+import { SiteContentProvider } from "@/providers/site-content-provider";
 import { StoreHydration } from "@/providers/store-hydration";
 
 const DeferredToaster = dynamic(
@@ -12,14 +14,17 @@ const DeferredToaster = dynamic(
 
 interface AppProvidersProps {
   children: ReactNode;
+  bootstrap?: SiteBootstrap | null;
 }
 
 /** Minimal client shell — toaster deferred off critical path. */
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders({ children, bootstrap = null }: AppProvidersProps) {
   return (
     <StoreHydration>
-      {children}
-      <DeferredToaster />
+      <SiteContentProvider bootstrap={bootstrap}>
+        {children}
+        <DeferredToaster />
+      </SiteContentProvider>
     </StoreHydration>
   );
 }

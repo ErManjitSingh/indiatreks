@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { TreksPageContent } from "@/components/treks";
 import { siteConfig } from "@/config/site";
 import { createMetadata } from "@/lib/seo";
+import { getTrekListings } from "@/services/treks.service";
 
 export const revalidate = 3600;
 
@@ -23,6 +24,7 @@ export const metadata: Metadata = createMetadata({
   ogImage: "/images/og-default.jpg",
 });
 
-export default function TreksPage() {
-  return <TreksPageContent />;
+export default async function TreksPage() {
+  const treks = await getTrekListings({ limit: 100 });
+  return <TreksPageContent treks={treks} />;
 }

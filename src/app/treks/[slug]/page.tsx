@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/seo";
 import { TrekDetailPageContent } from "@/components/trek-detail";
-import { getAllTrekDetailSlugs, getTrekDetailBySlug } from "@/data/trek-details";
+import { getAllTrekDetailSlugs } from "@/data/trek-details";
 import { createMetadata, reviewAggregateJsonLd } from "@/lib/seo";
+import { getTrekDetail } from "@/services/treks.service";
 
 interface TrekDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ export const revalidate = 3600;
 
 export async function generateMetadata({ params }: TrekDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const trek = getTrekDetailBySlug(slug);
+  const trek = await getTrekDetail(slug);
   if (!trek) {
     return createMetadata({
       title: "Trek not found",
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: TrekDetailPageProps): Promise
 
 export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
   const { slug } = await params;
-  const trek = getTrekDetailBySlug(slug);
+  const trek = await getTrekDetail(slug);
   if (!trek) notFound();
 
   return (

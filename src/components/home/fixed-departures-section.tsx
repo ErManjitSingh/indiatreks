@@ -1,12 +1,15 @@
+"use client";
+
 import { BookNowButton } from "@/components/booking/book-now-button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaButton } from "@/components/ui/cta-button";
-import { fixedDepartures } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 import { formatCurrency, formatDate } from "@/utils";
 
 export function FixedDeparturesSection() {
+  const { fixedDepartures } = useSiteContent();
   return (
     <Section className="bg-background" spacing="md" id="fixed-departures">
       <Container>

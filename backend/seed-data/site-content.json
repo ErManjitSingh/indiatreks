@@ -1,0 +1,1272 @@
+{
+  "site": {
+    "name": "India Holiday Destinations",
+    "shortName": "IHD Treks",
+    "tagline": "Explore India's Most Incredible Treks",
+    "description": "India's premium trekking platform for Himalayan adventures, weekend getaways, winter expeditions, and curated camping experiences.",
+    "url": "https://treks.indiaholidaydestination.com",
+    "ogImage": "/images/og-default.jpg",
+    "locale": "en_IN",
+    "currency": "INR",
+    "phone": "+91 98765 43210",
+    "email": "indiaholidaydestinations.in@gmail.com",
+    "enquiryEmail": "indiaholidaydestinations.in@gmail.com",
+    "whatsapp": "919876543210",
+    "address": {
+      "line1": "India Holiday Destinations",
+      "line2": "Adventure Hub, Himalayan Trails",
+      "city": "Delhi NCR",
+      "country": "India"
+    },
+    "social": {
+      "instagram": "https://instagram.com/indiaholidaydestinations",
+      "facebook": "https://facebook.com/indiaholidaydestinations",
+      "youtube": "https://youtube.com/@indiaholidaydestinations",
+      "twitter": "https://x.com/ihdtreks",
+      "linkedin": "https://linkedin.com/company/indiaholidaydestinations"
+    },
+    "logo": "/icons/logo.png"
+  },
+  "navigation": {
+    "main": [
+      {
+        "title": "Home",
+        "href": "/"
+      },
+      {
+        "title": "Treks",
+        "href": "/treks",
+        "description": "Browse India's most iconic curated treks",
+        "children": [
+          {
+            "title": "All Treks",
+            "href": "/treks",
+            "description": "Explore the complete trek collection"
+          },
+          {
+            "title": "Weekend Treks",
+            "href": "/weekend-treks",
+            "description": "Short escapes for busy schedules"
+          },
+          {
+            "title": "Winter Treks",
+            "href": "/winter-treks",
+            "description": "Snow trails and alpine winters"
+          },
+          {
+            "title": "High Altitude Treks",
+            "href": "/high-altitude-treks",
+            "description": "Challenging Himalayan expeditions"
+          },
+          {
+            "title": "Camping",
+            "href": "/camping",
+            "description": "Premium outdoor camping experiences"
+          },
+          {
+            "title": "Beginner Treks",
+            "href": "/treks?level=easy",
+            "description": "Gentle introductions to the mountains"
+          }
+        ]
+      },
+      {
+        "title": "Destinations",
+        "href": "/destinations",
+        "description": "Discover regions across the Himalayas",
+        "children": [
+          {
+            "title": "All Destinations",
+            "href": "/destinations",
+            "description": "Browse every Himalayan region"
+          },
+          {
+            "title": "Manali",
+            "href": "/destinations/manali",
+            "description": "Kullu Valley classics"
+          },
+          {
+            "title": "Kasol",
+            "href": "/destinations/kasol",
+            "description": "Parvati Valley escapes"
+          },
+          {
+            "title": "Spiti Valley",
+            "href": "/destinations/spiti-valley",
+            "description": "High desert expeditions"
+          },
+          {
+            "title": "Uttarakhand",
+            "href": "/destinations/uttarakhand",
+            "description": "Garhwal & Kumaon trails"
+          },
+          {
+            "title": "Ladakh",
+            "href": "/destinations/leh-ladakh",
+            "description": "High-altitude odysseys"
+          }
+        ]
+      },
+      {
+        "title": "Weekend Treks",
+        "href": "/weekend-treks",
+        "description": "2–3 day mountain escapes"
+      },
+      {
+        "title": "Blogs",
+        "href": "/blog",
+        "description": "Guides, stories, and trail insights"
+      },
+      {
+        "title": "About",
+        "href": "/about",
+        "description": "Our story and safety standards"
+      },
+      {
+        "title": "Contact",
+        "href": "/contact",
+        "description": "Talk to our trek specialists"
+      }
+    ],
+    "footer": {
+      "about": [
+        {
+          "title": "Our Story",
+          "href": "/about"
+        },
+        {
+          "title": "Safety Standards",
+          "href": "/about#safety"
+        },
+        {
+          "title": "Trek Leaders",
+          "href": "/about#leaders"
+        },
+        {
+          "title": "Careers",
+          "href": "/about#careers"
+        }
+      ],
+      "treks": [
+        {
+          "title": "All Treks",
+          "href": "/treks"
+        },
+        {
+          "title": "Weekend Treks",
+          "href": "/weekend-treks"
+        },
+        {
+          "title": "Winter Treks",
+          "href": "/winter-treks"
+        },
+        {
+          "title": "High Altitude",
+          "href": "/high-altitude-treks"
+        },
+        {
+          "title": "Camping",
+          "href": "/camping"
+        }
+      ],
+      "destinations": [
+        {
+          "title": "Manali",
+          "href": "/destinations/manali"
+        },
+        {
+          "title": "Kasol",
+          "href": "/destinations/kasol"
+        },
+        {
+          "title": "Spiti Valley",
+          "href": "/destinations/spiti-valley"
+        },
+        {
+          "title": "Leh Ladakh",
+          "href": "/destinations/leh-ladakh"
+        },
+        {
+          "title": "Uttarakhand",
+          "href": "/destinations/uttarakhand"
+        },
+        {
+          "title": "Kashmir",
+          "href": "/destinations/kashmir"
+        },
+        {
+          "title": "Sikkim",
+          "href": "/destinations/sikkim"
+        }
+      ],
+      "useful": [
+        {
+          "title": "Gallery",
+          "href": "/gallery"
+        },
+        {
+          "title": "Blog",
+          "href": "/blog"
+        },
+        {
+          "title": "FAQ",
+          "href": "/faq"
+        },
+        {
+          "title": "Booking",
+          "href": "/booking"
+        },
+        {
+          "title": "Contact",
+          "href": "/contact"
+        }
+      ],
+      "policies": [
+        {
+          "title": "Privacy Policy",
+          "href": "/privacy-policy"
+        },
+        {
+          "title": "Terms of Service",
+          "href": "/terms"
+        },
+        {
+          "title": "Cancellation Policy",
+          "href": "/cancellation"
+        }
+      ]
+    },
+    "social": [
+      {
+        "name": "Instagram",
+        "href": "https://instagram.com/indiaholidaydestinations",
+        "icon": "instagram"
+      },
+      {
+        "name": "Facebook",
+        "href": "https://facebook.com/indiaholidaydestinations",
+        "icon": "facebook"
+      },
+      {
+        "name": "YouTube",
+        "href": "https://youtube.com/@indiaholidaydestinations",
+        "icon": "youtube"
+      },
+      {
+        "name": "X",
+        "href": "https://x.com/ihdtreks",
+        "icon": "twitter"
+      },
+      {
+        "name": "LinkedIn",
+        "href": "https://linkedin.com/company/indiaholidaydestinations",
+        "icon": "linkedin"
+      }
+    ]
+  },
+  "homepage": {
+    "heroMedia": {
+      "image": "/images/treks/mountains-2.jpg",
+      "video": "https://cdn.coverr.co/videos/coverr-a-tent-in-the-mountains-5584/1080p.mp4",
+      "poster": "/images/treks/mountains-1.jpg",
+      "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+    },
+    "featuredTreks": [
+      {
+        "id": "ft-1",
+        "slug": "triund-trek",
+        "name": "Triund Trek",
+        "location": "Himachal Pradesh",
+        "difficulty": "easy",
+        "duration": "2 Days",
+        "altitude": "9,350 ft",
+        "bestSeason": "May – Oct",
+        "rating": 4.8,
+        "reviewCount": 2140,
+        "priceInr": 999,
+        "seatsLeft": 18,
+        "badge": "BESTSELLER",
+        "badgeTone": "lime",
+        "image": "/images/treks/landscape-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ft-2",
+        "slug": "kareri-lake-trek",
+        "name": "Kareri Lake Trek",
+        "location": "Himachal Pradesh",
+        "difficulty": "easy",
+        "duration": "2 Days",
+        "altitude": "10,170 ft",
+        "bestSeason": "Apr – Nov",
+        "rating": 4.6,
+        "reviewCount": 842,
+        "priceInr": 1499,
+        "seatsLeft": 14,
+        "badge": "TRENDING",
+        "badgeTone": "orange",
+        "image": "/images/treks/forest-2.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ft-3",
+        "slug": "kheerganga-trek",
+        "name": "Kheerganga Trek",
+        "location": "Himachal Pradesh",
+        "difficulty": "easy",
+        "duration": "2 Days",
+        "altitude": "10,006 ft",
+        "bestSeason": "Mar – Jun",
+        "rating": 4.7,
+        "reviewCount": 1876,
+        "priceInr": 1099,
+        "seatsLeft": 16,
+        "badge": "POPULAR",
+        "badgeTone": "blue",
+        "image": "/images/treks/camp-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ft-4",
+        "slug": "snowline-laka-trek",
+        "name": "Snowline Laka Trek",
+        "location": "Himachal Pradesh",
+        "difficulty": "easy",
+        "duration": "3 Days",
+        "altitude": "10,499 ft",
+        "bestSeason": "Mar – Nov",
+        "rating": 4.7,
+        "reviewCount": 624,
+        "priceInr": 2500,
+        "seatsLeft": 10,
+        "badge": "NEW",
+        "badgeTone": "sky",
+        "image": "/images/treks/mountains-3.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ft-5",
+        "slug": "hampta-pass-trek",
+        "name": "Hampta Pass Trek",
+        "location": "Himachal Pradesh",
+        "difficulty": "moderate",
+        "duration": "5 Days",
+        "altitude": "14,100 ft",
+        "bestSeason": "Jun – Oct",
+        "rating": 4.8,
+        "reviewCount": 962,
+        "priceInr": 9999,
+        "seatsLeft": 4,
+        "badge": "TRENDING",
+        "badgeTone": "orange",
+        "image": "/images/treks/mountains-2.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ft-6",
+        "slug": "kedarkantha-trek",
+        "name": "Kedarkantha Trek",
+        "location": "Uttarakhand",
+        "difficulty": "easy",
+        "duration": "6 Days",
+        "altitude": "12,500 ft",
+        "bestSeason": "Dec – Apr",
+        "rating": 4.8,
+        "reviewCount": 1284,
+        "priceInr": 7499,
+        "seatsLeft": 6,
+        "badge": "BESTSELLER",
+        "badgeTone": "lime",
+        "image": "/images/treks/mountains-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      }
+    ],
+    "destinationShowcases": [
+      {
+        "id": "ds-1",
+        "slug": "himachal-pradesh",
+        "name": "Himachal Pradesh",
+        "description": "Alpine meadows, forest trails and iconic Himalayan ridgelines.",
+        "badge": "MOST LOVED",
+        "trekCountLabel": "50+ Treks",
+        "destinationCountLabel": "25+ Destinations",
+        "bestTime": "Mar – Jun",
+        "icon": "mountain",
+        "image": "/images/treks/mountains-2.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ds-2",
+        "slug": "uttarakhand",
+        "name": "Uttarakhand",
+        "description": "Sacred peaks, glacial valleys and soulful mountain journeys.",
+        "badge": "SPIRITUAL TRAILS",
+        "trekCountLabel": "50+ Treks",
+        "destinationCountLabel": "25+ Destinations",
+        "bestTime": "Apr – Jun",
+        "icon": "temple",
+        "image": "/images/treks/mountains-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ds-3",
+        "slug": "jammu-kashmir",
+        "name": "Jammu & Kashmir",
+        "description": "Alpine lakes, pine forests and breathtaking high pastures.",
+        "badge": "HIDDEN PARADISE",
+        "trekCountLabel": "30+ Treks",
+        "destinationCountLabel": "15+ Destinations",
+        "bestTime": "Jun – Sep",
+        "icon": "lake",
+        "image": "/images/treks/india-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ds-4",
+        "slug": "ladakh",
+        "name": "Ladakh",
+        "description": "High desert trails, remote passes and cinematic landscapes.",
+        "badge": "HIGH ALTITUDE",
+        "trekCountLabel": "28+ Treks",
+        "destinationCountLabel": "12+ Destinations",
+        "bestTime": "Jun – Sep",
+        "icon": "desert",
+        "image": "/images/treks/mountains-3.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "ds-5",
+        "slug": "sikkim",
+        "name": "Sikkim",
+        "description": "Lush valleys, rhododendron trails and Eastern Himalayan views.",
+        "badge": "GREEN ESCAPES",
+        "trekCountLabel": "18+ Treks",
+        "destinationCountLabel": "10+ Destinations",
+        "bestTime": "Mar – May",
+        "icon": "pine",
+        "image": "/images/treks/india-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      }
+    ],
+    "popularDestinations": [
+      {
+        "id": "d0",
+        "slug": "dharamshala",
+        "name": "Dharamshala",
+        "region": "Dhauladhar Range",
+        "trekCount": 46,
+        "image": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d0b",
+        "slug": "mcleod-ganj",
+        "name": "McLeod Ganj",
+        "region": "Dharamshala",
+        "trekCount": 12,
+        "image": "/images/treks/landscape-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d1",
+        "slug": "manali",
+        "name": "Manali",
+        "region": "Himachal Pradesh",
+        "trekCount": 18,
+        "image": "/images/treks/india-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d2",
+        "slug": "kasol",
+        "name": "Kasol",
+        "region": "Parvati Valley",
+        "trekCount": 12,
+        "image": "/images/treks/camp-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d3",
+        "slug": "spiti-valley",
+        "name": "Spiti Valley",
+        "region": "Himachal Pradesh",
+        "trekCount": 14,
+        "image": "/images/treks/landscape-3.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d4",
+        "slug": "leh-ladakh",
+        "name": "Leh Ladakh",
+        "region": "Ladakh",
+        "trekCount": 22,
+        "image": "/images/treks/mountains-3.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d5",
+        "slug": "uttarakhand",
+        "name": "Uttarakhand",
+        "region": "Garhwal & Kumaon",
+        "trekCount": 36,
+        "image": "/images/treks/mountains-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d6",
+        "slug": "kashmir",
+        "name": "Kashmir",
+        "region": "Jammu & Kashmir",
+        "trekCount": 16,
+        "image": "/images/treks/mountains-2.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      },
+      {
+        "id": "d7",
+        "slug": "sikkim",
+        "name": "Sikkim",
+        "region": "Northeast Himalaya",
+        "trekCount": 11,
+        "image": "/images/treks/india-1.jpg",
+        "blurDataURL": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZDVlM2U4Ii8+PC9zdmc+"
+      }
+    ],
+    "trekCategoryCards": [
+      {
+        "id": "c1",
+        "title": "Weekend Treks",
+        "description": "Short escapes between Monday meetings",
+        "href": "/weekend-treks",
+        "image": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760"
+      },
+      {
+        "id": "c2",
+        "title": "Snow Treks",
+        "description": "Frozen trails and white horizons",
+        "href": "/winter-treks",
+        "image": "/images/treks/mountains-3.jpg"
+      },
+      {
+        "id": "c3",
+        "title": "High Altitude Treks",
+        "description": "Thin air, big summits, deeper courage",
+        "href": "/high-altitude-treks",
+        "image": "/images/treks/mountains-1.jpg"
+      },
+      {
+        "id": "c4",
+        "title": "Beginner Treks",
+        "description": "Your first Himalayan footsteps",
+        "href": "/treks?level=easy",
+        "image": "/images/treks/forest-1.jpg"
+      },
+      {
+        "id": "c5",
+        "title": "Family Adventures",
+        "description": "Shared trails for every generation",
+        "href": "/treks?category=family",
+        "image": "/images/treks/camp-2.jpg"
+      },
+      {
+        "id": "c6",
+        "title": "Camping",
+        "description": "Starlit nights beside alpine lakes",
+        "href": "/camping",
+        "image": "/images/treks/camp-1.jpg"
+      },
+      {
+        "id": "c7",
+        "title": "Backpacking",
+        "description": "Self-reliant journeys with light packs",
+        "href": "/treks?style=backpacking",
+        "image": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760"
+      },
+      {
+        "id": "c8",
+        "title": "Photography Tours",
+        "description": "Golden light across Himalayan ridges",
+        "href": "/treks?style=photography",
+        "image": "/images/treks/landscape-1.jpg"
+      }
+    ],
+    "whyChooseItems": [
+      {
+        "id": "w1",
+        "title": "Certified Trek Leaders",
+        "description": "Wilderness First Aid trained leaders on every departure.",
+        "icon": "shield"
+      },
+      {
+        "id": "w2",
+        "title": "Medical Support",
+        "description": "Oxygen, first-aid kits, and evacuation protocols ready.",
+        "icon": "heart"
+      },
+      {
+        "id": "w3",
+        "title": "Local Experts",
+        "description": "Guides who know weather, terrain, and village support.",
+        "icon": "users"
+      },
+      {
+        "id": "w4",
+        "title": "Best Campsites",
+        "description": "Handpicked meadows, ridgelines, and lakeside nights.",
+        "icon": "tent"
+      },
+      {
+        "id": "w5",
+        "title": "Eco Responsible",
+        "description": "Leave-no-trace practices and local partner communities.",
+        "icon": "leaf"
+      },
+      {
+        "id": "w6",
+        "title": "Premium Equipment",
+        "description": "Reliable tents, kitchen gear, and safety essentials.",
+        "icon": "backpack"
+      },
+      {
+        "id": "w7",
+        "title": "Small Groups",
+        "description": "Intimate departures for better pacing and attention.",
+        "icon": "group"
+      },
+      {
+        "id": "w8",
+        "title": "24x7 Support",
+        "description": "From booking questions to on-trail coordination.",
+        "icon": "headset"
+      }
+    ],
+    "fixedDepartures": [
+      {
+        "id": "fd-1",
+        "trekName": "Kedarkantha Trek",
+        "trekSlug": "kedarkantha-trek",
+        "departureDate": "2026-08-08",
+        "seatsAvailable": 6,
+        "priceInr": 7499,
+        "location": "Sankri"
+      },
+      {
+        "id": "fd-2",
+        "trekName": "Hampta Pass Trek",
+        "trekSlug": "hampta-pass-trek",
+        "departureDate": "2026-08-15",
+        "seatsAvailable": 4,
+        "priceInr": 9999,
+        "location": "Manali"
+      },
+      {
+        "id": "fd-3",
+        "trekName": "Kashmir Great Lakes",
+        "trekSlug": "kashmir-great-lakes",
+        "departureDate": "2026-08-22",
+        "seatsAvailable": 7,
+        "priceInr": 18999,
+        "location": "Sonamarg"
+      },
+      {
+        "id": "fd-4",
+        "trekName": "Spiti Circuit Expedition",
+        "trekSlug": "spiti-circuit",
+        "departureDate": "2026-09-05",
+        "seatsAvailable": 5,
+        "priceInr": 28999,
+        "location": "Kaza"
+      },
+      {
+        "id": "fd-5",
+        "trekName": "Valley of Flowers",
+        "trekSlug": "valley-of-flowers",
+        "departureDate": "2026-09-12",
+        "seatsAvailable": 8,
+        "priceInr": 10999,
+        "location": "Govindghat"
+      }
+    ],
+    "galleryPhotos": [
+      {
+        "id": "g1",
+        "src": "/images/treks/mountains-1.jpg",
+        "alt": "Alpine ridgeline under blue sky",
+        "span": "tall"
+      },
+      {
+        "id": "g2",
+        "src": "/images/treks/mountains-2.jpg",
+        "alt": "Snow peaks at golden hour",
+        "span": "wide"
+      },
+      {
+        "id": "g3",
+        "src": "/images/treks/camp-1.jpg",
+        "alt": "Tent camp beside mountain lake",
+        "span": "square"
+      },
+      {
+        "id": "g4",
+        "src": "/images/treks/forest-2.jpg",
+        "alt": "Trekkers on forest trail",
+        "span": "square"
+      },
+      {
+        "id": "g5",
+        "src": "/images/treks/mountains-3.jpg",
+        "alt": "High desert Himalayan landscape",
+        "span": "tall"
+      },
+      {
+        "id": "g6",
+        "src": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760",
+        "alt": "Sunrise above cloud valley",
+        "span": "wide"
+      }
+    ],
+    "testimonials": [
+      {
+        "id": "r1",
+        "name": "Ananya Sharma",
+        "location": "Bengaluru",
+        "rating": 5,
+        "experience": "The Kedarkantha summit sunrise felt cinematic. Guides paced us perfectly, camps were warm, and every detail felt premium.",
+        "photo": "/images/treks/avatar-1.jpg",
+        "trekName": "Kedarkantha Trek",
+        "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        "id": "r2",
+        "name": "Rahul Mehta",
+        "location": "Mumbai",
+        "rating": 5,
+        "experience": "Hampta Pass was my first high-altitude trek. Safety briefings, local knowledge, and small group size made it unforgettable.",
+        "photo": "/images/treks/avatar-2.jpg",
+        "trekName": "Hampta Pass Trek"
+      },
+      {
+        "id": "r3",
+        "name": "Priya Nair",
+        "location": "Kochi",
+        "rating": 5,
+        "experience": "Spiti felt intimate and thoughtfully planned. From campsites to cuisine, India Holiday Destinations set a new bar.",
+        "photo": "/images/treks/avatar-3.jpg",
+        "trekName": "Spiti Circuit",
+        "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        "id": "r4",
+        "name": "Arjun Kapoor",
+        "location": "Delhi",
+        "rating": 5,
+        "experience": "Kashmir Great Lakes was pure National Geographic terrain. Supportive crew, clear communication, and stunning routes.",
+        "photo": "/images/treks/avatar-4.jpg",
+        "trekName": "Kashmir Great Lakes"
+      }
+    ],
+    "latestBlogs": [
+      {
+        "id": "b1",
+        "slug": "first-himalayan-trek-guide",
+        "title": "How to Prepare for Your First Himalayan Trek",
+        "excerpt": "Fitness timelines, packing essentials, and altitude basics for first-timers.",
+        "category": "Guides",
+        "readingTimeMinutes": 8,
+        "author": "IHD Editorial",
+        "publishedAt": "2026-06-12",
+        "image": "/images/treks/forest-1.jpg"
+      },
+      {
+        "id": "b2",
+        "slug": "best-winter-treks-india",
+        "title": "7 Winter Treks That Feel Like Another Planet",
+        "excerpt": "From frozen rivers to snow forests — India's finest cold-season routes.",
+        "category": "Winter",
+        "readingTimeMinutes": 6,
+        "author": "Meera Joshi",
+        "publishedAt": "2026-05-28",
+        "image": "/images/treks/mountains-3.jpg"
+      },
+      {
+        "id": "b3",
+        "slug": "altitude-safety-checklist",
+        "title": "The Altitude Safety Checklist Every Trekker Needs",
+        "excerpt": "Acclimatization, warning signs, and gear that keeps teams safe.",
+        "category": "Safety",
+        "readingTimeMinutes": 7,
+        "author": "Dr. Kabir Singh",
+        "publishedAt": "2026-05-10",
+        "image": "/images/treks/mountains-1.jpg"
+      }
+    ],
+    "homeFaqs": [
+      {
+        "id": "hf1",
+        "question": "Do I need prior trekking experience?",
+        "answer": "Many weekend and beginner routes are designed for first-timers. Difficult and high-altitude expeditions recommend prior experience and documented fitness preparation. Each trek page lists difficulty and readiness guidance.",
+        "category": "general"
+      },
+      {
+        "id": "hf2",
+        "question": "What is included in the trek fee?",
+        "answer": "Most packages include stays, meals as listed, local trek transport, trek leadership, and permits. Inclusions vary by itinerary and are detailed on every trek page before booking.",
+        "category": "booking"
+      },
+      {
+        "id": "hf3",
+        "question": "Are your groups small?",
+        "answer": "Yes. We keep departures intimate so pacing, safety, and experience quality stay high. Exact group caps are shown on each fixed departure.",
+        "category": "trek"
+      },
+      {
+        "id": "hf4",
+        "question": "How do cancellations and refunds work?",
+        "answer": "Refund eligibility depends on notice period before departure. Full terms live on our Cancellation Policy page and are shared at booking confirmation.",
+        "category": "cancellation"
+      },
+      {
+        "id": "hf5",
+        "question": "Can I join as a solo traveler?",
+        "answer": "Absolutely. Most fixed departures welcome solo travelers, and our team helps you connect safely with the group.",
+        "category": "booking"
+      }
+    ],
+    "heroSearchOptions": {
+      "destinations": [
+        "Dharamshala",
+        "McLeod Ganj",
+        "Bir Billing",
+        "Barot",
+        "Kangra",
+        "Bharmour",
+        "Naddi",
+        "Manali",
+        "Kasol",
+        "Spiti",
+        "Ladakh",
+        "Uttarakhand",
+        "Kashmir",
+        "Sikkim"
+      ],
+      "difficulties": [
+        "Easy",
+        "Moderate",
+        "Difficult",
+        "Challenging"
+      ],
+      "durations": [
+        "2–3 Days",
+        "4–6 Days",
+        "7–9 Days",
+        "10+ Days"
+      ],
+      "months": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "budgets": [
+        "Under ₹8,000",
+        "₹8,000 – ₹15,000",
+        "₹15,000 – ₹25,000",
+        "₹25,000+"
+      ]
+    },
+    "trustBadges": [
+      {
+        "id": "t1",
+        "label": "Expert Trek Leaders",
+        "icon": "medal"
+      },
+      {
+        "id": "t2",
+        "label": "Small Group Departures",
+        "icon": "users"
+      },
+      {
+        "id": "t3",
+        "label": "Safety First",
+        "icon": "shield"
+      },
+      {
+        "id": "t4",
+        "label": "Certified Guides",
+        "icon": "badge-check"
+      },
+      {
+        "id": "t5",
+        "label": "Eco-Friendly Adventures",
+        "icon": "leaf"
+      }
+    ],
+    "adventureStats": [
+      {
+        "id": "s1",
+        "value": 10000,
+        "suffix": "+",
+        "label": "Happy Trekkers"
+      },
+      {
+        "id": "s2",
+        "value": 250,
+        "suffix": "+",
+        "label": "Treks"
+      },
+      {
+        "id": "s3",
+        "value": 15,
+        "suffix": "+",
+        "label": "Years Experience"
+      },
+      {
+        "id": "s4",
+        "value": 98,
+        "suffix": "%",
+        "label": "Customer Satisfaction"
+      }
+    ]
+  },
+  "trekFacets": {
+    "destinations": [
+      "McLeod Ganj",
+      "Dharamshala",
+      "Manali",
+      "Kasol",
+      "Sankri",
+      "Spiti",
+      "Kullu",
+      "Bir Billing",
+      "Barot",
+      "Naddi",
+      "Kangra",
+      "Bharmour"
+    ],
+    "states": [
+      "Himachal Pradesh",
+      "Uttarakhand"
+    ],
+    "regions": [
+      "Dharamshala",
+      "Kullu Valley",
+      "Parvati Valley",
+      "Garhwal",
+      "Spiti Valley",
+      "Kinnaur"
+    ],
+    "popularSearches": [
+      {
+        "label": "Dharamshala",
+        "href": "/treks?destination=Dharamshala"
+      },
+      {
+        "label": "McLeod Ganj",
+        "href": "/treks?destination=McLeod%20Ganj"
+      },
+      {
+        "label": "Triund",
+        "href": "/treks?q=Triund"
+      },
+      {
+        "label": "Kareri Lake",
+        "href": "/treks?q=Kareri"
+      },
+      {
+        "label": "Indrahar Pass",
+        "href": "/treks?q=Indrahar"
+      },
+      {
+        "label": "Lahesh Cave",
+        "href": "/treks?q=Lahesh"
+      },
+      {
+        "label": "Rajgundha",
+        "href": "/treks?destination=Bir%20Billing"
+      },
+      {
+        "label": "Kheerganga",
+        "href": "/treks?q=Kheerganga"
+      },
+      {
+        "label": "Hampta Pass",
+        "href": "/treks?q=Hampta"
+      },
+      {
+        "label": "Kedarkantha",
+        "href": "/treks?q=Kedarkantha"
+      }
+    ],
+    "collections": [
+      {
+        "id": "weekend",
+        "title": "Weekend Treks",
+        "description": "Short escapes for busy schedules",
+        "href": "/treks?trekType=weekend",
+        "image": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760"
+      },
+      {
+        "id": "snow",
+        "title": "Snow Treks",
+        "description": "Frozen trails and winter summits",
+        "href": "/treks?trekType=snow",
+        "image": "/images/treks/mountains-3.jpg"
+      },
+      {
+        "id": "high",
+        "title": "High Altitude Treks",
+        "description": "Thin air and big horizons",
+        "href": "/treks?trekType=high-altitude",
+        "image": "/images/treks/mountains-1.jpg"
+      },
+      {
+        "id": "camping",
+        "title": "Camping Adventures",
+        "description": "Starlit nights in alpine meadows",
+        "href": "/treks?trekType=camping",
+        "image": "/images/treks/camp-1.jpg"
+      },
+      {
+        "id": "photo",
+        "title": "Photography Treks",
+        "description": "Golden light across ridgelines",
+        "href": "/treks?trekType=photography",
+        "image": "/images/treks/landscape-1.jpg"
+      },
+      {
+        "id": "family",
+        "title": "Family Friendly",
+        "description": "Safe trails for every generation",
+        "href": "/treks?suitableFor=family",
+        "image": "/images/treks/camp-2.jpg"
+      }
+    ],
+    "priceBounds": {
+      "min": 499,
+      "max": 52000
+    },
+    "altitudeBounds": {
+      "min": 3500,
+      "max": 21000
+    }
+  },
+  "imageMap": {
+    "hero": "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760",
+    "heroMobile": "https://images.stockcake.com/public/1/e/1/1e149601-5e19-404b-b596-806d19605849/mountain-sunset-trek-stockcake.jpg",
+    "mountains1": "/images/treks/mountains-1.jpg",
+    "mountains2": "/images/treks/mountains-2.jpg",
+    "mountains3": "/images/treks/mountains-3.jpg",
+    "landscape1": "/images/treks/landscape-1.jpg",
+    "landscape2": "/images/treks/landscape-2.jpg",
+    "landscape3": "/images/treks/landscape-3.jpg",
+    "camp1": "/images/treks/camp-1.jpg",
+    "camp2": "/images/treks/camp-2.jpg",
+    "forest1": "/images/treks/forest-1.jpg",
+    "forest2": "/images/treks/forest-2.jpg",
+    "meadow1": "/images/treks/meadow-1.jpg",
+    "india1": "/images/treks/india-1.jpg",
+    "avatar1": "/images/treks/avatar-1.jpg",
+    "avatar2": "/images/treks/avatar-2.jpg",
+    "avatar3": "/images/treks/avatar-3.jpg",
+    "avatar4": "/images/treks/avatar-4.jpg",
+    "avatar5": "/images/treks/avatar-5.jpg"
+  },
+  "mediaCatalog": [
+    {
+      "url": "/file.svg",
+      "publicId": "file.svg",
+      "format": "svg",
+      "folder": "site-assets",
+      "alt": "file.svg"
+    },
+    {
+      "url": "/globe.svg",
+      "publicId": "globe.svg",
+      "format": "svg",
+      "folder": "site-assets",
+      "alt": "globe.svg"
+    },
+    {
+      "url": "/icons/logo.png",
+      "publicId": "icons__logo.png",
+      "format": "png",
+      "folder": "site-assets",
+      "alt": "logo.png"
+    },
+    {
+      "url": "/images/hero-home-reference.png",
+      "publicId": "images__hero-home-reference.png",
+      "format": "png",
+      "folder": "site-assets",
+      "alt": "hero-home-reference.png"
+    },
+    {
+      "url": "/images/home-mockup-reference.png",
+      "publicId": "images__home-mockup-reference.png",
+      "format": "png",
+      "folder": "site-assets",
+      "alt": "home-mockup-reference.png"
+    },
+    {
+      "url": "/images/og-default.jpg",
+      "publicId": "images__og-default.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "og-default.jpg"
+    },
+    {
+      "url": "/images/treks/avatar-1.jpg",
+      "publicId": "images__treks__avatar-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "avatar-1.jpg"
+    },
+    {
+      "url": "/images/treks/avatar-2.jpg",
+      "publicId": "images__treks__avatar-2.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "avatar-2.jpg"
+    },
+    {
+      "url": "/images/treks/avatar-3.jpg",
+      "publicId": "images__treks__avatar-3.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "avatar-3.jpg"
+    },
+    {
+      "url": "/images/treks/avatar-4.jpg",
+      "publicId": "images__treks__avatar-4.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "avatar-4.jpg"
+    },
+    {
+      "url": "/images/treks/avatar-5.jpg",
+      "publicId": "images__treks__avatar-5.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "avatar-5.jpg"
+    },
+    {
+      "url": "/images/treks/camp-1.jpg",
+      "publicId": "images__treks__camp-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "camp-1.jpg"
+    },
+    {
+      "url": "/images/treks/camp-2.jpg",
+      "publicId": "images__treks__camp-2.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "camp-2.jpg"
+    },
+    {
+      "url": "/images/treks/forest-1.jpg",
+      "publicId": "images__treks__forest-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "forest-1.jpg"
+    },
+    {
+      "url": "/images/treks/forest-2.jpg",
+      "publicId": "images__treks__forest-2.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "forest-2.jpg"
+    },
+    {
+      "url": "/images/treks/hero.jpg",
+      "publicId": "images__treks__hero.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "hero.jpg"
+    },
+    {
+      "url": "/images/treks/india-1.jpg",
+      "publicId": "images__treks__india-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "india-1.jpg"
+    },
+    {
+      "url": "/images/treks/landscape-1.jpg",
+      "publicId": "images__treks__landscape-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "landscape-1.jpg"
+    },
+    {
+      "url": "/images/treks/landscape-2.jpg",
+      "publicId": "images__treks__landscape-2.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "landscape-2.jpg"
+    },
+    {
+      "url": "/images/treks/landscape-3.jpg",
+      "publicId": "images__treks__landscape-3.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "landscape-3.jpg"
+    },
+    {
+      "url": "/images/treks/meadow-1.jpg",
+      "publicId": "images__treks__meadow-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "meadow-1.jpg"
+    },
+    {
+      "url": "/images/treks/mountains-1.jpg",
+      "publicId": "images__treks__mountains-1.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "mountains-1.jpg"
+    },
+    {
+      "url": "/images/treks/mountains-2.jpg",
+      "publicId": "images__treks__mountains-2.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "mountains-2.jpg"
+    },
+    {
+      "url": "/images/treks/mountains-3.jpg",
+      "publicId": "images__treks__mountains-3.jpg",
+      "format": "jpg",
+      "folder": "site-assets",
+      "alt": "mountains-3.jpg"
+    },
+    {
+      "url": "/next.svg",
+      "publicId": "next.svg",
+      "format": "svg",
+      "folder": "site-assets",
+      "alt": "next.svg"
+    },
+    {
+      "url": "/vercel.svg",
+      "publicId": "vercel.svg",
+      "format": "svg",
+      "folder": "site-assets",
+      "alt": "vercel.svg"
+    },
+    {
+      "url": "/window.svg",
+      "publicId": "window.svg",
+      "format": "svg",
+      "folder": "site-assets",
+      "alt": "window.svg"
+    }
+  ]
+}

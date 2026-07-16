@@ -11,9 +11,10 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { testimonials } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function TestimonialsSection() {
+  const { testimonials } = useSiteContent();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     loop: true,

@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
 import { Container } from "@/components/ui/container";
-import { heroSearchOptions } from "@/data/homepage";
+import { useSiteContent } from "@/providers/site-content-provider";
 import { cn } from "@/lib/utils";
 
 const guarantees = [
@@ -28,6 +28,7 @@ const guarantees = [
 
 export function HeroSearch() {
   const router = useRouter();
+  const { heroSearchOptions } = useSiteContent();
   const [destination, setDestination] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [duration, setDuration] = useState("");

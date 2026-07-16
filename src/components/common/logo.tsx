@@ -1,8 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
-import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 interface LogoProps {
   className?: string;
@@ -11,11 +13,12 @@ interface LogoProps {
 }
 
 export function Logo({ className, showTagline = false, href = "/" }: LogoProps) {
+  const { site, logoSrc } = useSiteContent();
   return (
     <Link href={href} className={cn("inline-flex items-center gap-2.5", className)}>
       <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
         <Image
-          src="/icons/logo.png"
+          src={logoSrc}
           alt=""
           width={40}
           height={40}
@@ -25,11 +28,11 @@ export function Logo({ className, showTagline = false, href = "/" }: LogoProps) 
       </span>
       <span className="flex flex-col leading-none">
         <span className="font-heading text-sm font-extrabold tracking-tight md:text-base">
-          {siteConfig.name}
+          {String(site.name ?? "India Holiday Destinations")}
         </span>
         {showTagline ? (
           <span className="mt-1 text-[11px] font-medium text-muted-foreground">
-            {siteConfig.tagline}
+            {String(site.tagline ?? "")}
           </span>
         ) : null}
       </span>
