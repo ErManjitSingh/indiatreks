@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { AdvancedTrekSearch } from "@/components/treks/advanced-trek-search";
+import { PopularSearches } from "@/components/treks/popular-searches";
 import { TrekFiltersPanel } from "@/components/treks/trek-filters-panel";
 import { TreksEmptyState } from "@/components/treks/treks-empty-state";
 import { TreksHelpPanel } from "@/components/treks/treks-help-panel";
@@ -136,6 +137,8 @@ export function TreksExplorer() {
         onSortChange={(sort: TrekSortOption) => pushFilters({ ...filters, sort })}
         onOpenSort={() => setTrekSortOpen(true)}
       />
+
+      <PopularSearches />
 
       <Container className="py-4 md:py-8">
         <AdvancedTrekSearch

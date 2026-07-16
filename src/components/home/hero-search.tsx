@@ -37,8 +37,14 @@ export function HeroSearch() {
   const onSearch = () => {
     const params = new URLSearchParams();
     if (destination) params.set("destination", destination);
-    if (difficulty) params.set("difficulty", difficulty);
-    if (duration) params.set("duration", duration);
+    if (difficulty) params.set("difficulty", difficulty.toLowerCase());
+    if (duration) {
+      // Map hero labels onto trek duration filter buckets
+      if (duration.startsWith("2")) params.set("duration", "1-2,3-4");
+      else if (duration.startsWith("4")) params.set("duration", "3-4,5-7");
+      else if (duration.startsWith("7")) params.set("duration", "5-7,8+");
+      else if (duration.startsWith("10")) params.set("duration", "8+");
+    }
     if (month) params.set("month", month);
     if (budget) params.set("budget", budget);
     router.push(`/treks${params.toString() ? `?${params.toString()}` : ""}`);

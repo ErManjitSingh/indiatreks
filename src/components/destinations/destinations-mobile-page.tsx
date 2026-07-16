@@ -16,13 +16,19 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Container } from "@/components/ui/container";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { trekImages } from "@/constants/trek-images";
-import { destinationShowcases } from "@/data/homepage";
+import {
+  destinationShowcases,
+  popularDestinations,
+  type DestinationShowcase,
+} from "@/data/homepage";
 import { cn } from "@/lib/utils";
 
-const chips = ["All", "Himachal", "Uttarakhand", "Ladakh", "Kashmir"] as const;
+const chips = ["All", "Himachal", "Dharamshala", "Uttarakhand", "Ladakh", "Kashmir"] as const;
 
 const listBadges: Record<string, { label: string; className: string }> = {
   "himachal-pradesh": { label: "POPULAR", className: "bg-[#3B82F6] text-white" },
+  dharamshala: { label: "NEW", className: "bg-[#2D5A27] text-white" },
+  "mcleod-ganj": { label: "HOT", className: "bg-[#F97316] text-white" },
   uttarakhand: { label: "SPIRITUAL", className: "bg-[#7C3AED] text-white" },
   "jammu-kashmir": { label: "ADVENTURE", className: "bg-[#F97316] text-white" },
   ladakh: { label: "HIGH ALT", className: "bg-[#0EA5E9] text-white" },
@@ -30,29 +36,103 @@ const listBadges: Record<string, { label: string; className: string }> = {
 };
 
 const priceFrom: Record<string, number> = {
-  "himachal-pradesh": 2499,
+  "himachal-pradesh": 499,
+  dharamshala: 499,
+  "mcleod-ganj": 499,
+  manali: 5499,
+  kasol: 1099,
   uttarakhand: 7499,
   "jammu-kashmir": 9999,
   ladakh: 18999,
   sikkim: 8999,
 };
 
+/** Hub cards mapped into the same card shape used by state showcases. */
+const hubShowcases: DestinationShowcase[] = popularDestinations
+  .filter((d) =>
+    ["dharamshala", "mcleod-ganj", "manali", "kasol"].includes(d.slug),
+  )
+  .map((d) => ({
+    id: `hub-${d.id}`,
+    slug: d.slug,
+    name: d.name,
+    description:
+      d.slug === "dharamshala"
+        ? "Triund, Kareri, Indrahar, Lahesh Cave and 40+ Dhauladhar treks."
+        : d.slug === "mcleod-ganj"
+          ? "Bhagsu, Snowline, Laka Glacier and classic McLeod weekend trails."
+          : `Curated treks around ${d.name}.`,
+    badge: d.slug === "dharamshala" ? "DHARAMSHALA" : "HUB",
+    trekCountLabel: `${d.trekCount}+ Treks`,
+    destinationCountLabel: d.region,
+    bestTime: "Mar – Nov",
+    icon: "mountain" as const,
+    image: d.image,
+    blurDataURL: d.blurDataURL,
+  }));
+
+const allDestinationCards: DestinationShowcase[] = [
+  ...hubShowcases,
+  ...destinationShowcases,
+];
+
+function exploreHref(slug: string, name: string): string {
+  if (slug === "himachal-pradesh") {
+    return "/treks?state=Himachal%20Pradesh";
+  }
+  if (slug === "uttarakhand") {
+    return "/treks?state=Uttarakhand";
+  }
+  if (slug === "dharamshala") {
+    return "/treks?destination=Dharamshala";
+  }
+  if (
+    ["mcleod-ganj", "manali", "kasol", "spiti-valley", "leh-ladakh", "kashmir", "sikkim"].includes(
+      slug,
+    )
+  ) {
+    const destinationName =
+      slug === "mcleod-ganj"
+        ? "McLeod Ganj"
+        : slug === "spiti-valley"
+          ? "Spiti"
+          : slug === "leh-ladakh"
+            ? "Ladakh"
+            : name;
+    return `/treks?destination=${encodeURIComponent(destinationName)}`;
+  }
+  return `/treks?q=${encodeURIComponent(name)}`;
+}
+
 export function DestinationsMobilePage() {
   const [query, setQuery] = useState("");
   const [chip, setChip] = useState<(typeof chips)[number]>("All");
 
   const filtered = useMemo(() => {
-    return destinationShowcases.filter((d) => {
+    return allDestinationCards.filter((d) => {
       const q = query.trim().toLowerCase();
       const matchesQuery =
         !q ||
         d.name.toLowerCase().includes(q) ||
-        d.description.toLowerCase().includes(q);
+        d.description.toLowerCase().includes(q) ||
+        d.destinationCountLabel.toLowerCase().includes(q) ||
+        d.slug.includes(q.replace(/\s+/g, "-"));
       const matchesChip =
         chip === "All" ||
         d.name.toLowerCase().includes(chip.toLowerCase()) ||
+        d.slug.includes(chip.toLowerCase().replace(/\s+/g, "-")) ||
         (chip === "Kashmir" && d.slug.includes("kashmir")) ||
-        (chip === "Himachal" && d.slug.includes("himachal"));
+        (chip === "Himachal" &&
+          (d.slug.includes("himachal") ||
+            d.slug === "dharamshala" ||
+            d.slug === "mcleod-ganj" ||
+            d.slug === "manali" ||
+            d.slug === "kasol")) ||
+        (chip === "Dharamshala" &&
+          (d.slug === "dharamshala" ||
+            d.slug === "mcleod-ganj" ||
+            d.name.toLowerCase().includes("dharamshala") ||
+            d.name.toLowerCase().includes("mcleod")));
       return matchesQuery && matchesChip;
     });
   }, [query, chip]);
@@ -81,18 +161,19 @@ export function DestinationsMobilePage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="relative flex-1">
+          <label className="relative min-w-0 flex-1">
+            <span className="sr-only">Search destinations</span>
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#9aa39a]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search destinations..."
-              className="h-11 w-full rounded-xl border-0 bg-white pr-3 pl-10 text-sm text-[#14201a] shadow-sm ring-1 ring-[#e5e7eb] outline-none placeholder:text-[#9aa39a] focus:ring-[#2D5A27]"
+              placeholder="Search Dharamshala, McLeod Ganj…"
+              className="h-11 w-full rounded-xl border border-[#e1e5de] bg-white pr-3 pl-10 text-sm text-[#14201a] outline-none placeholder:text-[#9aa39a] focus:border-[#2D5A27]/40"
             />
           </label>
           <button
             type="button"
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#d0d5cc] bg-white text-[#1A1A1A]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e1e5de] bg-white text-[#14201a]"
             aria-label="Filters"
           >
             <SlidersHorizontal className="h-4 w-4" />
@@ -117,7 +198,6 @@ export function DestinationsMobilePage() {
           ))}
         </div>
 
-        {/* Featured banner */}
         <div className="relative mt-4 overflow-hidden rounded-2xl">
           <div className="relative aspect-[16/10]">
             <Image
@@ -138,17 +218,16 @@ export function DestinationsMobilePage() {
                 From alpine meadows to high desert trails across India.
               </p>
               <Link
-                href="/treks"
+                href="/treks?destination=Dharamshala"
                 className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#2D5A27]"
               >
-                Explore All Destinations
+                Explore Dharamshala Treks
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Horizontal destination cards */}
         <ul className="mt-4 space-y-3">
           {filtered.map((dest) => {
             const badge = listBadges[dest.slug] ?? {
@@ -214,7 +293,7 @@ export function DestinationsMobilePage() {
                         </span>
                       </p>
                       <Link
-                        href={`/destinations/${dest.slug}`}
+                        href={exploreHref(dest.slug, dest.name)}
                         className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#2D5A27]"
                       >
                         Explore

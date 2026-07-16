@@ -182,7 +182,13 @@ function DestinationCard({
         </div>
 
         <Link
-          href={`/destinations/${dest.slug}`}
+          href={
+            dest.slug === "himachal-pradesh"
+              ? "/treks?state=Himachal%20Pradesh"
+              : dest.slug === "uttarakhand"
+                ? "/treks?state=Uttarakhand"
+                : `/treks?q=${encodeURIComponent(dest.name)}`
+          }
           className="inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-[#C5E063] transition hover:text-lime"
         >
           Explore Region

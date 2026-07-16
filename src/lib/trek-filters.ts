@@ -118,6 +118,35 @@ function matchesDuration(days: number, buckets: string[]): boolean {
   });
 }
 
+/**
+ * Hub → region expansion so destination search shows the full local trek set.
+ * Selecting "Dharamshala" returns every trek tagged region=Dharamshala
+ * (McLeod Ganj, Bir, Barot, Bharmour, Kangra, Naddi, …).
+ */
+export const DESTINATION_REGION_ALIASES: Record<string, string> = {
+  Dharamshala: "Dharamshala",
+  "McLeod Ganj": "Dharamshala",
+  Naddi: "Dharamshala",
+  Kangra: "Dharamshala",
+  "Bir Billing": "Dharamshala",
+  Barot: "Dharamshala",
+  Bharmour: "Dharamshala",
+};
+
+/** When these are selected, match by region (full hub set). Specific hubs stay exact. */
+const DESTINATION_EXPAND_TO_REGION = new Set(["Dharamshala"]);
+
+function matchesDestination(trek: TrekListingItem, selected: string[]): boolean {
+  if (!selected.length) return true;
+  return selected.some((dest) => {
+    if (DESTINATION_EXPAND_TO_REGION.has(dest)) {
+      const region = DESTINATION_REGION_ALIASES[dest] ?? dest;
+      return trek.region === region || trek.destinationName === dest;
+    }
+    return trek.destinationName === dest;
+  });
+}
+
 export function filterTreks(
   treks: TrekListingItem[],
   filters: TrekFiltersState,
@@ -129,7 +158,7 @@ export function filterTreks(
       const haystack = `${trek.title} ${trek.destinationName} ${trek.region} ${trek.state}`.toLowerCase();
       if (!haystack.includes(query)) return false;
     }
-    if (filters.destination.length && !filters.destination.includes(trek.destinationName)) {
+    if (!matchesDestination(trek, filters.destination)) {
       return false;
     }
     if (filters.difficulty.length && !filters.difficulty.includes(trek.difficulty)) {

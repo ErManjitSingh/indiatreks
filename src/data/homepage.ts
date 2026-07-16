@@ -242,6 +242,24 @@ export const featuredTreks: FeaturedTrekCard[] = [
 
 export const popularDestinations: DestinationCard[] = [
   {
+    id: "d0",
+    slug: "dharamshala",
+    name: "Dharamshala",
+    region: "Dhauladhar Range",
+    trekCount: 46,
+    image: img("photo-1551632811-561732d1e306"),
+    blurDataURL: BLUR_DATA_URL,
+  },
+  {
+    id: "d0b",
+    slug: "mcleod-ganj",
+    name: "McLeod Ganj",
+    region: "Dharamshala",
+    trekCount: 12,
+    image: img("photo-1500530855697-b586d89ba3ee"),
+    blurDataURL: BLUR_DATA_URL,
+  },
+  {
     id: "d1",
     slug: "manali",
     name: "Manali",
@@ -313,8 +331,8 @@ export const destinationShowcases: DestinationShowcase[] = [
     name: "Himachal Pradesh",
     description: "Alpine meadows, forest trails and iconic Himalayan ridgelines.",
     badge: "MOST LOVED",
-    trekCountLabel: "45+ Treks",
-    destinationCountLabel: "20+ Destinations",
+    trekCountLabel: "50+ Treks",
+    destinationCountLabel: "25+ Destinations",
     bestTime: "Mar – Jun",
     icon: "mountain",
     image: img("photo-1506905925346-21bda4d32df4", 900),
@@ -700,6 +718,13 @@ export const homeFaqs: FAQ[] = [
 
 export const heroSearchOptions = {
   destinations: [
+    "Dharamshala",
+    "McLeod Ganj",
+    "Bir Billing",
+    "Barot",
+    "Kangra",
+    "Bharmour",
+    "Naddi",
     "Manali",
     "Kasol",
     "Spiti",

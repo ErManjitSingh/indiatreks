@@ -33,16 +33,16 @@ export const trekListingRegions = [
 ] as const;
 
 export const popularTrekSearches = [
+  { label: "Dharamshala", href: "/treks?destination=Dharamshala" },
+  { label: "McLeod Ganj", href: "/treks?destination=McLeod%20Ganj" },
   { label: "Triund", href: "/treks?q=Triund" },
-  { label: "Kheerganga", href: "/treks?q=Kheerganga" },
   { label: "Kareri Lake", href: "/treks?q=Kareri" },
-  { label: "Snowline", href: "/treks?q=Snowline" },
   { label: "Indrahar Pass", href: "/treks?q=Indrahar" },
   { label: "Lahesh Cave", href: "/treks?q=Lahesh" },
-  { label: "Rajgundha", href: "/treks?q=Rajgundha" },
+  { label: "Rajgundha", href: "/treks?destination=Bir%20Billing" },
+  { label: "Kheerganga", href: "/treks?q=Kheerganga" },
   { label: "Hampta Pass", href: "/treks?q=Hampta" },
   { label: "Kedarkantha", href: "/treks?q=Kedarkantha" },
-  { label: "Bhrigu Lake", href: "/treks?q=Bhrigu" },
 ] as const;
 
 export const trekCollections = [
