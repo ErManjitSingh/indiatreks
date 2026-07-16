@@ -15,7 +15,7 @@ export async function getFeaturedTreks(): Promise<Trek[]> {
   return [];
 }
 
-export async function getTrekBySlug(slug: string): Promise<Trek | null> {
+export async function getTrekBySlug(_slug: string): Promise<Trek | null> {
   return null;
 }
 
