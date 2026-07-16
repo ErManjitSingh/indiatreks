@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "ihd-api",
       script: "dist/server.js",
-      cwd: "/var/www/api.treks.indiaholidaydestination.com/app",
+      cwd: "/var/www/api.treks.indiaholidaydestination.com/app/backend",
       instances: 1,
       exec_mode: "fork",
       max_memory_restart: "512M",
