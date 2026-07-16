@@ -215,9 +215,9 @@ export default function AdminOverviewPage() {
             fill
             priority
             sizes="(max-width: 1280px) 100vw, 1100px"
-            className="object-cover object-[center_40%] opacity-[0.22]"
+            className="object-cover object-[center_40%] opacity-40"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/55" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/70 to-white/45" />
         </div>
         <div className="relative flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-end sm:justify-between md:px-7 md:py-7">
           <div>

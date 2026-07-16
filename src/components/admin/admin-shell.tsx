@@ -105,7 +105,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sidebar = (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-[#E8ECF1] bg-white transition-[width] duration-200",
+        "flex h-full max-h-screen flex-col overflow-hidden border-r border-[#E8ECF1] bg-white transition-[width] duration-200",
         collapsed ? "w-[84px]" : "w-[280px]",
       )}
     >
@@ -250,7 +250,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-[#F5F7FA] text-[#111827]">
       <div className="flex min-h-screen">
-        <div className="hidden md:block">{sidebar}</div>
+        <div className="hidden md:fixed md:inset-y-0 md:left-0 md:z-40 md:block">
+          {sidebar}
+        </div>
 
         {mobileOpen ? (
           <div className="fixed inset-0 z-50 md:hidden">
@@ -264,7 +266,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div
+          className={cn(
+            "flex min-w-0 flex-1 flex-col transition-[margin] duration-200",
+            collapsed ? "md:ml-[84px]" : "md:ml-[280px]",
+          )}
+        >
           <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-[#E8ECF1] bg-white/95 px-4 py-3 backdrop-blur md:px-6">
             <button
               type="button"
