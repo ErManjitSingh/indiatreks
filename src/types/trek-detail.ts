@@ -65,6 +65,46 @@ export interface TrekQuickInfo {
   transport: string;
 }
 
+/** Optional CMS / SEO extras — editable later without changing UI components. */
+export interface TrekCmsExtras {
+  seoTitle?: string;
+  metaDescription?: string;
+  country?: string;
+  coordinates?: { lat: number; lng: number; label?: string };
+  flora?: string;
+  fauna?: string;
+  photographySpots?: string[];
+  campingLocations?: string[];
+  waterSources?: string;
+  networkAvailability?: string;
+  electricityAvailability?: string;
+  atmAvailability?: string;
+  medicalFacilities?: string;
+  nearestHospital?: string;
+  nearestAirport?: string;
+  nearestRailwayStation?: string;
+  nearestBusStand?: string;
+  roadConnectivity?: string;
+  permitsRequired?: string;
+  forestPermissions?: string;
+  safetyGuidelines?: string[];
+  emergencyContacts?: Array<{ label: string; value: string }>;
+  thingsToCarry?: string[];
+  thingsNotToCarry?: string[];
+  cancellationPolicy?: string;
+  bookingPolicy?: string;
+  childPolicy?: string;
+  privateDepartureInfo?: string;
+  travelTips?: string[];
+  responsibleTourism?: string[];
+  nearbyAttractions?: string[];
+  nearbyTreks?: string[];
+  relatedBlogs?: Array<{ title: string; href: string }>;
+  videoPlaceholder?: string;
+  externalReferences?: Array<{ label: string; href: string }>;
+  canonicalUrl?: string;
+}
+
 export interface TrekDetail {
   id: string;
   slug: string;
@@ -114,4 +154,6 @@ export interface TrekDetail {
   reviews: TrekReview[];
   downloads: Array<{ label: string; href: string }>;
   relatedSlugs: string[];
+  /** Future CMS / indexing fields — ignored by current UI, kept for content ops. */
+  cms?: TrekCmsExtras;
 }

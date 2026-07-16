@@ -244,3 +244,58 @@ export function bookingJsonLd(input: {
       : {}),
   };
 }
+
+export function reviewAggregateJsonLd(input: {
+  name: string;
+  description: string;
+  image: string;
+  url: string;
+  rating: number;
+  reviewCount: number;
+  priceInr: number;
+  reviews: Array<{
+    author: string;
+    rating: number;
+    comment: string;
+    date: string;
+  }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    description: input.description,
+    image: absoluteUrl(input.image),
+    url: absoluteUrl(input.url),
+    brand: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: input.rating,
+      reviewCount: input.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    review: input.reviews.map((review) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: review.author },
+      datePublished: review.date,
+      reviewBody: review.comment,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: review.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    })),
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "INR",
+      price: input.priceInr,
+      availability: "https://schema.org/InStock",
+      url: absoluteUrl(input.url),
+    },
+  };
+}

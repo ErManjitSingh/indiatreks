@@ -1,9 +1,10 @@
 import { BLUR_DATA_URL } from "@/constants/media";
+import { dharamshalaTrekListings } from "@/data/dharamshala";
 import { img } from "@/lib/media";
 import type { TrekListingItem } from "@/types/trek-listing";
 
-export const TREK_PRICE_BOUNDS = { min: 500, max: 45000 } as const;
-export const TREK_ALTITUDE_BOUNDS = { min: 5000, max: 21000 } as const;
+export const TREK_PRICE_BOUNDS = { min: 499, max: 52000 } as const;
+export const TREK_ALTITUDE_BOUNDS = { min: 3500, max: 21000 } as const;
 
 export const trekListingDestinations = [
   "McLeod Ganj",
@@ -13,6 +14,11 @@ export const trekListingDestinations = [
   "Sankri",
   "Spiti",
   "Kullu",
+  "Bir Billing",
+  "Barot",
+  "Naddi",
+  "Kangra",
+  "Bharmour",
 ] as const;
 
 export const trekListingStates = ["Himachal Pradesh", "Uttarakhand"] as const;
@@ -31,6 +37,9 @@ export const popularTrekSearches = [
   { label: "Kheerganga", href: "/treks?q=Kheerganga" },
   { label: "Kareri Lake", href: "/treks?q=Kareri" },
   { label: "Snowline", href: "/treks?q=Snowline" },
+  { label: "Indrahar Pass", href: "/treks?q=Indrahar" },
+  { label: "Lahesh Cave", href: "/treks?q=Lahesh" },
+  { label: "Rajgundha", href: "/treks?q=Rajgundha" },
   { label: "Hampta Pass", href: "/treks?q=Hampta" },
   { label: "Kedarkantha", href: "/treks?q=Kedarkantha" },
   { label: "Bhrigu Lake", href: "/treks?q=Bhrigu" },
@@ -456,6 +465,7 @@ export const allTreks: TrekListingItem[] = [
     createdAt: "2025-12-01",
     popularity: 84,
   },
+  ...dharamshalaTrekListings,
 ];
 
 export const treksBlurDataURL = BLUR_DATA_URL;

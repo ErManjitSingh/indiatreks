@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/seo";
 import { TrekDetailPageContent } from "@/components/trek-detail";
 import { getAllTrekDetailSlugs, getTrekDetailBySlug } from "@/data/trek-details";
-import { createMetadata } from "@/lib/seo";
+import { createMetadata, reviewAggregateJsonLd } from "@/lib/seo";
 
 interface TrekDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -28,14 +29,17 @@ export async function generateMetadata({ params }: TrekDetailPageProps): Promise
   }
 
   return createMetadata({
-    title: `${trek.title} | Himalayan Trek`,
-    description: trek.summary,
+    title: trek.cms?.seoTitle ?? `${trek.title} | Himalayan Trek`,
+    description: trek.cms?.metaDescription ?? trek.summary,
     canonical: `/treks/${trek.slug}`,
     keywords: [
       trek.title,
       trek.location,
+      trek.region,
       `${trek.title} package`,
       `${trek.title} itinerary`,
+      "Dharamshala trek",
+      "Dhauladhar trek",
       "Himalayan trek",
       "India Holiday Destinations",
     ],
@@ -48,5 +52,26 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
   const trek = getTrekDetailBySlug(slug);
   if (!trek) notFound();
 
-  return <TrekDetailPageContent trek={trek} />;
+  return (
+    <>
+      <JsonLd
+        data={reviewAggregateJsonLd({
+          name: trek.title,
+          description: trek.summary,
+          image: trek.heroImages[0] ?? "",
+          url: `/treks/${trek.slug}`,
+          rating: trek.rating,
+          reviewCount: trek.reviewCount,
+          priceInr: trek.basePriceInr,
+          reviews: trek.reviews.map((review) => ({
+            author: review.name,
+            rating: review.rating,
+            comment: review.comment,
+            date: review.date,
+          })),
+        })}
+      />
+      <TrekDetailPageContent trek={trek} />
+    </>
+  );
 }
