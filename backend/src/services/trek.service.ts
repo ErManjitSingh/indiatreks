@@ -36,7 +36,6 @@ export const TREK_LISTING_SELECT = [
   "trekTypes",
   "suitableFor",
   "months",
-  "departures",
   "status",
   "createdAt",
   "publishedAt",

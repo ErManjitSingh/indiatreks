@@ -125,16 +125,37 @@ function matchesDuration(days: number, buckets: string[]): boolean {
  */
 export const DESTINATION_REGION_ALIASES: Record<string, string> = {
   Dharamshala: "Dharamshala",
-  "McLeod Ganj": "Dharamshala",
-  Naddi: "Dharamshala",
   Kangra: "Dharamshala",
-  "Bir Billing": "Dharamshala",
-  Barot: "Dharamshala",
-  Bharmour: "Dharamshala",
+  Manali: "Manali",
+  Naggar: "Manali",
+  Kasol: "Parvati Valley",
+  "Parvati Valley": "Parvati Valley",
+  Malana: "Parvati Valley",
+  Kullu: "Kullu",
+  Banjar: "Banjar",
+  "Jalori Pass": "Banjar",
+  Jalori: "Banjar",
+  Chamba: "Chamba",
+  Bharmour: "Chamba",
+  Kinnaur: "Kinnaur",
+  Kalpa: "Kinnaur",
+  Janglik: "Kinnaur",
+  Sirmaur: "Sirmaur",
+  Spiti: "Spiti",
+  "Pin Valley": "Spiti",
 };
 
-/** When these are selected, match by region (full hub set). Specific hubs stay exact. */
-const DESTINATION_EXPAND_TO_REGION = new Set(["Dharamshala"]);
+/** When these are selected, match by region belt (full hub set). */
+const DESTINATION_EXPAND_TO_REGION = new Set([
+  "Dharamshala",
+  "Manali",
+  "Kasol",
+  "Parvati Valley",
+  "Banjar",
+  "Chamba",
+  "Kinnaur",
+  "Spiti",
+]);
 
 function matchesDestination(trek: TrekListingItem, selected: string[]): boolean {
   if (!selected.length) return true;
@@ -143,7 +164,7 @@ function matchesDestination(trek: TrekListingItem, selected: string[]): boolean 
       const region = DESTINATION_REGION_ALIASES[dest] ?? dest;
       return trek.region === region || trek.destinationName === dest;
     }
-    return trek.destinationName === dest;
+    return trek.destinationName === dest || trek.region === (DESTINATION_REGION_ALIASES[dest] ?? dest);
   });
 }
 

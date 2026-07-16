@@ -22,13 +22,35 @@ export class TrekRepository extends BaseRepository<ITrek> {
 
   buildFilterQuery(filters: TrekListFilters): FilterQuery<ITrek> {
     const query: FilterQuery<ITrek> = { deletedAt: null };
+    const and: FilterQuery<ITrek>[] = [];
 
     if (filters.status) {
       query.status = filters.status;
     }
 
     if (filters.destination) {
-      query.destinationName = new RegExp(filters.destination, "i");
+      const dest = String(filters.destination);
+      const expand: Record<string, string> = {
+        Dharamshala: "Dharamshala",
+        Manali: "Manali",
+        Kasol: "Parvati Valley",
+        "Parvati Valley": "Parvati Valley",
+        Banjar: "Banjar",
+        Chamba: "Chamba",
+        Kinnaur: "Kinnaur",
+        Spiti: "Spiti",
+      };
+      const region = expand[dest];
+      if (region) {
+        and.push({
+          $or: [
+            { destinationName: new RegExp(`^${dest}$`, "i") },
+            { region: new RegExp(`^${region}$`, "i") },
+          ],
+        });
+      } else {
+        query.destinationName = new RegExp(dest, "i");
+      }
     }
     if (filters.region) {
       query.region = new RegExp(`^${filters.region}$`, "i");
@@ -52,14 +74,20 @@ export class TrekRepository extends BaseRepository<ITrek> {
       };
     }
     if (filters.q) {
-      query.$or = [
-        { title: new RegExp(filters.q, "i") },
-        { slug: new RegExp(filters.q, "i") },
-        { summary: new RegExp(filters.q, "i") },
-        { destinationName: new RegExp(filters.q, "i") },
-        { location: new RegExp(filters.q, "i") },
-        { region: new RegExp(filters.q, "i") },
-      ];
+      and.push({
+        $or: [
+          { title: new RegExp(filters.q, "i") },
+          { slug: new RegExp(filters.q, "i") },
+          { summary: new RegExp(filters.q, "i") },
+          { destinationName: new RegExp(filters.q, "i") },
+          { location: new RegExp(filters.q, "i") },
+          { region: new RegExp(filters.q, "i") },
+        ],
+      });
+    }
+
+    if (and.length) {
+      query.$and = and;
     }
 
     return query;

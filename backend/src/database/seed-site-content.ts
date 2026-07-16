@@ -7,6 +7,7 @@ import { FaqModel } from "../models/Faq.model";
 import { TestimonialModel } from "../models/Testimonial.model";
 import { BlogModel } from "../models/Blog.model";
 import { MediaModel } from "../models/Media.model";
+import { TrekModel } from "../models/Trek.model";
 import { logger } from "../utils/logger";
 import { slugify } from "../utils/slugify";
 
@@ -221,6 +222,17 @@ async function seedSiteContent() {
     mediaCount += 1;
   }
   logger.info("Media catalog upserted", { count: mediaCount });
+
+  const destinations = await DestinationModel.find({ deletedAt: null }).select("name").lean();
+  for (const dest of destinations) {
+    const trekCount = await TrekModel.countDocuments({
+      destinationName: dest.name,
+      status: "published",
+      deletedAt: null,
+    });
+    await DestinationModel.updateOne({ _id: dest._id }, { $set: { trekCount } });
+  }
+  logger.info("Destination trek counts synced", { count: destinations.length });
 
   await disconnectDatabase();
   logger.info("Site content seed complete");

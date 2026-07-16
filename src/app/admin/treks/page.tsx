@@ -114,22 +114,16 @@ export default function AdminTreksPage() {
 
   const loadStatsAndRegions = useCallback(async () => {
     try {
-      const [all, published, draft, archived] = await Promise.all([
-        adminListTreks({ limit: 100 }),
-        adminListTreks({ limit: 1, status: "published" }),
-        adminListTreks({ limit: 1, status: "draft" }),
-        adminListTreks({ limit: 1, status: "archived" }),
-      ]);
+      const all = await adminListTreks({ limit: 100 });
+      const rows = all.items;
       setStats({
-        total: Number(all.meta?.total ?? all.items.length),
-        published: Number(published.meta?.total ?? 0),
-        draft: Number(draft.meta?.total ?? 0),
-        archived: Number(archived.meta?.total ?? 0),
+        total: Number(all.meta?.total ?? rows.length),
+        published: rows.filter((t) => t.status === "published").length,
+        draft: rows.filter((t) => t.status === "draft").length,
+        archived: rows.filter((t) => t.status === "archived").length,
       });
       const unique = [
-        ...new Set(
-          all.items.map((t) => String(t.region || "").trim()).filter(Boolean),
-        ),
+        ...new Set(rows.map((t) => String(t.region || "").trim()).filter(Boolean)),
       ].sort((a, b) => a.localeCompare(b));
       setRegions(unique);
     } catch {
