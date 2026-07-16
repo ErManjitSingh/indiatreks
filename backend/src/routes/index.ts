@@ -1,0 +1,51 @@
+import { Router } from "express";
+
+import authRoutes from "./auth.routes";
+import usersRoutes from "./users.routes";
+import treksRoutes from "./treks.routes";
+import destinationsRoutes from "./destinations.routes";
+import categoriesRoutes from "./categories.routes";
+import blogsRoutes from "./blogs.routes";
+import bookingsRoutes from "./bookings.routes";
+import paymentsRoutes from "./payments.routes";
+import couponsRoutes from "./coupons.routes";
+import reviewsRoutes from "./reviews.routes";
+import testimonialsRoutes from "./testimonials.routes";
+import mediaRoutes from "./media.routes";
+import faqsRoutes from "./faqs.routes";
+import newsletterRoutes from "./newsletter.routes";
+import contactsRoutes from "./contacts.routes";
+import enquiriesRoutes from "./enquiries.routes";
+import seoRoutes from "./seo.routes";
+import analyticsRoutes from "./analytics.routes";
+import settingsRoutes from "./settings.routes";
+import notificationsRoutes from "./notifications.routes";
+import searchRoutes from "./search.routes";
+import healthRoutes from "./health.routes";
+
+const router = Router();
+
+router.use("/health", healthRoutes);
+router.use("/auth", authRoutes);
+router.use("/users", usersRoutes);
+router.use("/treks", treksRoutes);
+router.use("/destinations", destinationsRoutes);
+router.use("/categories", categoriesRoutes);
+router.use("/blogs", blogsRoutes);
+router.use("/bookings", bookingsRoutes);
+router.use("/payments", paymentsRoutes);
+router.use("/coupons", couponsRoutes);
+router.use("/reviews", reviewsRoutes);
+router.use("/testimonials", testimonialsRoutes);
+router.use("/media", mediaRoutes);
+router.use("/faqs", faqsRoutes);
+router.use("/newsletter", newsletterRoutes);
+router.use("/contacts", contactsRoutes);
+router.use("/enquiries", enquiriesRoutes);
+router.use("/seo", seoRoutes);
+router.use("/analytics", analyticsRoutes);
+router.use("/settings", settingsRoutes);
+router.use("/notifications", notificationsRoutes);
+router.use("/search", searchRoutes);
+
+export default router;
