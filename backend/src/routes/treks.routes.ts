@@ -2,14 +2,15 @@ import { Router } from "express";
 import * as trekController from "../controllers/trek.controller";
 import { validate } from "../middlewares/validate";
 import { authenticate, optionalAuth, requirePermission } from "../middlewares/auth";
+import { publicCache } from "../middlewares/publicCache";
 import { paramsIdSchema, paramsSlugSchema } from "../validators/common.validator";
 import { createTrekSchema, updateTrekSchema, listTreksQuerySchema } from "../validators/trek.validator";
 
 const router = Router();
 
-router.get("/", optionalAuth, validate(listTreksQuerySchema, "query"), trekController.listTreks);
-router.get("/:slug", optionalAuth, validate(paramsSlugSchema, "params"), trekController.getTrekBySlug);
-router.get("/:slug/related", validate(paramsSlugSchema, "params"), trekController.getRelatedTreks);
+router.get("/", optionalAuth, publicCache(30, 120), validate(listTreksQuerySchema, "query"), trekController.listTreks);
+router.get("/:slug", optionalAuth, publicCache(30, 120), validate(paramsSlugSchema, "params"), trekController.getTrekBySlug);
+router.get("/:slug/related", publicCache(60, 300), validate(paramsSlugSchema, "params"), trekController.getRelatedTreks);
 
 router.post(
   "/",

@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/(.*)\\.(js|css|woff2|avif|webp|png|jpg|jpeg|svg)",
+        source: "/_next/static/:path*",
         headers: [
           {
             key: "Cache-Control",

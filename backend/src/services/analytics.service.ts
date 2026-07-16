@@ -3,6 +3,10 @@ import { BookingModel } from "../models/Booking.model";
 import { UserModel } from "../models/User.model";
 import { EnquiryModel } from "../models/Enquiry.model";
 import { ReviewModel } from "../models/Review.model";
+import { DestinationModel } from "../models/Destination.model";
+import { FaqModel } from "../models/Faq.model";
+import { BlogModel } from "../models/Blog.model";
+import { CategoryModel } from "../models/Category.model";
 
 async function getDashboardStats() {
   const now = new Date();
@@ -18,20 +22,28 @@ async function getDashboardStats() {
     totalUsers,
     newEnquiries,
     pendingReviews,
+    destinationCount,
+    faqCount,
+    blogCount,
+    categoryCount,
     revenueAgg,
     revenueThisMonthAgg,
     revenueLastMonthAgg,
     bookingsByStatus,
     topTreksAgg,
   ] = await Promise.all([
-    TrekModel.countDocuments({}),
-    TrekModel.countDocuments({ status: "published" }),
+    TrekModel.countDocuments({ deletedAt: null }),
+    TrekModel.countDocuments({ status: "published", deletedAt: null }),
     BookingModel.countDocuments({}),
     BookingModel.countDocuments({ bookingStatus: "confirmed" }),
     BookingModel.countDocuments({ bookingStatus: "pending" }),
     UserModel.countDocuments({}),
     EnquiryModel.countDocuments({ status: "new" }),
     ReviewModel.countDocuments({ status: "pending" }),
+    DestinationModel.countDocuments({ deletedAt: null }),
+    FaqModel.countDocuments({}).catch(() => 0),
+    BlogModel.countDocuments({ deletedAt: null }),
+    CategoryModel.countDocuments({ deletedAt: null }).catch(() => 0),
     BookingModel.aggregate([
       { $match: { paymentStatus: "paid" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
@@ -41,7 +53,12 @@ async function getDashboardStats() {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]),
     BookingModel.aggregate([
-      { $match: { paymentStatus: "paid", createdAt: { $gte: startOfLastMonth, $lt: startOfMonth } } },
+      {
+        $match: {
+          paymentStatus: "paid",
+          createdAt: { $gte: startOfLastMonth, $lt: startOfMonth },
+        },
+      },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]),
     BookingModel.aggregate([{ $group: { _id: "$bookingStatus", count: { $sum: 1 } } }]),
@@ -55,6 +72,12 @@ async function getDashboardStats() {
 
   return {
     treks: { total: totalTreks, published: publishedTreks },
+    content: {
+      destinations: destinationCount,
+      faqs: faqCount,
+      blogs: blogCount,
+      categories: categoryCount,
+    },
     bookings: {
       total: totalBookings,
       confirmed: confirmedBookings,
@@ -69,7 +92,11 @@ async function getDashboardStats() {
       thisMonth: revenueThisMonthAgg[0]?.total ?? 0,
       lastMonth: revenueLastMonthAgg[0]?.total ?? 0,
     },
-    topTreks: topTreksAgg.map((t) => ({ title: t._id, bookings: t.bookings, revenue: t.revenue })),
+    topTreks: topTreksAgg.map((t) => ({
+      title: t._id,
+      bookings: t.bookings,
+      revenue: t.revenue,
+    })),
   };
 }
 

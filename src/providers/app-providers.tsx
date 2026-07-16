@@ -15,10 +15,25 @@ const DeferredToaster = dynamic(
 interface AppProvidersProps {
   children: ReactNode;
   bootstrap?: SiteBootstrap | null;
+  /** Skip homepage static data + content provider (admin routes). */
+  lean?: boolean;
 }
 
 /** Minimal client shell — toaster deferred off critical path. */
-export function AppProviders({ children, bootstrap = null }: AppProvidersProps) {
+export function AppProviders({
+  children,
+  bootstrap = null,
+  lean = false,
+}: AppProvidersProps) {
+  if (lean) {
+    return (
+      <StoreHydration>
+        {children}
+        <DeferredToaster />
+      </StoreHydration>
+    );
+  }
+
   return (
     <StoreHydration>
       <SiteContentProvider bootstrap={bootstrap}>

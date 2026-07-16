@@ -8,7 +8,7 @@ import {
   trekListingStates,
   TREK_ALTITUDE_BOUNDS,
   TREK_PRICE_BOUNDS,
-} from "@/data/treks";
+} from "@/data/trek-listing-meta";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

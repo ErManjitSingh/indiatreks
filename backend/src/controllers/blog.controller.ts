@@ -2,9 +2,10 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess, sendPaginated } from "../utils/response";
 import { blogService } from "../services/blog.service";
+import { isStaffUser } from "../middlewares/auth";
 
 export const listBlogs = asyncHandler(async (req: Request, res: Response) => {
-  const isAdmin = Boolean(req.user);
+  const isAdmin = isStaffUser(req);
   const query = { ...req.query } as Record<string, unknown>;
   if (!isAdmin) query.status = "published";
   const { items, meta } = await blogService.list(query as never);
@@ -12,7 +13,7 @@ export const listBlogs = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getBlogBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const includeUnpublished = Boolean(req.user);
+  const includeUnpublished = isStaffUser(req);
   const blog = await blogService.getBySlug((req.params.slug as string), includeUnpublished);
   return sendSuccess(res, blog);
 });

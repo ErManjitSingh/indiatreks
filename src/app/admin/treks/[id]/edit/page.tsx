@@ -1,10 +1,17 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { TrekForm } from "@/components/admin/trek-form";
 import { adminGetTrek, getErrorMessage, type AdminDoc } from "@/lib/api/admin";
+
+const TrekForm = dynamic(
+  () => import("@/components/admin/trek-form").then((m) => m.TrekForm),
+  {
+    loading: () => <p className="text-sm text-[#6B7280]">Loading editor…</p>,
+  },
+);
 
 export default function EditTrekPage() {
   const params = useParams<{ id: string }>();

@@ -15,7 +15,8 @@ export const fontBody = Inter({
   variable: "--font-body",
   display: "swap",
   weight: ["400", "500", "600", "700"],
-  preload: true,
+  // Only preload heading font for LCP; body swaps in shortly after
+  preload: false,
   adjustFontFallback: true,
 });
 

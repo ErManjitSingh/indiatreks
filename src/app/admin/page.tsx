@@ -23,12 +23,8 @@ import {
 
 import { getStoredUser, type AuthUser } from "@/lib/api/auth";
 import {
+  adminGetDashboardStats,
   adminGetSettings,
-  adminListBlogs,
-  adminListCategories,
-  adminListDestinations,
-  adminListFaqs,
-  adminListTreks,
   getErrorMessage,
 } from "@/lib/api/admin";
 import { cn } from "@/lib/utils";
@@ -58,27 +54,22 @@ export default function AdminOverviewPage() {
     let cancelled = false;
     (async () => {
       try {
-        const [treks, destinations, faqs, blogs, categories, settings, health] =
-          await Promise.all([
-            adminListTreks({ limit: 1 }),
-            adminListDestinations({ limit: 1 }),
-            adminListFaqs({ limit: 1 }),
-            adminListBlogs({ limit: 1 }),
-            adminListCategories({ limit: 1 }),
-            adminGetSettings("site"),
-            fetch("/api/v1/health")
-              .then((r) => r.ok)
-              .catch(() => false),
-          ]);
+        const [dashboard, settings, health] = await Promise.all([
+          adminGetDashboardStats(),
+          adminGetSettings("site"),
+          fetch("/api/v1/health")
+            .then((r) => r.ok)
+            .catch(() => false),
+        ]);
         if (cancelled) return;
         const site = (settings["site.config"] as { name?: string } | undefined) ?? {};
         setApiOnline(Boolean(health));
         setStats({
-          trekCount: Number(treks.meta?.total ?? 0),
-          destinationCount: Number(destinations.meta?.total ?? 0),
-          faqCount: Number(faqs.meta?.total ?? 0),
-          blogCount: Number(blogs.meta?.total ?? 0),
-          categoryCount: Number(categories.meta?.total ?? 0),
+          trekCount: Number(dashboard?.treks?.total ?? 0),
+          destinationCount: Number(dashboard?.content?.destinations ?? 0),
+          faqCount: Number(dashboard?.content?.faqs ?? 0),
+          blogCount: Number(dashboard?.content?.blogs ?? 0),
+          categoryCount: Number(dashboard?.content?.categories ?? 0),
           siteName: String(site.name ?? "India Holiday Destinations"),
         });
       } catch (err) {

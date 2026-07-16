@@ -5,6 +5,7 @@ import {
   UpdateQuery,
   QueryOptions,
   Types,
+  PopulateOptions,
 } from "mongoose";
 
 export interface ListOptions {
@@ -13,7 +14,8 @@ export interface ListOptions {
   skip?: number;
   limit?: number;
   select?: string;
-  populate?: string | string[];
+  populate?: string | string[] | PopulateOptions | PopulateOptions[];
+  lean?: boolean;
 }
 
 export class BaseRepository<T extends Document> {
@@ -36,11 +38,20 @@ export class BaseRepository<T extends Document> {
   }
 
   async findMany(options: ListOptions = {}): Promise<T[]> {
-    const { filter = {}, sort = { createdAt: -1 }, skip = 0, limit = 20, select, populate } = options;
+    const {
+      filter = {},
+      sort = { createdAt: -1 },
+      skip = 0,
+      limit = 20,
+      select,
+      populate,
+      lean = true,
+    } = options;
     const query = this.model.find(filter).sort(sort).skip(skip).limit(limit);
     if (select) query.select(select);
-    if (populate) query.populate(populate as string);
-    return query.exec();
+    if (populate) query.populate(populate as PopulateOptions);
+    if (lean) query.lean();
+    return query.exec() as Promise<T[]>;
   }
 
   async count(filter: FilterQuery<T> = {}): Promise<number> {

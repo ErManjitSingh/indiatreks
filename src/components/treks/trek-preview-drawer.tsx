@@ -14,15 +14,15 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { allTreks } from "@/data/treks";
 import { useRecentlyViewedStore, useUiStore } from "@/lib/store";
+import type { TrekListingItem } from "@/types/trek-listing";
 import { formatCurrency, formatDate, formatTrekDuration } from "@/utils";
 import { formatAltitude } from "@/utils/trek";
 
-export function TrekPreviewDrawer() {
+export function TrekPreviewDrawer({ treks = [] }: { treks?: TrekListingItem[] }) {
   const { trekPreviewId, setTrekPreviewId } = useUiStore();
   const addRecent = useRecentlyViewedStore((state) => state.add);
-  const trek = allTreks.find((item) => item.id === trekPreviewId) ?? null;
+  const trek = treks.find((item) => item.id === trekPreviewId) ?? null;
   const [imageIndex, setImageIndex] = useState(0);
 
   useEffect(() => {

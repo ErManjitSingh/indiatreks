@@ -10,15 +10,15 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { allTreks } from "@/data/treks";
 import { useCompareStore, useUiStore } from "@/lib/store";
+import type { TrekListingItem } from "@/types/trek-listing";
 import { formatCurrency, formatTrekDuration } from "@/utils";
 import { formatAltitude } from "@/utils/trek";
 
-export function TrekCompareDrawer() {
+export function TrekCompareDrawer({ catalog = [] }: { catalog?: TrekListingItem[] }) {
   const { trekCompareOpen, setTrekCompareOpen } = useUiStore();
   const { trekIds, remove, clear } = useCompareStore();
-  const treks = allTreks.filter((trek) => trekIds.includes(trek.id));
+  const treks = catalog.filter((trek) => trekIds.includes(trek.id));
 
   return (
     <Drawer open={trekCompareOpen} onOpenChange={setTrekCompareOpen}>

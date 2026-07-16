@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
 
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
@@ -61,6 +61,30 @@ interface SiteShellProps {
   showStickyBooking?: boolean;
 }
 
+function useIdleReady(delayMs = 2500) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const enable = () => setReady(true);
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: delayMs });
+    } else {
+      timeoutId = setTimeout(enable, delayMs);
+    }
+
+    return () => {
+      if (idleId != null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [delayMs]);
+  return ready;
+}
+
 export function SiteShell({
   children,
   showAnnouncement = true,
@@ -72,13 +96,13 @@ export function SiteShell({
   const isTreksListing = pathname === "/treks";
   const isTrekDetail = /^\/treks\/.+/.test(pathname);
   const hideGlobalStickyBooking = isHome || isTreksListing || isTrekDetail;
+  const idleReady = useIdleReady(2500);
 
   return (
     <>
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <ScrollProgress />
       {showAnnouncement && !isHome ? (
         <div className="hidden md:block">
           <AnnouncementBar />
@@ -92,7 +116,6 @@ export function SiteShell({
           <TopBar />
         </div>
       ) : null}
-      {/* Home uses solid white nav (mockup); dark overlay was desktop-only and is retired */}
       <Navbar overlayHero={false} sticky={!isTreksListing} />
       <main
         id="main-content"
@@ -108,8 +131,6 @@ export function SiteShell({
       <div className="hidden md:block">
         <Footer />
       </div>
-      <GlobalSearch />
-      <EnquireModal />
       <div className="hidden md:block">
         <FloatingWhatsApp
           label={
@@ -119,17 +140,24 @@ export function SiteShell({
           }
         />
       </div>
-      <div className="hidden md:block">
-        <BackToTop />
-      </div>
       {showStickyBooking && !hideGlobalStickyBooking ? (
         <div className="hidden md:block">
           <StickyBookingButton />
         </div>
       ) : null}
-      {!isTreksListing && !isTrekDetail ? <MobileBottomNav /> : null}
-      <ConversionLayer />
       <BookingDrawer />
+      {!isTreksListing && !isTrekDetail ? <MobileBottomNav /> : null}
+      {idleReady ? (
+        <>
+          <ScrollProgress />
+          <GlobalSearch />
+          <EnquireModal />
+          <div className="hidden md:block">
+            <BackToTop />
+          </div>
+          <ConversionLayer />
+        </>
+      ) : null}
     </>
   );
 }

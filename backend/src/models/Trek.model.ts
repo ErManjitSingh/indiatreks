@@ -362,6 +362,11 @@ TrekSchema.index({ region: 1, status: 1 });
 TrekSchema.index({ destinationName: 1, status: 1 });
 TrekSchema.index({ difficulty: 1, status: 1 });
 TrekSchema.index({ status: 1, deletedAt: 1 });
+TrekSchema.index({ status: 1, deletedAt: 1, createdAt: -1 });
+TrekSchema.index({ status: 1, basePriceInr: 1 });
+TrekSchema.index({ status: 1, rating: -1 });
+TrekSchema.index({ trekTypes: 1, status: 1 });
+TrekSchema.index({ bestSeasons: 1, status: 1 });
 TrekSchema.index({ title: "text", summary: "text", overview: "text", location: "text" });
 
 softDeletePlugin(TrekSchema);

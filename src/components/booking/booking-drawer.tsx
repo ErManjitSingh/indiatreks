@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import { BookingFlow } from "@/components/booking/booking-flow";
 import { QuickEnquiryForm } from "@/components/booking/quick-enquiry-form";
@@ -10,9 +10,21 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { getTrekBySlug } from "@/data/treks";
-import { getTrekDetailBySlug } from "@/data/trek-details";
+import { fetchTrekBySlug } from "@/lib/api/treks";
 import { useBookingUiStore } from "@/lib/booking/store";
+
+type DrawerTrek = {
+  slug: string;
+  title: string;
+  basePriceInr: number;
+  departures: Array<{
+    id: string;
+    date: string;
+    seats: number;
+    priceInr: number;
+    status: "open";
+  }>;
+};
 
 export function BookingDrawer() {
   const {
@@ -25,26 +37,57 @@ export function BookingDrawer() {
     startAdvanceBooking,
   } = useBookingUiStore();
 
-  const trek = useMemo(() => {
-    if (!activeSlug) return null;
-    const detail = getTrekDetailBySlug(activeSlug);
-    const listing = getTrekBySlug(activeSlug);
-    if (!detail && !listing) return null;
-    return {
-      slug: activeSlug,
-      title: detail?.title ?? listing?.title ?? activeSlug,
-      basePriceInr: detail?.basePriceInr ?? listing?.basePriceInr ?? 0,
-      departures:
-        detail?.departures ??
-        (listing?.departures ?? []).map((date, index) => ({
-          id: `${activeSlug}-${index}`,
-          date,
-          seats: listing?.seatsLeft ?? 8,
-          priceInr: listing?.basePriceInr ?? 0,
-          status: "open" as const,
-        })),
+  const [trek, setTrek] = useState<DrawerTrek | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!sheetOpen || !activeSlug) {
+      setTrek(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+
+    void (async () => {
+      try {
+        const detail = await fetchTrekBySlug(activeSlug);
+        if (cancelled) return;
+        if (!detail) {
+          setTrek({
+            slug: activeSlug,
+            title: activeSlug
+              .split("-")
+              .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+              .join(" "),
+            basePriceInr: 0,
+            departures: [],
+          });
+          return;
+        }
+        setTrek({
+          slug: detail.slug,
+          title: detail.title,
+          basePriceInr: detail.basePriceInr,
+          departures: (detail.departures ?? []).map((d, index) => ({
+            id: d.id ?? `${detail.slug}-${index}`,
+            date: d.date,
+            seats: d.seats ?? detail.seatsLeft ?? 8,
+            priceInr: d.priceInr ?? detail.basePriceInr,
+            status: "open" as const,
+          })),
+        });
+      } catch {
+        if (!cancelled) setTrek(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
     };
-  }, [activeSlug]);
+  }, [sheetOpen, activeSlug]);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -70,7 +113,9 @@ export function BookingDrawer() {
             : "Send a quick enquiry to our trek team"}
         </DrawerDescription>
         <div className="flex h-full flex-col p-5 md:p-6">
-          {trek ? (
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading trek…</p>
+          ) : trek ? (
             stage === "advance" ? (
               <BookingFlow
                 trekSlug={trek.slug}

@@ -87,7 +87,7 @@ async function list(query: ListQuery) {
     sort: { createdAt: -1 },
     skip,
     limit,
-    populate: "trek",
+    populate: { path: "trek", select: "title slug heroImages basePriceInr" },
   });
   return { items, meta: paginateMeta(total, page, limit) };
 }

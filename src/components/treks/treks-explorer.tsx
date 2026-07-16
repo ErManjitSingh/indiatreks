@@ -21,7 +21,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { TrekCardSkeleton } from "@/components/ui/skeleton";
-import { allTreks as staticTreks } from "@/data/treks";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 import {
   countActiveFilters,
@@ -78,7 +77,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
-  const treks = initialTreks?.length ? initialTreks : staticTreks;
+  const treks = initialTreks ?? [];
 
   const {
     trekFiltersOpen,
@@ -335,8 +334,8 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
         </DrawerContent>
       </Drawer>
 
-      <TrekPreviewDrawer />
-      <TrekCompareDrawer />
+      <TrekPreviewDrawer treks={treks} />
+      <TrekCompareDrawer catalog={treks} />
       <div className="hidden md:block">
         <CompareBar />
       </div>

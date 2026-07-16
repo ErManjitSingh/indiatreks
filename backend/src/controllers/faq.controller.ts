@@ -2,9 +2,10 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess, sendPaginated } from "../utils/response";
 import { faqService } from "../services/faq.service";
+import { isStaffUser } from "../middlewares/auth";
 
 export const listFaqs = asyncHandler(async (req: Request, res: Response) => {
-  const isAdmin = Boolean(req.user);
+  const isAdmin = isStaffUser(req);
   const query = { ...req.query } as Record<string, unknown>;
   if (!isAdmin) query.status = "published";
   const { items, meta } = await faqService.list(query as never);

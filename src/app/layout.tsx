@@ -46,7 +46,7 @@ export default async function RootLayout({
         className={`${fontHeading.variable} ${fontBody.variable} ${fontDisplay.variable} ${fontBrush.variable} font-body antialiased`}
         suppressHydrationWarning
       >
-        <AppProviders bootstrap={bootstrap}>
+        <AppProviders bootstrap={bootstrap} lean={isAdmin}>
           {isAdmin ? (
             children
           ) : (

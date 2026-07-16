@@ -1,97 +1,24 @@
 import { BLUR_DATA_URL } from "@/constants/media";
 import { dharamshalaTrekListings } from "@/data/dharamshala";
+import {
+  TREK_ALTITUDE_BOUNDS,
+  TREK_PRICE_BOUNDS,
+  popularTrekSearches,
+  trekListingDestinations,
+  trekListingRegions,
+  trekListingStates,
+} from "@/data/trek-listing-meta";
 import { img } from "@/lib/media";
 import type { TrekListingItem } from "@/types/trek-listing";
 
-export const TREK_PRICE_BOUNDS = { min: 499, max: 52000 } as const;
-export const TREK_ALTITUDE_BOUNDS = { min: 3500, max: 21000 } as const;
-
-export const trekListingDestinations = [
-  "Dharamshala",
-  "Kangra",
-  "Manali",
-  "Naggar",
-  "Kasol",
-  "Parvati Valley",
-  "Malana",
-  "Kullu",
-  "Banjar",
-  "Jalori Pass",
-  "Jalori",
-  "Chamba",
-  "Bharmour",
-  "Kinnaur",
-  "Kalpa",
-  "Janglik",
-  "Sirmaur",
-  "Spiti",
-  "Pin Valley",
-  "Sankri",
-  "Gangotri",
-  "Uttarkashi",
-  "Joshimath",
-  "Govindghat",
-  "Auli",
-  "Lohajung",
-  "Bageshwar",
-  "Munsiyari",
-  "Pithoragarh",
-  "Dharchula",
-  "Mussoorie",
-  "Dhanaulti",
-  "Chopta",
-  "Sari Village",
-  "Rudraprayag",
-  "Ghuttu",
-  "Ukhimath",
-  "Gopeshwar",
-  "Helang",
-  "Badrinath",
-  "Harsil",
-  "Govind Wildlife Sanctuary",
-  "Yamunotri",
-  "Kedarnath",
-  "Gaurikund",
-] as const;
-
-export const trekListingStates = ["Himachal Pradesh", "Uttarakhand"] as const;
-
-export const trekListingRegions = [
-  "Dharamshala",
-  "Manali",
-  "Parvati Valley",
-  "Kullu",
-  "Banjar",
-  "Chamba",
-  "Kinnaur",
-  "Spiti",
-  "Sankri",
-  "Gangotri",
-  "Uttarkashi",
-  "Joshimath",
-  "Lohajung",
-  "Bageshwar",
-  "Munsiyari",
-  "Chopta",
-  "Mussoorie",
-  "Pithoragarh",
-  "Badrinath",
-  "Kedarnath",
-  "Yamunotri",
-] as const;
-
-export const popularTrekSearches = [
-  { label: "Dharamshala", href: "/treks?destination=Dharamshala" },
-  { label: "Triund", href: "/treks?q=Triund" },
-  { label: "Kedarkantha", href: "/treks?q=Kedarkantha" },
-  { label: "Manali", href: "/treks?destination=Manali" },
-  { label: "Hampta Pass", href: "/treks?q=Hampta" },
-  { label: "Kasol", href: "/treks?destination=Kasol" },
-  { label: "Chopta", href: "/treks?destination=Chopta" },
-  { label: "Valley of Flowers", href: "/treks?q=Valley%20of%20Flowers" },
-  { label: "Roopkund", href: "/treks?q=Roopkund" },
-  { label: "Spiti", href: "/treks?destination=Spiti" },
-] as const;
+export {
+  TREK_ALTITUDE_BOUNDS,
+  TREK_PRICE_BOUNDS,
+  popularTrekSearches,
+  trekListingDestinations,
+  trekListingRegions,
+  trekListingStates,
+};
 
 export const trekCollections = [
   {

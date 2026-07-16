@@ -2,9 +2,10 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess, sendPaginated } from "../utils/response";
 import { destinationService } from "../services/destination.service";
+import { isStaffUser } from "../middlewares/auth";
 
 export const listDestinations = asyncHandler(async (req: Request, res: Response) => {
-  const isAdmin = Boolean(req.user);
+  const isAdmin = isStaffUser(req);
   const query = { ...req.query } as Record<string, unknown>;
   if (!isAdmin) query.status = "published";
   const { items, meta } = await destinationService.list(query as never);
@@ -12,7 +13,7 @@ export const listDestinations = asyncHandler(async (req: Request, res: Response)
 });
 
 export const getDestinationBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const includeUnpublished = Boolean(req.user);
+  const includeUnpublished = isStaffUser(req);
   const destination = await destinationService.getBySlug((req.params.slug as string), includeUnpublished);
   return sendSuccess(res, destination);
 });

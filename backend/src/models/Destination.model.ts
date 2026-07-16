@@ -58,6 +58,7 @@ const DestinationSchema = new Schema<IDestination>(
 );
 
 DestinationSchema.index({ name: "text", summary: "text", description: "text" });
+DestinationSchema.index({ status: 1, deletedAt: 1, name: 1 });
 softDeletePlugin(DestinationSchema);
 
 export const DestinationModel = model<IDestination>("Destination", DestinationSchema);

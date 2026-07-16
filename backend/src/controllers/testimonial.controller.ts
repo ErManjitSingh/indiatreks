@@ -2,9 +2,10 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess, sendPaginated } from "../utils/response";
 import { testimonialService } from "../services/testimonial.service";
+import { isStaffUser } from "../middlewares/auth";
 
 export const listTestimonials = asyncHandler(async (req: Request, res: Response) => {
-  const isAdmin = Boolean(req.user);
+  const isAdmin = isStaffUser(req);
   const query = { ...req.query } as Record<string, unknown>;
   if (!isAdmin) query.status = "approved";
   const { items, meta } = await testimonialService.list(query as never);

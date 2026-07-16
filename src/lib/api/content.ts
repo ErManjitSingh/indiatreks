@@ -37,7 +37,7 @@ export async function fetchBootstrap(): Promise<SiteBootstrap | null> {
     if (typeof window === "undefined") {
       const base = getApiBaseUrl();
       const res = await fetch(`${base}/content/bootstrap`, {
-        next: { revalidate: 300 },
+        next: { revalidate: 600, tags: ["bootstrap"] },
         headers: { Accept: "application/json" },
       });
       if (!res.ok) return null;

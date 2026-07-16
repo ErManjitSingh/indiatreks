@@ -56,8 +56,20 @@ export function createApp() {
     );
   }
 
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-  app.use("/api/uploads", express.static(path.join(process.cwd(), "uploads")));
+  app.use(
+    "/uploads",
+    express.static(path.join(process.cwd(), "uploads"), {
+      maxAge: "7d",
+      immutable: true,
+    }),
+  );
+  app.use(
+    "/api/uploads",
+    express.static(path.join(process.cwd(), "uploads"), {
+      maxAge: "7d",
+      immutable: true,
+    }),
+  );
 
   app.get("/", (_req, res) => {
     res.json({

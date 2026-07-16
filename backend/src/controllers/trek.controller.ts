@@ -3,9 +3,10 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess, sendPaginated } from "../utils/response";
 import { trekService } from "../services/trek.service";
 import { logAudit } from "../middlewares/audit";
+import { isStaffReader } from "../middlewares/auth";
 
 export const listTreks = asyncHandler(async (req: Request, res: Response) => {
-  const isAdmin = Boolean(req.user);
+  const isAdmin = isStaffReader(req, "treks.read");
   const query = { ...req.query } as Record<string, unknown>;
   if (!isAdmin) query.status = "published";
   const { items, meta } = await trekService.list(query as never);
@@ -13,10 +14,11 @@ export const listTreks = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getTrekBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const includeUnpublished = Boolean(req.user);
+  const includeUnpublished = isStaffReader(req, "treks.read");
   const trek = await trekService.getBySlug((req.params.slug as string), includeUnpublished);
   return sendSuccess(res, trek);
 });
+
 
 export const getRelatedTreks = asyncHandler(async (req: Request, res: Response) => {
   const treks = await trekService.getRelated((req.params.slug as string), Number(req.query.limit) || 4);

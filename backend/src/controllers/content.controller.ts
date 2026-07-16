@@ -14,8 +14,16 @@ function settingsToObject(rows: Array<{ key: string; value: unknown }>) {
   return out;
 }
 
-/** Public bootstrap payload for the Next.js website (no auth). Kept lean on purpose. */
-export const getBootstrap = asyncHandler(async (_req: Request, res: Response) => {
+type BootstrapPayload = Record<string, unknown>;
+
+let bootstrapCache: { expiresAt: number; payload: BootstrapPayload } | null = null;
+const BOOTSTRAP_TTL_MS = 2 * 60 * 1000;
+
+export function invalidateBootstrapCache() {
+  bootstrapCache = null;
+}
+
+async function buildBootstrap(): Promise<BootstrapPayload> {
   const [settings, destinations, faqs, testimonials, blogs, trekCount] = await Promise.all([
     SettingModel.find({
       group: { $in: ["site", "homepage", "navigation", "facets", "media"] },
@@ -29,6 +37,7 @@ export const getBootstrap = asyncHandler(async (_req: Request, res: Response) =>
     FaqModel.find({ status: "published" })
       .select("question answer category sortOrder")
       .sort({ sortOrder: 1 })
+      .limit(40)
       .lean()
       .catch(() => []),
     TestimonialModel.find({ status: "approved" })
@@ -47,7 +56,7 @@ export const getBootstrap = asyncHandler(async (_req: Request, res: Response) =>
 
   const map = settingsToObject(settings as Array<{ key: string; value: unknown }>);
 
-  return sendSuccess(res, {
+  return {
     site: map["site.config"] ?? null,
     navigation: map["site.navigation"] ?? null,
     homepage: map["homepage.content"] ?? null,
@@ -57,10 +66,23 @@ export const getBootstrap = asyncHandler(async (_req: Request, res: Response) =>
     faqs,
     testimonials,
     blogs,
-    // Media catalog intentionally omitted — files are served from /public; use /media admin API.
     media: [],
     meta: { trekCount },
-  });
+  };
+}
+
+/** Public bootstrap payload for the Next.js website (no auth). Cached in-memory. */
+export const getBootstrap = asyncHandler(async (_req: Request, res: Response) => {
+  const now = Date.now();
+  if (bootstrapCache && bootstrapCache.expiresAt > now) {
+    res.setHeader("X-Cache", "HIT");
+    return sendSuccess(res, bootstrapCache.payload);
+  }
+
+  const payload = await buildBootstrap();
+  bootstrapCache = { expiresAt: now + BOOTSTRAP_TTL_MS, payload };
+  res.setHeader("X-Cache", "MISS");
+  return sendSuccess(res, payload);
 });
 
 export const getPublicSettings = asyncHandler(async (_req: Request, res: Response) => {

@@ -203,6 +203,25 @@ export async function adminGetSettings(group?: string) {
   return res.data ?? {};
 }
 
+export type AdminDashboardStats = {
+  treks?: { total?: number; published?: number };
+  content?: {
+    destinations?: number;
+    faqs?: number;
+    blogs?: number;
+    categories?: number;
+  };
+  bookings?: { total?: number; confirmed?: number; pending?: number };
+  users?: { total?: number };
+  enquiries?: { new?: number };
+  revenue?: { total?: number; thisMonth?: number; lastMonth?: number };
+};
+
+export async function adminGetDashboardStats(): Promise<AdminDashboardStats> {
+  const res = await apiGet<AdminDashboardStats>("/analytics/dashboard");
+  return res.data ?? {};
+}
+
 export async function adminUpsertSetting(key: string, value: unknown, group?: string) {
   const res = await apiPut<AdminDoc>("/settings", { key, value, group });
   return res.data;

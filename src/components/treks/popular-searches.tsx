@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
-import { popularTrekSearches } from "@/data/treks";
+import { popularTrekSearches } from "@/data/trek-listing-meta";
 
 export function PopularSearches() {
   return (

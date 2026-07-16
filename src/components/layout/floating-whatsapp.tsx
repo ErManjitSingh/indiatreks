@@ -5,7 +5,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useMemo } from "react";
 
 import { siteConfig } from "@/config/site";
-import { getTrekBySlug } from "@/data/treks";
 import { buildTrekWhatsAppMessage } from "@/lib/booking/whatsapp";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +12,14 @@ interface FloatingWhatsAppProps {
   className?: string;
   message?: string;
   label?: string;
+}
+
+function titleFromSlug(slug: string): string {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 export function FloatingWhatsApp(props: FloatingWhatsAppProps) {
@@ -39,15 +46,10 @@ function FloatingWhatsAppWithTrekContext({
 
     const slugMatch = pathname.match(/^\/treks\/([^/]+)\/?$/);
     const slug = slugMatch?.[1];
-    const listing = slug ? getTrekBySlug(slug) : undefined;
-    const trekTitle = trekParam || listing?.title;
+    const trekTitle = trekParam || (slug ? titleFromSlug(slug) : undefined);
 
     if (trekTitle) {
-      return buildTrekWhatsAppMessage(
-        trekTitle,
-        departure,
-        price ?? listing?.basePriceInr,
-      );
+      return buildTrekWhatsAppMessage(trekTitle, departure, price);
     }
 
     return message;
