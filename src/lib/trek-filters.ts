@@ -337,7 +337,9 @@ export function filterTreks(
     ) {
       return false;
     }
-    if (filters.state.length && !filters.state.includes(trek.state)) return false;
+    if (filters.state.length && !filters.state.some((s) => trek.state.toLowerCase() === s.toLowerCase())) {
+      return false;
+    }
     if (filters.region.length && !filters.region.includes(trek.region)) return false;
     if (
       filters.suitableFor.length &&

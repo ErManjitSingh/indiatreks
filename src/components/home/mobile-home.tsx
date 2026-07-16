@@ -25,11 +25,12 @@ import { useState, type ComponentType } from "react";
 
 import { TrekCard } from "@/components/home/trek-card";
 import { budgetLabelToPriceRange } from "@/lib/trek-filters";
+import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { trekImages } from "@/constants/trek-images";
 import { useSiteContent } from "@/providers/site-content-provider";
 
-const heroImage = trekImages.heroMobile;
+const heroImage =
+  "https://i.pinimg.com/originals/b8/85/74/b8857474f8d270e5e4720f216c7a8481.jpg";
 const serviceChips: Array<{ title: string; icon: LucideIcon }> = [
   { title: "Expert Trek Leaders", icon: UserRound },
   { title: "Safety First", icon: ShieldCheck },
@@ -72,7 +73,7 @@ function MobileHero() {
         quality={65}
         placeholder="blur"
         blurDataURL={BLUR_DATA_URL}
-        className="object-cover object-[center_35%]"
+        className="object-cover object-[28%_center]"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.35)_0%,rgba(8,12,20,0.25)_40%,rgba(8,12,20,0.82)_100%)]" />
 
@@ -370,7 +371,7 @@ function MobileDestinations() {
               </div>
 
               <Link
-                href={`/destinations/${dest.slug}`}
+                href={getDestinationShowcaseHref(dest.slug, dest.name)}
                 className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#d0d5cc] bg-white py-2.5 text-[12px] font-bold text-[#1A1A1A]"
               >
                 Explore Region

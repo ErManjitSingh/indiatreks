@@ -19,6 +19,7 @@ import { Container } from "@/components/ui/container";
 import { trekImages } from "@/constants/trek-images";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { destinationShowcases as staticShowcases, type DestinationShowcase } from "@/data/homepage";
+import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { useSiteContent } from "@/providers/site-content-provider";
 import { cn } from "@/lib/utils";
 
@@ -139,10 +140,13 @@ function DestinationCard({
   dest: DestinationShowcase;
   featured?: boolean;
 }) {
+  const href = getDestinationShowcaseHref(dest.slug, dest.name);
+
   return (
-    <article
+    <Link
+      href={href}
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-2xl bg-[#1a1a1a] transition duration-300",
+        "group flex h-full flex-col overflow-hidden rounded-2xl bg-[#1a1a1a] transition duration-300",
         featured
           ? "scale-[1.02] shadow-[0_18px_50px_rgba(27,48,34,0.28)] ring-2 ring-[#7cb342]/50"
           : "shadow-[0_10px_28px_rgba(0,0,0,0.12)] ring-1 ring-black/10",
@@ -183,21 +187,12 @@ function DestinationCard({
           <Meta icon={<CalendarDays className="h-3 w-3" />} label={dest.bestTime} />
         </div>
 
-        <Link
-          href={
-            dest.slug === "himachal-pradesh"
-              ? "/treks?destination=Himachal%20Pradesh"
-              : dest.slug === "uttarakhand"
-                ? "/treks?destination=Uttarakhand"
-                : `/treks?destination=${encodeURIComponent(dest.name)}`
-          }
-          className="inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-[#C5E063] transition hover:text-lime"
-        >
+        <span className="inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-[#C5E063] transition group-hover:text-lime">
           Explore Region
           <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-        </Link>
+        </span>
       </div>
-    </article>
+    </Link>
   );
 }
 

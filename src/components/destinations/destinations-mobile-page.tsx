@@ -21,6 +21,7 @@ import {
   popularDestinations,
   type DestinationShowcase,
 } from "@/data/homepage";
+import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { cn } from "@/lib/utils";
 
 const chips = ["All", "Himachal", "Dharamshala", "Uttarakhand", "Ladakh", "Kashmir"] as const;
@@ -75,34 +76,6 @@ const allDestinationCards: DestinationShowcase[] = [
   ...hubShowcases,
   ...destinationShowcases,
 ];
-
-function exploreHref(slug: string, name: string): string {
-  if (slug === "himachal-pradesh") {
-    return "/treks?state=Himachal%20Pradesh";
-  }
-  if (slug === "uttarakhand") {
-    return "/treks?state=Uttarakhand";
-  }
-  if (slug === "dharamshala") {
-    return "/treks?destination=Dharamshala";
-  }
-  if (
-    ["mcleod-ganj", "manali", "kasol", "spiti-valley", "leh-ladakh", "kashmir", "sikkim"].includes(
-      slug,
-    )
-  ) {
-    const destinationName =
-      slug === "mcleod-ganj"
-        ? "McLeod Ganj"
-        : slug === "spiti-valley"
-          ? "Spiti"
-          : slug === "leh-ladakh"
-            ? "Ladakh"
-            : name;
-    return `/treks?destination=${encodeURIComponent(destinationName)}`;
-  }
-  return `/treks?q=${encodeURIComponent(name)}`;
-}
 
 export function DestinationsMobilePage() {
   const [query, setQuery] = useState("");
@@ -293,7 +266,7 @@ export function DestinationsMobilePage() {
                         </span>
                       </p>
                       <Link
-                        href={exploreHref(dest.slug, dest.name)}
+                        href={getDestinationShowcaseHref(dest.slug, dest.name)}
                         className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#2D5A27]"
                       >
                         Explore
