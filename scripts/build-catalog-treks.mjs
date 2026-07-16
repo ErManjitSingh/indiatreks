@@ -1,5 +1,5 @@
 /**
- * Build the canonical 60-trek Himachal catalog into backend/seed-data/treks.json
+ * Build Himachal + Uttarakhand trek catalogs into backend/seed-data/treks.json
  * Merges rich content from existing seed when titles match.
  *
  * Usage: node scripts/build-catalog-treks.mjs
@@ -13,7 +13,8 @@ const root = path.join(__dirname, "..");
 const existingPath = path.join(root, "backend/seed-data/treks.json");
 const outPath = existingPath;
 
-const CATALOG = [
+/** [title, destination/region, state, difficulty, duration] */
+const CATALOG_HP = [
   ["Triund Trek", "Dharamshala", "Himachal Pradesh", "Easy", "2D/1N"],
   ["Kareri Lake Trek", "Dharamshala", "Himachal Pradesh", "Moderate", "3D/2N"],
   ["Indrahar Pass Trek", "Dharamshala", "Himachal Pradesh", "Moderate", "4D/3N"],
@@ -76,8 +77,74 @@ const CATALOG = [
   ["Mudh Village Trek", "Pin Valley", "Himachal Pradesh", "Easy", "2D/1N"],
 ];
 
+const CATALOG_UK = [
+  ["Kedarkantha Trek", "Sankri", "Uttarakhand", "Easy", "6D/5N"],
+  ["Har Ki Dun Trek", "Sankri", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Bali Pass Trek", "Sankri", "Uttarakhand", "Difficult", "8D/7N"],
+  ["Phulara Ridge Trek", "Sankri", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Dev Kyara Trek", "Sankri", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Ruinsara Lake Trek", "Sankri", "Uttarakhand", "Moderate", "8D/7N"],
+  ["Borasu Pass Trek", "Sankri", "Uttarakhand", "Expert", "8D/7N"],
+  ["Kedartal Trek", "Gangotri", "Uttarakhand", "Difficult", "7D/6N"],
+  ["Gaumukh Tapovan Trek", "Gangotri", "Uttarakhand", "Moderate", "8D/7N"],
+  ["Nandanvan Vasuki Tal Trek", "Gangotri", "Uttarakhand", "Difficult", "9D/8N"],
+  ["Dayara Bugyal Trek", "Uttarkashi", "Uttarakhand", "Easy", "4D/3N"],
+  ["Dodital Trek", "Uttarkashi", "Uttarakhand", "Easy", "5D/4N"],
+  ["Darwa Pass Trek", "Uttarkashi", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Auden's Col Trek", "Gangotri", "Uttarakhand", "Expert", "15D/14N"],
+  ["Valley of Flowers Trek", "Joshimath", "Uttarakhand", "Easy", "6D/5N"],
+  ["Hemkund Sahib Trek", "Govindghat", "Uttarakhand", "Easy", "2D/1N"],
+  ["Gorson Bugyal Trek", "Auli", "Uttarakhand", "Easy", "3D/2N"],
+  ["Kuari Pass Trek", "Joshimath", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Pangarchulla Peak Trek", "Joshimath", "Uttarakhand", "Difficult", "7D/6N"],
+  ["Tali Lake Trek", "Auli", "Uttarakhand", "Easy", "2D/1N"],
+  ["Gurson Bugyal Trek", "Auli", "Uttarakhand", "Easy", "1D"],
+  ["Chenab Lake Trek", "Joshimath", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Roopkund Trek", "Lohajung", "Uttarakhand", "Difficult", "8D/7N"],
+  ["Ali Bedni Bugyal Trek", "Lohajung", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Brahmatal Trek", "Lohajung", "Uttarakhand", "Easy", "6D/5N"],
+  ["Bagji Bugyal Trek", "Lohajung", "Uttarakhand", "Moderate", "5D/4N"],
+  ["Ranthan Kharak Trek", "Bageshwar", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Pindari Glacier Trek", "Bageshwar", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Kafni Glacier Trek", "Bageshwar", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Sunderdhunga Trek", "Bageshwar", "Uttarakhand", "Difficult", "8D/7N"],
+  ["Milam Glacier Trek", "Munsiyari", "Uttarakhand", "Difficult", "9D/8N"],
+  ["Ralam Glacier Trek", "Munsiyari", "Uttarakhand", "Difficult", "8D/7N"],
+  ["Namik Glacier Trek", "Munsiyari", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Khaliya Top Trek", "Munsiyari", "Uttarakhand", "Easy", "2D/1N"],
+  ["Panchachuli Base Camp Trek", "Munsiyari", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Nanda Devi East Base Camp Trek", "Munsiyari", "Uttarakhand", "Difficult", "9D/8N"],
+  ["Adi Kailash Trek", "Pithoragarh", "Uttarakhand", "Moderate", "8D/7N"],
+  ["Om Parvat Trek", "Dharchula", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Nag Tibba Trek", "Mussoorie", "Uttarakhand", "Easy", "2D/1N"],
+  ["Surkanda Devi Trek", "Dhanaulti", "Uttarakhand", "Easy", "1D"],
+  ["Chandrashila Trek", "Chopta", "Uttarakhand", "Easy", "3D/2N"],
+  ["Tungnath Trek", "Chopta", "Uttarakhand", "Easy", "1D"],
+  ["Deoria Tal Trek", "Sari Village", "Uttarakhand", "Easy", "2D/1N"],
+  ["Chopta Chandrashila Trek", "Chopta", "Uttarakhand", "Easy", "3D/2N"],
+  ["Kartik Swami Trek", "Rudraprayag", "Uttarakhand", "Easy", "1D"],
+  ["Panwali Kantha Trek", "Ghuttu", "Uttarakhand", "Moderate", "6D/5N"],
+  ["Madhyamaheshwar Trek", "Ukhimath", "Uttarakhand", "Moderate", "4D/3N"],
+  ["Rudranath Trek", "Gopeshwar", "Uttarakhand", "Moderate", "5D/4N"],
+  ["Kalpeshwar Trek", "Helang", "Uttarakhand", "Easy", "2D/1N"],
+  ["Satopanth Lake Trek", "Badrinath", "Uttarakhand", "Difficult", "7D/6N"],
+  ["Kalindi Khal Trek", "Gangotri", "Uttarakhand", "Expert", "14D/13N"],
+  ["Lamkhaga Pass Trek", "Harsil", "Uttarakhand", "Expert", "10D/9N"],
+  ["Bamsaru Khal Trek", "Govind Wildlife Sanctuary", "Uttarakhand", "Difficult", "7D/6N"],
+  ["Black Peak (Kala Nag) Trek", "Sankri", "Uttarakhand", "Expert", "10D/9N"],
+  ["Bandarpunch Base Camp Trek", "Yamunotri", "Uttarakhand", "Difficult", "8D/7N"],
+  ["Fachi Kandi Pass Trek", "Uttarkashi", "Uttarakhand", "Difficult", "9D/8N"],
+  ["Kyarkoti Trek", "Gangotri", "Uttarakhand", "Moderate", "7D/6N"],
+  ["Vasuki Tal Trek", "Kedarnath", "Uttarakhand", "Moderate", "5D/4N"],
+  ["Kedarnath Trek", "Gaurikund", "Uttarakhand", "Easy", "2D/1N"],
+  ["Neelkanth Base Camp Trek", "Badrinath", "Uttarakhand", "Difficult", "6D/5N"],
+];
+
+const CATALOG = [...CATALOG_HP, ...CATALOG_UK];
+
 /** Parent belt used for related-treks + filter expansion */
 const BELT = {
+  // Himachal
   Dharamshala: "Dharamshala",
   Kangra: "Dharamshala",
   Manali: "Manali",
@@ -97,6 +164,33 @@ const BELT = {
   Sirmaur: "Sirmaur",
   Spiti: "Spiti",
   "Pin Valley": "Spiti",
+  // Uttarakhand
+  Sankri: "Sankri",
+  Gangotri: "Gangotri",
+  Uttarkashi: "Uttarkashi",
+  Joshimath: "Joshimath",
+  Govindghat: "Joshimath",
+  Auli: "Joshimath",
+  Lohajung: "Lohajung",
+  Bageshwar: "Bageshwar",
+  Munsiyari: "Munsiyari",
+  Pithoragarh: "Pithoragarh",
+  Dharchula: "Pithoragarh",
+  Mussoorie: "Mussoorie",
+  Dhanaulti: "Mussoorie",
+  Chopta: "Chopta",
+  "Sari Village": "Chopta",
+  Rudraprayag: "Chopta",
+  Ghuttu: "Chopta",
+  Ukhimath: "Chopta",
+  Gopeshwar: "Chopta",
+  Helang: "Joshimath",
+  Badrinath: "Badrinath",
+  Harsil: "Gangotri",
+  "Govind Wildlife Sanctuary": "Sankri",
+  Yamunotri: "Yamunotri",
+  Kedarnath: "Kedarnath",
+  Gaurikund: "Kedarnath",
 };
 
 const LOCAL_IMAGES = [
@@ -170,7 +264,13 @@ function priceFor({ days, difficulty }) {
   return { basePriceInr: rounded, originalPriceInr: rounded + 2500 };
 }
 
-function altitudeFor(difficulty, days, destination) {
+function altitudeFor(difficulty, days, destination, state) {
+  if (/uttarakhand/i.test(state || "")) {
+    if (difficulty === "challenging") return 17000 + days * 120;
+    if (difficulty === "difficult") return 14000 + days * 180;
+    if (difficulty === "moderate") return 11000 + days * 220;
+    return 8500 + days * 250;
+  }
   if (/spiti|kinnaur|kalpa|janglik|pin valley/i.test(destination)) {
     return 14000 + days * 200;
   }
@@ -180,7 +280,13 @@ function altitudeFor(difficulty, days, destination) {
   return 7000 + days * 300;
 }
 
-function seasonsFor(destination) {
+function seasonsFor(destination, state) {
+  if (/uttarakhand/i.test(state || "")) {
+    if (/sankri|lohajung|munsiyari|gangotri|harsil/i.test(destination)) {
+      return ["spring", "autumn", "winter"];
+    }
+    return ["spring", "summer", "autumn"];
+  }
   if (/spiti|kinnaur|kalpa|janglik|pin valley/i.test(destination)) {
     return ["summer", "autumn"];
   }
@@ -258,15 +364,15 @@ function buildItinerary(title, days, destination) {
   });
 }
 
-function defaultContent(entry) {
+function defaultContent(entry, usedSlugs) {
   const [title, destination, state, difficultyRaw, durationLabel] = entry;
   const { days, nights } = parseDuration(durationLabel);
   const difficulty = mapDifficulty(difficultyRaw);
   const belt = BELT[destination] || destination;
   const { basePriceInr, originalPriceInr } = priceFor({ days, difficulty });
-  const bestSeasons = seasonsFor(destination);
+  const bestSeasons = seasonsFor(destination, state);
   const months = monthsFor(bestSeasons);
-  const maxAltitude = altitudeFor(difficulty, days, destination);
+  const maxAltitude = altitudeFor(difficulty, days, destination, state);
   const distanceKm = Math.max(6, days * 7);
   const imgBase = LOCAL_IMAGES[(slugify(title).length + days) % LOCAL_IMAGES.length];
   const heroImages = [
@@ -275,8 +381,14 @@ function defaultContent(entry) {
     LOCAL_IMAGES[(days + 7) % LOCAL_IMAGES.length],
   ];
 
+  let slug = slugify(title);
+  if (usedSlugs.has(slug)) {
+    slug = `${slug}-${slugify(destination)}`;
+  }
+  usedSlugs.add(slug);
+
   return {
-    slug: slugify(title),
+    slug,
     title,
     summary: `${durationLabel} ${title} from ${destination}, ${state} — guided Himalayan experience with India Holiday Destinations.`,
     overview: `${title} is a carefully curated Himalayan trek based around ${destination} in ${state}. Rated ${difficulty} with a ${durationLabel} itinerary, this journey balances scenic walking, safe camping or homestays, and memorable mountain views. India Holiday Destinations handles permits, experienced local guides, meals on trek, and logistics so you can focus on the trail.`,
@@ -386,9 +498,9 @@ function defaultContent(entry) {
     reviews: [],
     relatedSlugs: [],
     seo: {
-      title: `${title} | ${destination} | India Holiday Destinations`,
-      description: `Book ${title} (${durationLabel}) from ${destination}. ${difficulty} Himalayan trek with guided support.`,
-      canonical: `/treks/${slugify(title)}`,
+      title: `${title} | ${destination}, ${state} | India Holiday Destinations`,
+      description: `Book ${title} (${durationLabel}) from ${destination}, ${state}. ${difficulty} Himalayan trek with guided support.`,
+      canonical: `/treks/${slug}`,
       ogImage: heroImages[0],
     },
     status: "published",
@@ -397,7 +509,7 @@ function defaultContent(entry) {
   };
 }
 
-function pickExisting(existing, title) {
+function pickExisting(existing, title, state) {
   const key = normalizeTitle(title);
   const aliasKeys = (TITLE_ALIASES[`${key} trek`] || TITLE_ALIASES[key] || []).map(normalizeTitle);
   const candidates = [key, ...aliasKeys];
@@ -405,17 +517,26 @@ function pickExisting(existing, title) {
   let best = null;
   for (const trek of existing) {
     const n = normalizeTitle(trek.title);
-    if (candidates.some((c) => n === c || n.includes(c) || c.includes(n))) {
-      best = trek;
-      break;
+    if (!candidates.some((c) => n === c || n.includes(c) || c.includes(n))) continue;
+    if (state && trek.state && String(trek.state) !== state) continue;
+    best = trek;
+    break;
+  }
+  if (!best) {
+    for (const trek of existing) {
+      const n = normalizeTitle(trek.title);
+      if (candidates.some((c) => n === c || n.includes(c) || c.includes(n))) {
+        best = trek;
+        break;
+      }
     }
   }
   return best;
 }
 
-function mergeTrek(entry, existing) {
-  const generated = defaultContent(entry);
-  if (!existing) return generated;
+function mergeTrek(entry, existingDoc, usedSlugs) {
+  const generated = defaultContent(entry, usedSlugs);
+  if (!existingDoc) return generated;
 
   const [title, destination, state, difficultyRaw, durationLabel] = entry;
   const { days, nights } = parseDuration(durationLabel);
@@ -423,31 +544,29 @@ function mergeTrek(entry, existing) {
   const belt = BELT[destination] || destination;
   const prices = priceFor({ days, difficulty });
 
-  const heroImages = Array.isArray(existing.heroImages) && existing.heroImages.length
-    ? existing.heroImages.map((src) =>
+  const heroImages = Array.isArray(existingDoc.heroImages) && existingDoc.heroImages.length
+    ? existingDoc.heroImages.map((src) =>
         String(src).startsWith("http") ? LOCAL_IMAGES[0] : src,
       )
     : generated.heroImages;
 
   return {
-    ...existing,
+    ...existingDoc,
     ...generated,
-    // keep rich narrative when present
-    summary: existing.summary || generated.summary,
-    overview: existing.overview || generated.overview,
-    highlights: existing.highlights?.length ? existing.highlights : generated.highlights,
-    itinerary: existing.itinerary?.length ? existing.itinerary : generated.itinerary,
-    inclusions: existing.inclusions?.length ? existing.inclusions : generated.inclusions,
-    exclusions: existing.exclusions?.length ? existing.exclusions : generated.exclusions,
-    packingList: existing.packingList?.length ? existing.packingList : generated.packingList,
-    fitness: existing.fitness?.level ? existing.fitness : generated.fitness,
-    faqs: existing.faqs?.length ? existing.faqs : generated.faqs,
-    gallery: existing.gallery?.length ? existing.gallery : generated.gallery,
-    quickInfo: { ...generated.quickInfo, ...(existing.quickInfo || {}) },
-    weather: existing.weather?.length ? existing.weather : generated.weather,
-    map: existing.map?.overview ? existing.map : generated.map,
+    summary: existingDoc.summary || generated.summary,
+    overview: existingDoc.overview || generated.overview,
+    highlights: existingDoc.highlights?.length ? existingDoc.highlights : generated.highlights,
+    itinerary: existingDoc.itinerary?.length ? existingDoc.itinerary : generated.itinerary,
+    inclusions: existingDoc.inclusions?.length ? existingDoc.inclusions : generated.inclusions,
+    exclusions: existingDoc.exclusions?.length ? existingDoc.exclusions : generated.exclusions,
+    packingList: existingDoc.packingList?.length ? existingDoc.packingList : generated.packingList,
+    fitness: existingDoc.fitness?.level ? existingDoc.fitness : generated.fitness,
+    faqs: existingDoc.faqs?.length ? existingDoc.faqs : generated.faqs,
+    gallery: existingDoc.gallery?.length ? existingDoc.gallery : generated.gallery,
+    quickInfo: { ...generated.quickInfo, ...(existingDoc.quickInfo || {}) },
+    weather: existingDoc.weather?.length ? existingDoc.weather : generated.weather,
+    map: existingDoc.map?.overview ? existingDoc.map : generated.map,
     heroImages,
-    // force catalog mapping
     slug: generated.slug,
     title,
     location: `${destination}, ${state}`,
@@ -457,10 +576,10 @@ function mergeTrek(entry, existing) {
     difficulty,
     durationDays: days,
     durationNights: nights,
-    basePriceInr: existing.basePriceInr || prices.basePriceInr,
-    originalPriceInr: existing.originalPriceInr || prices.originalPriceInr,
+    basePriceInr: existingDoc.basePriceInr || prices.basePriceInr,
+    originalPriceInr: existingDoc.originalPriceInr || prices.originalPriceInr,
     status: "published",
-    publishedAt: existing.publishedAt || generated.publishedAt,
+    publishedAt: existingDoc.publishedAt || generated.publishedAt,
     deletedAt: null,
   };
 }
@@ -481,17 +600,21 @@ function linkRelated(treks) {
 }
 
 const existing = JSON.parse(fs.readFileSync(existingPath, "utf8"));
-const built = CATALOG.map((entry) => mergeTrek(entry, pickExisting(existing, entry[0])));
+const usedSlugs = new Set();
+const built = CATALOG.map((entry) =>
+  mergeTrek(entry, pickExisting(existing, entry[0], entry[2]), usedSlugs),
+);
 const finalTreks = linkRelated(built);
 
 fs.writeFileSync(outPath, `${JSON.stringify(finalTreks, null, 2)}\n`, "utf8");
 
-const merged = built.filter((t) =>
-  existing.some((e) => normalizeTitle(e.title) === normalizeTitle(t.title) || e.slug === t.slug),
-).length;
+const byState = finalTreks.reduce((acc, t) => {
+  acc[t.state] = (acc[t.state] || 0) + 1;
+  return acc;
+}, {});
 
 console.log(`Wrote ${finalTreks.length} treks → ${path.relative(root, outPath)}`);
-console.log(`Merged from existing: ${merged}, newly generated: ${finalTreks.length - merged}`);
+console.log("By state:", byState);
 console.log(
   "Destinations:",
   [...new Set(finalTreks.map((t) => t.destinationName))].sort().join(", "),

@@ -114,7 +114,7 @@ export default function AdminTreksPage() {
 
   const loadStatsAndRegions = useCallback(async () => {
     try {
-      const all = await adminListTreks({ limit: 100 });
+      const all = await adminListTreks({ limit: 150 });
       const rows = all.items;
       setStats({
         total: Number(all.meta?.total ?? rows.length),

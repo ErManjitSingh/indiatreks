@@ -39,6 +39,15 @@ export class TrekRepository extends BaseRepository<ITrek> {
         Chamba: "Chamba",
         Kinnaur: "Kinnaur",
         Spiti: "Spiti",
+        Sankri: "Sankri",
+        Gangotri: "Gangotri",
+        Joshimath: "Joshimath",
+        Lohajung: "Lohajung",
+        Bageshwar: "Bageshwar",
+        Munsiyari: "Munsiyari",
+        Chopta: "Chopta",
+        Mussoorie: "Mussoorie",
+        Pithoragarh: "Pithoragarh",
       };
       const region = expand[dest];
       if (region) {
