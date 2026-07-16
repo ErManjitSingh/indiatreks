@@ -32,7 +32,7 @@ function RegionIcon({ type }: { type: DestinationShowcase["icon"] }) {
 }
 
 export function DestinationsSection() {
-  const { destinationShowcases, site } = useSiteContent();
+  const { destinationShowcases } = useSiteContent();
   const showcases = destinationShowcases.length ? destinationShowcases : staticShowcases;
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
