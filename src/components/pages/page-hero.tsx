@@ -43,28 +43,28 @@ export function PageHero({
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.55)_0%,rgba(8,12,20,0.72)_55%,rgba(8,12,20,0.92)_100%)]" />
 
       <Container className="relative z-[1] py-14 md:py-20 lg:py-24">
-        <nav aria-label="Breadcrumb" className="mb-6 text-[11px] font-semibold tracking-[0.14em] text-white/55 uppercase">
+        <nav aria-label="Breadcrumb" className="mb-6 text-[11px] font-semibold tracking-[0.14em] text-white/70 uppercase">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/" className="transition hover:text-white">
+              <Link href="/" className="text-white/70 transition hover:text-white">
                 Home
               </Link>
             </li>
-            <li aria-hidden className="text-white/35">
+            <li aria-hidden className="text-white/40">
               /
             </li>
-            <li className="text-lime">{eyebrow}</li>
+            <li className="text-white">{eyebrow}</li>
           </ol>
         </nav>
 
         <div className="max-w-3xl">
-          <p className="text-[11px] font-bold tracking-[0.22em] text-lime uppercase">
+          <p className="text-[11px] font-bold tracking-[0.22em] text-white uppercase">
             {eyebrow}
           </p>
           <h1 className="mt-3 font-display text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-tight tracking-tight text-white">
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/75 md:text-base">
+          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/90 md:text-base">
             {description}
           </p>
         </div>
