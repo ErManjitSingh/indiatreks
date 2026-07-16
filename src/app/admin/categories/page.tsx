@@ -7,18 +7,17 @@ import {
   AdminPageHeader,
   AdminTable,
   ConfirmDeleteButton,
-  StatusPill,
   adminInputClass,
 } from "@/components/admin/admin-ui";
 import { toast } from "@/components/ui/toast";
 import {
-  adminDeleteDestination,
-  adminListDestinations,
+  adminDeleteCategory,
+  adminListCategories,
   getErrorMessage,
   type AdminDoc,
 } from "@/lib/api/admin";
 
-export default function AdminDestinationsPage() {
+export default function AdminCategoriesPage() {
   const [items, setItems] = useState<AdminDoc[]>([]);
   const [total, setTotal] = useState(0);
   const [q, setQ] = useState("");
@@ -27,11 +26,17 @@ export default function AdminDestinationsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { items: rows, meta } = await adminListDestinations({ q: q || undefined, limit: 100 });
-      setItems(rows);
+      const { items: rows, meta } = await adminListCategories({ limit: 100 });
+      const filtered = q
+        ? rows.filter((row) => {
+            const hay = `${row.name ?? ""} ${row.slug ?? ""} ${row.type ?? ""}`.toLowerCase();
+            return hay.includes(q.toLowerCase());
+          })
+        : rows;
+      setItems(filtered);
       setTotal(Number(meta?.total ?? rows.length));
     } catch (err) {
-      toast.error(getErrorMessage(err, "Failed to load destinations"));
+      toast.error(getErrorMessage(err, "Failed to load categories"));
     } finally {
       setLoading(false);
     }
@@ -44,14 +49,14 @@ export default function AdminDestinationsPage() {
   return (
     <div>
       <AdminPageHeader
-        title="Destinations"
-        description={`${total} destinations in MongoDB`}
-        actionHref="/admin/destinations/new"
-        actionLabel="Add destination"
+        title="Categories"
+        description={`${total} categories in MongoDB`}
+        actionHref="/admin/categories/new"
+        actionLabel="Add category"
       >
         <input
           className={`${adminInputClass} max-w-xs`}
-          placeholder="Search…"
+          placeholder="Filter…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -61,9 +66,8 @@ export default function AdminDestinationsPage() {
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[#F4F6F3] text-xs uppercase tracking-wide text-[#6b7668]">
             <tr>
-              <th className="px-4 py-3">Destination</th>
-              <th className="px-4 py-3">Region / State</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -74,16 +78,11 @@ export default function AdminDestinationsPage() {
                   <p className="font-semibold">{String(row.name)}</p>
                   <p className="text-xs text-[#6b7668]">{String(row.slug)}</p>
                 </td>
-                <td className="px-4 py-3">
-                  {[row.region, row.state].filter(Boolean).map(String).join(" · ") || "—"}
-                </td>
-                <td className="px-4 py-3">
-                  <StatusPill value={String(row.status ?? "")} />
-                </td>
+                <td className="px-4 py-3 capitalize">{String(row.type ?? "—")}</td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
                     <Link
-                      href={`/admin/destinations/${row._id}/edit`}
+                      href={`/admin/categories/${row._id}/edit`}
                       className="text-sm font-semibold text-[#2D5A27] hover:underline"
                     >
                       Edit
@@ -91,8 +90,8 @@ export default function AdminDestinationsPage() {
                     <ConfirmDeleteButton
                       onConfirm={async () => {
                         try {
-                          await adminDeleteDestination(String(row._id));
-                          toast.success("Destination deleted");
+                          await adminDeleteCategory(String(row._id));
+                          toast.success("Category deleted");
                           await load();
                         } catch (err) {
                           toast.error(getErrorMessage(err));
@@ -105,8 +104,8 @@ export default function AdminDestinationsPage() {
             ))}
             {!loading && items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-[#6b7668]">
-                  No destinations found.
+                <td colSpan={3} className="px-4 py-8 text-center text-[#6b7668]">
+                  No categories found.
                 </td>
               </tr>
             ) : null}

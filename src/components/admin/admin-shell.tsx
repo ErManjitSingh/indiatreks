@@ -5,10 +5,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   BookOpen,
+  FolderTree,
+  HelpCircle,
+  Image as ImageIcon,
   LayoutDashboard,
   LogOut,
   Map,
+  MessageSquareQuote,
   Mountain,
+  Newspaper,
   ExternalLink,
 } from "lucide-react";
 
@@ -20,8 +25,13 @@ import { cn } from "@/lib/utils";
 const nav = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/treks", label: "Treks", icon: Mountain },
-  { href: "/admin/content", label: "Site content", icon: BookOpen },
   { href: "/admin/destinations", label: "Destinations", icon: Map },
+  { href: "/admin/blogs", label: "Blogs", icon: Newspaper },
+  { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
+  { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
+  { href: "/admin/categories", label: "Categories", icon: FolderTree },
+  { href: "/admin/media", label: "Media", icon: ImageIcon },
+  { href: "/admin/content", label: "Site content", icon: BookOpen },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -67,7 +77,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <p className="mt-2 truncate text-xs text-white/60">{user?.email}</p>
             <p className="mt-0.5 text-[11px] capitalize text-[#C5E063]/80">{user?.role?.replaceAll("_", " ")}</p>
           </div>
-          <nav className="flex flex-1 flex-col gap-1 p-3">
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
             {nav.map((item) => {
               const active = item.exact
                 ? pathname === item.href

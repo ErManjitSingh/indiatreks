@@ -82,3 +82,18 @@ export async function apiPost<T>(url: string, body?: unknown): Promise<ApiSucces
   const res = await getApiClient().post<ApiSuccess<T>>(url, body);
   return res.data;
 }
+
+export async function apiPatch<T>(url: string, body?: unknown): Promise<ApiSuccess<T>> {
+  const res = await getApiClient().patch<ApiSuccess<T>>(url, body);
+  return res.data;
+}
+
+export async function apiPut<T>(url: string, body?: unknown): Promise<ApiSuccess<T>> {
+  const res = await getApiClient().put<ApiSuccess<T>>(url, body);
+  return res.data;
+}
+
+export async function apiDelete<T = null>(url: string): Promise<ApiSuccess<T>> {
+  const res = await getApiClient().delete<ApiSuccess<T>>(url);
+  return res.data;
+}
