@@ -54,9 +54,11 @@ export class TrekRepository extends BaseRepository<ITrek> {
     if (filters.q) {
       query.$or = [
         { title: new RegExp(filters.q, "i") },
+        { slug: new RegExp(filters.q, "i") },
         { summary: new RegExp(filters.q, "i") },
         { destinationName: new RegExp(filters.q, "i") },
         { location: new RegExp(filters.q, "i") },
+        { region: new RegExp(filters.q, "i") },
       ];
     }
 
