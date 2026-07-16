@@ -7,13 +7,15 @@ import { getPagination, paginateMeta } from "../utils/pagination";
 import { ApiError } from "../utils/ApiError";
 
 export const uploadMedia = asyncHandler(async (req: Request, res: Response) => {
-  const file = (req as unknown as { file?: { buffer: Buffer } }).file;
+  const file = req.file;
   if (!file) throw new ApiError(400, "No file uploaded", "FILE_REQUIRED");
 
   const media = await mediaService.uploadImage(file.buffer, {
     folder: req.body.folder,
     alt: req.body.alt,
     uploadedBy: req.user?.id,
+    mimetype: file.mimetype,
+    originalname: file.originalname,
   });
   return sendSuccess(res, media, "File uploaded", 201);
 });

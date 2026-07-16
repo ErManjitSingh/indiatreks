@@ -1,5 +1,9 @@
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import { randomUUID } from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
 import multer from "multer";
+
 import { env } from "../config/env";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../utils/logger";
@@ -21,6 +25,29 @@ function ensureConfigured(): void {
   configured = true;
 }
 
+function extFromMime(mimetype?: string, originalname?: string): string {
+  if (mimetype === "image/jpeg") return "jpg";
+  if (mimetype === "image/png") return "png";
+  if (mimetype === "image/webp") return "webp";
+  if (mimetype === "image/gif") return "gif";
+  if (mimetype === "image/avif") return "avif";
+  const fromName = originalname?.split(".").pop()?.toLowerCase();
+  if (fromName && ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(fromName)) {
+    return fromName === "jpeg" ? "jpg" : fromName;
+  }
+  return "jpg";
+}
+
+function sanitizeFolder(folder?: string): string {
+  const cleaned = (folder || env.CLOUDINARY_FOLDER || "site-assets")
+    .replace(/\\/g, "/")
+    .split("/")
+    .map((part) => part.replace(/[^a-zA-Z0-9_-]/g, ""))
+    .filter(Boolean)
+    .join("/");
+  return cleaned || "site-assets";
+}
+
 export const uploadMiddleware = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: env.UPLOAD_MAX_MB * 1024 * 1024 },
@@ -33,12 +60,8 @@ export const uploadMiddleware = multer({
   },
 });
 
-async function uploadBuffer(buffer: Buffer, folder?: string): Promise<UploadApiResponse> {
+async function uploadToCloudinary(buffer: Buffer, folder?: string): Promise<UploadApiResponse> {
   ensureConfigured();
-  if (!isCloudinaryConfigured()) {
-    throw new ApiError(503, "Media storage is not configured", "MEDIA_NOT_CONFIGURED");
-  }
-
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder: folder ?? env.CLOUDINARY_FOLDER, resource_type: "image" },
@@ -54,11 +77,48 @@ async function uploadBuffer(buffer: Buffer, folder?: string): Promise<UploadApiR
   });
 }
 
+async function uploadToLocal(
+  buffer: Buffer,
+  options: { folder?: string; mimetype?: string; originalname?: string },
+): Promise<{
+  public_id: string;
+  secure_url: string;
+  format: string;
+  width: number;
+  height: number;
+  bytes: number;
+}> {
+  const folder = sanitizeFolder(options.folder);
+  const ext = extFromMime(options.mimetype, options.originalname);
+  const filename = `${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
+  const dir = path.join(process.cwd(), "uploads", folder);
+  await fs.mkdir(dir, { recursive: true });
+  await fs.writeFile(path.join(dir, filename), buffer);
+
+  return {
+    public_id: `local/${folder}/${filename}`,
+    secure_url: `/api/uploads/${folder}/${filename}`,
+    format: ext,
+    width: 0,
+    height: 0,
+    bytes: buffer.length,
+  };
+}
+
 async function uploadImage(
   buffer: Buffer,
-  options: { folder?: string; alt?: string; uploadedBy?: string } = {},
+  options: {
+    folder?: string;
+    alt?: string;
+    uploadedBy?: string;
+    mimetype?: string;
+    originalname?: string;
+  } = {},
 ) {
-  const result = await uploadBuffer(buffer, options.folder);
+  const result = isCloudinaryConfigured()
+    ? await uploadToCloudinary(buffer, options.folder)
+    : await uploadToLocal(buffer, options);
+
   const media = await MediaModel.create({
     publicId: result.public_id,
     url: result.secure_url,
@@ -66,7 +126,7 @@ async function uploadImage(
     width: result.width,
     height: result.height,
     bytes: result.bytes,
-    folder: options.folder ?? env.CLOUDINARY_FOLDER,
+    folder: sanitizeFolder(options.folder),
     uploadedBy: options.uploadedBy,
     alt: options.alt,
   });
@@ -74,12 +134,23 @@ async function uploadImage(
 }
 
 async function deleteImage(publicId: string): Promise<void> {
-  ensureConfigured();
-  if (isCloudinaryConfigured()) {
+  if (publicId.startsWith("local/")) {
+    const relative = publicId.replace(/^local\//, "");
+    const filePath = path.join(process.cwd(), "uploads", relative);
+    try {
+      await fs.unlink(filePath);
+    } catch (err) {
+      logger.warn("Failed to delete local image", { publicId, error: (err as Error).message });
+    }
+  } else if (isCloudinaryConfigured()) {
+    ensureConfigured();
     try {
       await cloudinary.uploader.destroy(publicId);
     } catch (err) {
-      logger.warn("Failed to delete image from Cloudinary", { publicId, error: (err as Error).message });
+      logger.warn("Failed to delete image from Cloudinary", {
+        publicId,
+        error: (err as Error).message,
+      });
     }
   }
   await MediaModel.findOneAndUpdate({ publicId }, { deletedAt: new Date() });
