@@ -2,19 +2,25 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { BookOpen, ImageIcon, MapPin, Mountain } from "lucide-react";
+import { BookOpen, FolderTree, HelpCircle, MapPin, Mountain, Newspaper } from "lucide-react";
 
 import { getStoredUser, type AuthUser } from "@/lib/api/auth";
-import { fetchBootstrap } from "@/lib/api/content";
-import { fetchTreks } from "@/lib/api/treks";
+import {
+  adminGetSettings,
+  adminListBlogs,
+  adminListCategories,
+  adminListDestinations,
+  adminListFaqs,
+  adminListTreks,
+  getErrorMessage,
+} from "@/lib/api/admin";
 
 type Stats = {
   trekCount: number;
   destinationCount: number;
   faqCount: number;
-  testimonialCount: number;
   blogCount: number;
-  mediaCount: number;
+  categoryCount: number;
   siteName: string;
 };
 
@@ -28,26 +34,26 @@ export default function AdminOverviewPage() {
     let cancelled = false;
     (async () => {
       try {
-        const [bootstrap, treks] = await Promise.all([
-          fetchBootstrap(),
-          fetchTreks({ limit: 1 }),
+        const [treks, destinations, faqs, blogs, categories, settings] = await Promise.all([
+          adminListTreks({ limit: 1 }),
+          adminListDestinations({ limit: 1 }),
+          adminListFaqs({ limit: 1 }),
+          adminListBlogs({ limit: 1 }),
+          adminListCategories({ limit: 1 }),
+          adminGetSettings("site"),
         ]);
         if (cancelled) return;
+        const site = (settings["site.config"] as { name?: string } | undefined) ?? {};
         setStats({
-          trekCount: Number(bootstrap?.meta?.trekCount ?? treks.meta?.total ?? 0),
-          destinationCount: Array.isArray(bootstrap?.destinations)
-            ? bootstrap.destinations.length
-            : 0,
-          faqCount: Array.isArray(bootstrap?.faqs) ? bootstrap.faqs.length : 0,
-          testimonialCount: Array.isArray(bootstrap?.testimonials)
-            ? bootstrap.testimonials.length
-            : 0,
-          blogCount: Array.isArray(bootstrap?.blogs) ? bootstrap.blogs.length : 0,
-          mediaCount: Array.isArray(bootstrap?.media) ? bootstrap.media.length : 0,
-          siteName: String(bootstrap?.site?.name ?? "India Holiday Destinations"),
+          trekCount: Number(treks.meta?.total ?? 0),
+          destinationCount: Number(destinations.meta?.total ?? 0),
+          faqCount: Number(faqs.meta?.total ?? 0),
+          blogCount: Number(blogs.meta?.total ?? 0),
+          categoryCount: Number(categories.meta?.total ?? 0),
+          siteName: String(site.name ?? "India Holiday Destinations"),
         });
-      } catch {
-        if (!cancelled) setError("Could not load dashboard stats from API.");
+      } catch (err) {
+        if (!cancelled) setError(getErrorMessage(err, "Could not load dashboard stats from API."));
       }
     })();
     return () => {
@@ -58,19 +64,11 @@ export default function AdminOverviewPage() {
   const cards = stats
     ? [
         { label: "Treks", value: stats.trekCount, href: "/admin/treks", icon: Mountain },
-        {
-          label: "Destinations",
-          value: stats.destinationCount,
-          href: "/admin/destinations",
-          icon: MapPin,
-        },
-        {
-          label: "Site content",
-          value: stats.faqCount + stats.blogCount,
-          href: "/admin/content",
-          icon: BookOpen,
-        },
-        { label: "Media URLs", value: stats.mediaCount, href: "/admin/content", icon: ImageIcon },
+        { label: "Destinations", value: stats.destinationCount, href: "/admin/destinations", icon: MapPin },
+        { label: "Blogs", value: stats.blogCount, href: "/admin/blogs", icon: Newspaper },
+        { label: "FAQs", value: stats.faqCount, href: "/admin/faqs", icon: HelpCircle },
+        { label: "Categories", value: stats.categoryCount, href: "/admin/categories", icon: FolderTree },
+        { label: "Site content", value: 1, href: "/admin/content", icon: BookOpen },
       ]
     : [];
 
@@ -94,7 +92,7 @@ export default function AdminOverviewPage() {
 
       {stats ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {cards.map((card) => {
               const Icon = card.icon;
               return (
@@ -124,25 +122,7 @@ export default function AdminOverviewPage() {
               <li>
                 API: <code className="rounded bg-[#F4F6F3] px-1.5 py-0.5 text-xs">/api/v1</code>
               </li>
-              <li>
-                Public docs:{" "}
-                <a
-                  className="font-semibold text-[#2D5A27] hover:underline"
-                  href="/api/v1/docs"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  /api/v1/docs
-                </a>
-              </li>
-              <li>
-                Testimonials in Mongo:{" "}
-                <span className="font-semibold">{stats.testimonialCount}</span>
-              </li>
             </ul>
-            <p className="mt-4 text-xs text-[#6b7668]">
-              Lead capturing CRM is separate — this panel manages website/trek content only.
-            </p>
           </div>
         </>
       ) : null}

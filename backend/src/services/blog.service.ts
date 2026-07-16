@@ -33,7 +33,12 @@ async function list(query: ListQuery) {
   }
 
   const [items, total] = await Promise.all([
-    BlogModel.find(filter).sort({ publishedAt: -1, createdAt: -1 }).skip(skip).limit(limit),
+    BlogModel.find(filter)
+      .select("slug title excerpt coverImage category tags status publishedAt readingTimeMinutes author createdAt updatedAt")
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     BlogModel.countDocuments(filter),
   ]);
   return { items, meta: paginateMeta(total, page, limit) };

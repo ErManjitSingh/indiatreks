@@ -10,6 +10,39 @@ interface ListQuery extends TrekListFilters {
   sort?: string;
 }
 
+/** Fields needed for cards / admin tables — excludes itinerary, faqs, packing, etc. */
+export const TREK_LISTING_SELECT = [
+  "_id",
+  "slug",
+  "title",
+  "summary",
+  "destinationName",
+  "location",
+  "state",
+  "region",
+  "difficulty",
+  "bestSeasons",
+  "durationDays",
+  "durationNights",
+  "maxAltitude",
+  "distanceKm",
+  "basePriceInr",
+  "originalPriceInr",
+  "rating",
+  "reviewCount",
+  "heroImages",
+  "seatsLeft",
+  "badges",
+  "trekTypes",
+  "suitableFor",
+  "months",
+  "departures",
+  "status",
+  "createdAt",
+  "publishedAt",
+  "updatedAt",
+].join(" ");
+
 function resolveSort(sort?: string): Record<string, 1 | -1> {
   switch (sort) {
     case "price-asc":
@@ -33,7 +66,13 @@ async function list(query: ListQuery) {
   const filter = trekRepository.buildFilterQuery(query);
   const sort = resolveSort(query.sort);
 
-  const { items, total } = await trekRepository.paginate({ filter, sort, skip, limit });
+  const { items, total } = await trekRepository.paginate({
+    filter,
+    sort,
+    skip,
+    limit,
+    select: TREK_LISTING_SELECT,
+  });
   return { items, meta: paginateMeta(total, page, limit) };
 }
 
@@ -126,6 +165,7 @@ async function getRelated(slug: string, limit = 4) {
     const related = await trekRepository.findMany({
       filter: { slug: { $in: trek.relatedSlugs }, status: "published" },
       limit,
+      select: TREK_LISTING_SELECT,
     });
     if (related.length) return related;
   }
@@ -137,6 +177,7 @@ async function getRelated(slug: string, limit = 4) {
       $or: [{ region: trek.region }, { destinationName: trek.destinationName }],
     },
     limit,
+    select: TREK_LISTING_SELECT,
   });
 }
 

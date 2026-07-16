@@ -68,15 +68,10 @@ export function SiteShell({
   showStickyBooking = true,
 }: SiteShellProps) {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
   const isHome = pathname === "/";
   const isTreksListing = pathname === "/treks";
   const isTrekDetail = /^\/treks\/.+/.test(pathname);
   const hideGlobalStickyBooking = isHome || isTreksListing || isTrekDetail;
-
-  if (isAdmin) {
-    return <>{children}</>;
-  }
 
   return (
     <>

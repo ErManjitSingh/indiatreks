@@ -24,7 +24,13 @@ async function list(query: ListQuery) {
     filter.$or = [{ name: new RegExp(query.q, "i") }, { summary: new RegExp(query.q, "i") }];
   }
 
-  const { items, total } = await destinationRepository.paginate({ filter, sort: { name: 1 }, skip, limit });
+  const { items, total } = await destinationRepository.paginate({
+    filter,
+    sort: { name: 1 },
+    skip,
+    limit,
+    select: "slug name region state summary coverImage trekCount status weatherNotes createdAt updatedAt",
+  });
   return { items, meta: paginateMeta(total, page, limit) };
 }
 

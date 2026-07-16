@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+
 import { SiteShell } from "@/components/layout";
 import { Seo } from "@/components/seo";
 import { fontBody, fontBrush, fontDisplay, fontHeading } from "@/config/fonts";
@@ -33,7 +35,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const bootstrap = await fetchBootstrap();
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  const isAdmin = pathname.startsWith("/admin");
+  // Admin does not need homepage bootstrap payload (saves ~50KB+ per request).
+  const bootstrap = isAdmin ? null : await fetchBootstrap();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -42,8 +47,14 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders bootstrap={bootstrap}>
-          <Seo />
-          <SiteShell>{children}</SiteShell>
+          {isAdmin ? (
+            children
+          ) : (
+            <>
+              <Seo />
+              <SiteShell>{children}</SiteShell>
+            </>
+          )}
         </AppProviders>
       </body>
     </html>

@@ -29,7 +29,7 @@ async function listResource<T>(
 
 /* ---------- Treks ---------- */
 export async function adminListTreks(params?: Record<string, unknown>) {
-  return listResource<AdminDoc>("/treks", { limit: 100, ...params });
+  return listResource<AdminDoc>("/treks", { limit: 50, ...params });
 }
 
 export async function adminGetTrek(id: string) {

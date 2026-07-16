@@ -21,7 +21,7 @@ export class TrekRepository extends BaseRepository<ITrek> {
   }
 
   buildFilterQuery(filters: TrekListFilters): FilterQuery<ITrek> {
-    const query: FilterQuery<ITrek> = {};
+    const query: FilterQuery<ITrek> = { deletedAt: null };
 
     if (filters.status) {
       query.status = filters.status;
