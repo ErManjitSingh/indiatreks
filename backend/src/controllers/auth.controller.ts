@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { sendSuccess } from "../utils/response";
 import { authService } from "../services/auth.service";
+import { tokenService } from "../services/token.service";
 import { ApiError } from "../utils/ApiError";
 import { env } from "../config/env";
 
@@ -42,6 +43,13 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   const token = req.body.refreshToken || req.cookies?.[REFRESH_COOKIE];
   if (req.user) {
     await authService.logout(req.user.id, token);
+  } else if (token) {
+    try {
+      const payload = tokenService.verifyRefresh(token);
+      await authService.logout(payload.sub, token);
+    } catch {
+      // ignore invalid refresh on logout
+    }
   }
   res.clearCookie(REFRESH_COOKIE, { path: "/api/v1/auth" });
   return sendSuccess(res, null, "Logged out successfully");

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getStoredUser, logoutSession, type AuthUser } from "@/lib/api/auth";
+import { getStoredUser, logoutSession, ensureAuthSession, type AuthUser } from "@/lib/api/auth";
 import { isStaffRole } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
@@ -41,13 +41,25 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const stored = getStoredUser();
-    if (!stored || !isStaffRole(stored.role)) {
-      router.replace("/login?next=/admin");
-      return;
-    }
-    setUser(stored);
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const stored = getStoredUser();
+      if (!stored || !isStaffRole(stored.role)) {
+        router.replace("/login?next=/admin");
+        return;
+      }
+      const ok = await ensureAuthSession();
+      if (cancelled) return;
+      if (!ok) {
+        router.replace("/login?next=/admin");
+        return;
+      }
+      setUser(getStoredUser() ?? stored);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   async function onLogout() {

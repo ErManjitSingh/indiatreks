@@ -1,4 +1,4 @@
-import { apiPost } from "@/lib/api/client";
+import { apiPost, getApiClient } from "@/lib/api/client";
 
 export type AuthUser = {
   id: string;
@@ -37,6 +37,11 @@ export function getAccessToken(): string | null {
   return localStorage.getItem(ACCESS_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(REFRESH_KEY);
+}
+
 export function getStoredUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(USER_KEY);
@@ -50,16 +55,42 @@ export function getStoredUser(): AuthUser | null {
 
 export async function loginWithEmail(email: string, password: string) {
   const res = await apiPost<AuthResponse>("/auth/login", { email, password });
+  if (!res.data?.accessToken || !res.data?.refreshToken) {
+    throw new Error("Login response missing tokens");
+  }
   saveSession(res.data);
   return res.data;
 }
 
+/** Ensure access token is valid (refresh if needed). Returns false if session is dead. */
+export async function ensureAuthSession(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const access = getAccessToken();
+  const refresh = getRefreshToken();
+  if (!access && !refresh) return false;
+
+  try {
+    await getApiClient().get("/auth/me");
+    return true;
+  } catch {
+    // interceptor may already refresh; try once more after short wait
+    if (!getAccessToken()) return false;
+    try {
+      await getApiClient().get("/auth/me");
+      return true;
+    } catch {
+      clearSession();
+      return false;
+    }
+  }
+}
+
 export async function logoutSession() {
-  const refreshToken = typeof window !== "undefined" ? localStorage.getItem(REFRESH_KEY) : null;
+  const refreshToken = getRefreshToken();
   try {
     if (refreshToken) await apiPost("/auth/logout", { refreshToken });
   } catch {
-    // ignore
+    // ignore — still clear local session
   }
   clearSession();
 }
