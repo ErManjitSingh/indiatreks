@@ -53,7 +53,7 @@ const CompareBar = dynamic(
   { ssr: false },
 );
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 5;
 
 const sortLabels: Record<TrekSortOption, string> = {
   popularity: "Popularity",
@@ -74,7 +74,6 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const searchParams = useSearchParams();
   const hydrated = useHasHydrated();
   const [isPending, startTransition] = useTransition();
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const treks = useMemo(() => initialTreks ?? [], [initialTreks]);
@@ -97,8 +96,12 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const activeFilterCount = countActiveFilters(filters);
   const results = useMemo(() => filterTreks(treks, filters), [filters, treks]);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
-  const visibleTreks = results.slice(0, visibleCount);
-  const hasMore = visibleCount < results.length;
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const visibleTreks = results.slice(pageStart, pageStart + PAGE_SIZE);
+  const hasMore = safePage < totalPages;
+  const showingFrom = results.length ? pageStart + 1 : 0;
+  const showingTo = Math.min(pageStart + PAGE_SIZE, results.length);
 
   const filterOptions = useMemo(() => {
     const destinations = [
@@ -113,11 +116,9 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
     return { destinations, states, regions };
   }, [treks]);
 
-  // Prefer virtualizing the full filtered set once shown (after load-more expands).
-  const listTreks = results.length > 0 && !hasMore ? results : visibleTreks;
+  const listTreks = visibleTreks;
 
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
     setPage(1);
   }, [searchParams]);
 
@@ -135,16 +136,15 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const resetFilters = () => pushFilters(defaultTrekFilters);
 
   const loadMore = async () => {
+    if (!hasMore) return;
     setLoadingMore(true);
-    await new Promise((resolve) => setTimeout(resolve, 350));
-    setVisibleCount((count) => count + PAGE_SIZE);
+    await new Promise((resolve) => setTimeout(resolve, 250));
     setPage((current) => Math.min(current + 1, totalPages));
     setLoadingMore(false);
   };
 
   const goToPage = (nextPage: number) => {
-    setPage(nextPage);
-    setVisibleCount(nextPage * PAGE_SIZE);
+    setPage(Math.max(1, Math.min(nextPage, totalPages)));
   };
 
   const listClass =
@@ -192,7 +192,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
 
             {isPending ? (
               <div className={listClass}>
-                {Array.from({ length: 4 }).map((_, index) => (
+                {Array.from({ length: PAGE_SIZE }).map((_, index) => (
                   <TrekCardSkeleton key={index} />
                 ))}
               </div>
@@ -212,13 +212,15 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
                 ) : null}
 
                 <div className="flex flex-col items-center gap-4 pt-4">
-                  <div className="hidden md:flex">
-                    <Pagination
-                      page={Math.min(page, totalPages)}
-                      totalPages={totalPages}
-                      onChange={goToPage}
-                    />
-                  </div>
+                  {results.length > PAGE_SIZE ? (
+                    <p className="text-sm text-muted-foreground">
+                      Showing {showingFrom}–{showingTo} of {results.length} treks
+                    </p>
+                  ) : null}
+
+                  {totalPages > 1 ? (
+                    <Pagination page={safePage} totalPages={totalPages} onChange={goToPage} />
+                  ) : null}
 
                   {hasMore ? (
                     <Button
@@ -232,11 +234,11 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
                       <RefreshCw className="h-4 w-4" aria-hidden />
                       Load More Treks
                     </Button>
-                  ) : (
+                  ) : results.length > PAGE_SIZE ? (
                     <p className="text-sm text-muted-foreground">
                       You&apos;ve reached the end of this trail list.
                     </p>
-                  )}
+                  ) : null}
                 </div>
               </>
             )}
