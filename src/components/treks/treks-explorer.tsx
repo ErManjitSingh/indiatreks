@@ -77,7 +77,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
-  const treks = initialTreks ?? [];
+  const treks = useMemo(() => initialTreks ?? [], [initialTreks]);
 
   const {
     trekFiltersOpen,
