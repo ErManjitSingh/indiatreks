@@ -134,10 +134,10 @@ export function HeroSearch() {
         </form>
       </div>
 
-      {/* —— Desktop / tablet unchanged —— */}
+      {/* —— Desktop / tablet (white mockup bar) —— */}
       <Container className="relative z-20 -mt-28 hidden md:block lg:-mt-32">
         <form
-          className="overflow-hidden rounded-2xl border border-white/10 bg-[#12161f] text-white shadow-[0_16px_40px_rgba(8,12,20,0.35)] md:rounded-[1.35rem]"
+          className="overflow-hidden rounded-2xl border border-[#e4e9df] bg-white text-[#14201a] shadow-[0_20px_48px_rgba(15,23,42,0.14)] md:rounded-[1.25rem]"
           onSubmit={(e) => {
             e.preventDefault();
             onSearch();
@@ -160,7 +160,7 @@ export function HeroSearch() {
               value={fields.difficulty}
               onChange={fields.setDifficulty}
               options={heroSearchOptions.difficulties}
-              className="sm:border-l sm:border-white/10"
+              className="sm:border-l sm:border-[#e8ece6]"
             />
             <DesktopField
               icon={Clock3}
@@ -169,7 +169,7 @@ export function HeroSearch() {
               value={fields.duration}
               onChange={fields.setDuration}
               options={heroSearchOptions.durations}
-              className="lg:border-l lg:border-white/10"
+              className="lg:border-l lg:border-[#e8ece6]"
             />
             <DesktopField
               icon={CalendarDays}
@@ -178,7 +178,7 @@ export function HeroSearch() {
               value={fields.month}
               onChange={fields.setMonth}
               options={heroSearchOptions.months}
-              className="sm:border-l sm:border-white/10 lg:border-l"
+              className="sm:border-l sm:border-[#e8ece6] lg:border-l"
             />
             <DesktopField
               icon={Wallet}
@@ -187,29 +187,29 @@ export function HeroSearch() {
               value={fields.budget}
               onChange={fields.setBudget}
               options={heroSearchOptions.budgets}
-              className="lg:border-l lg:border-white/10"
+              className="lg:border-l lg:border-[#e8ece6]"
             />
 
             <div className="flex items-stretch p-2.5 sm:col-span-2 lg:col-span-1 lg:p-3">
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d0d5cc] bg-white px-4 py-3 text-xs font-extrabold text-[#1A1A1A] transition hover:bg-[#F7F8F6] sm:text-sm lg:min-w-[9.5rem]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#244820] bg-[#2D5A27] px-4 py-3 text-xs font-extrabold !text-white transition hover:bg-[#244820] sm:text-sm lg:min-w-[10rem]"
               >
-                Find Your Trek
                 <Search className="h-3.5 w-3.5" aria-hidden />
+                Find Your Trek
               </button>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/10 bg-black/20 px-3 py-2.5 md:px-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-t border-[#e8ece6] bg-[#eef5e6] px-4 py-2.5 md:px-5">
             {guarantees.map((item) => {
               const Icon = item.icon;
               return (
                 <span
                   key={item.label}
-                  className="inline-flex items-center gap-1.5 text-[10px] font-medium text-white/65 sm:text-[11px]"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#3d4a3a] sm:text-[11px]"
                 >
-                  <Icon className="h-3 w-3 text-lime" aria-hidden />
+                  <Icon className="h-3.5 w-3.5 text-[#6b8f3c]" aria-hidden />
                   {item.label}
                 </span>
               );
@@ -281,32 +281,30 @@ function DesktopField({
   return (
     <label
       className={cn(
-        "relative flex min-w-0 cursor-pointer flex-col gap-0.5 border-b border-white/10 px-3 py-2.5 sm:py-3 lg:border-b-0",
+        "relative flex min-w-0 cursor-pointer flex-col gap-0.5 border-b border-[#e8ece6] px-3.5 py-3 sm:py-3.5 lg:border-b-0",
         className,
       )}
     >
-      <span className="inline-flex items-center gap-1 text-[9px] font-semibold tracking-[0.14em] text-white/50 uppercase sm:text-[10px]">
-        <Icon className="h-3 w-3 text-lime" aria-hidden />
+      <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold tracking-[0.14em] text-[#6b7668] uppercase sm:text-[10px]">
+        <Icon className="h-3.5 w-3.5 text-[#6b8f3c]" aria-hidden />
         {label}
       </span>
       <span className="relative">
         <select
-          className="h-7 w-full appearance-none bg-transparent pr-5 text-xs font-semibold text-white outline-none sm:text-sm"
+          className="h-7 w-full appearance-none bg-transparent pr-5 text-xs font-semibold text-[#14201a] outline-none sm:text-sm"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-label={label}
         >
-          <option value="" className="text-foreground">
-            {placeholder}
-          </option>
+          <option value="">{placeholder}</option>
           {options.map((item) => (
-            <option key={item} value={item} className="text-foreground">
+            <option key={item} value={item}>
               {item}
             </option>
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 text-white/45"
+          className="pointer-events-none absolute top-1/2 right-0 h-3.5 w-3.5 -translate-y-1/2 text-[#8a939c]"
           aria-hidden
         />
       </span>

@@ -84,12 +84,16 @@ export function SiteShell({
           <AnnouncementBar />
         </div>
       ) : null}
+      {showTopBar && isHome ? (
+        <TopBar variant="home" />
+      ) : null}
       {showTopBar && !isHome ? (
         <div className="hidden md:block">
           <TopBar />
         </div>
       ) : null}
-      <Navbar overlayHero={isHome} sticky={!isTreksListing} />
+      {/* Home uses solid white nav (mockup); dark overlay was desktop-only and is retired */}
+      <Navbar overlayHero={false} sticky={!isTreksListing} />
       <main
         id="main-content"
         className={cn(
@@ -108,7 +112,11 @@ export function SiteShell({
       <EnquireModal />
       <div className="hidden md:block">
         <FloatingWhatsApp
-          label={isHome ? "Chat with Trek Expert" : "Chat on WhatsApp - Get Instant Help"}
+          label={
+            isHome
+              ? "Chat with Trek Expert — We’re online!"
+              : "Chat on WhatsApp - Get Instant Help"
+          }
         />
       </div>
       <div className="hidden md:block">

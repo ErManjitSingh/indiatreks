@@ -40,25 +40,18 @@ export function FeaturedTreksSection() {
           </Link>
         </div>
 
-        {/* Desktop header */}
-        <div className="mb-9 hidden flex-col gap-4 md:flex lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-xl">
-            <p className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.18em] text-[#7cb342] uppercase">
-              <Mountain className="h-3.5 w-3.5" aria-hidden />
-              Handpicked Adventures
-            </p>
-            <h2 className="mt-2 font-heading text-3xl font-extrabold tracking-tight text-[#14201a] md:text-[2rem]">
-              Featured Treks
-            </h2>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-[#6b7668]">
-              Curated trekking experiences across the Himalayas for explorers, photographers and
-              mountain lovers.
-            </p>
-          </div>
-
+        {/* Desktop header — matches mockup “Popular Treks” */}
+        <div className="mb-9 hidden flex-col items-center text-center md:flex">
+          <Mountain className="mb-2 h-7 w-7 text-[#6b8f3c]" strokeWidth={1.4} aria-hidden />
+          <h2 className="font-heading text-3xl font-extrabold tracking-tight text-[#14201a] md:text-[2.15rem]">
+            Popular Treks
+          </h2>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#6b7668]">
+            Handpicked Himalayan adventures loved by thousands of trekkers.
+          </p>
           <Link
             href="/treks"
-            className="inline-flex items-center gap-1.5 self-start rounded-full border border-[#1a2e1a]/80 px-4 py-2 text-sm font-semibold text-[#14201a] transition hover:bg-[#14201a] hover:text-white lg:self-auto"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[#1a2e1a]/80 px-4 py-2 text-sm font-semibold text-[#14201a] transition hover:bg-[#14201a] hover:text-white"
           >
             View All Treks
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />

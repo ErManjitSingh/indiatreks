@@ -14,14 +14,51 @@ import { cn } from "@/lib/utils";
 const features: Array<{
   title: string;
   caption: string;
+  desktopTitle?: string;
+  desktopCaption?: string;
   icon: LucideIcon;
 }> = [
-  { title: "Expert Trek Leaders", caption: "Certified & Experienced", icon: UserRound },
-  { title: "Small Group", caption: "Max 12–15 People", icon: Users },
-  { title: "Safety First", caption: "Standard Protocols", icon: ShieldCheck },
-  { title: "Medical Support", caption: "First-Aid Ready", icon: BriefcaseMedical },
-  { title: "Eco Friendly", caption: "Leave No Trace", icon: Leaf },
-  { title: "Premium Camps", caption: "Comfort in Wild", icon: Tent },
+  {
+    title: "Expert Trek Leaders",
+    caption: "Certified & Experienced",
+    desktopCaption: "Certified & Experienced Guides",
+    icon: UserRound,
+  },
+  {
+    title: "Small Group",
+    caption: "Max 12–15 People",
+    desktopTitle: "Small Group Experiences",
+    desktopCaption: "Intimate & Personal Journeys",
+    icon: Users,
+  },
+  {
+    title: "Safety First",
+    caption: "Standard Protocols",
+    desktopTitle: "Safety First Approach",
+    desktopCaption: "Standard Operating Protocols",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Medical Support",
+    caption: "First-Aid Ready",
+    desktopTitle: "Medical Support Ready",
+    desktopCaption: "First-Aid Trained Staff",
+    icon: BriefcaseMedical,
+  },
+  {
+    title: "Eco Friendly",
+    caption: "Leave No Trace",
+    desktopTitle: "Eco Friendly Practices",
+    desktopCaption: "Leave No Trace Ethos",
+    icon: Leaf,
+  },
+  {
+    title: "Premium Camps",
+    caption: "Comfort in Wild",
+    desktopTitle: "Premium Camp Comfort",
+    desktopCaption: "Comfort in the Wilderness",
+    icon: Tent,
+  },
 ];
 
 export function TrustSection() {
@@ -57,35 +94,35 @@ export function TrustSection() {
         </ul>
       </section>
 
-      {/* —— Desktop strip unchanged —— */}
+      {/* —— Desktop feature strip (mockup) —— */}
       <section
-        className="hidden border-y border-[#d8ded0] bg-[#eef2ea] md:block"
+        className="hidden border-y border-[#e4e9df] bg-white md:block"
         aria-label="Why travelers trust us"
       >
         <Container>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-0 xl:grid-cols-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <li
                   key={feature.title}
                   className={cn(
-                    "flex items-center gap-3 border-[#d5dccf] px-4 py-4 sm:px-5 sm:py-5",
-                    "border-b sm:border-b",
+                    "flex flex-col items-start gap-3 border-[#e8ece6] px-4 py-7 sm:px-5",
+                    "border-b",
                     index % 2 === 0 && "sm:border-r",
                     index >= 4 && "sm:border-b-0",
                     "xl:border-b-0 xl:border-r xl:last:border-r-0",
                   )}
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#6b8f3c] shadow-[inset_0_0_0_1px_#d8ded0]">
-                    <Icon className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden />
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eef5e6] text-[#2D5A27]">
+                    <Icon className="h-5 w-5" strokeWidth={1.6} aria-hidden />
                   </span>
                   <div className="flex min-w-0 flex-col gap-1">
                     <strong className="font-heading text-[13px] leading-5 font-bold text-[#14201a]">
-                      {feature.title}
+                      {feature.desktopTitle ?? feature.title}
                     </strong>
                     <span className="text-[11px] leading-4 font-normal text-[#6b7668]">
-                      {feature.caption}
+                      {feature.desktopCaption ?? feature.caption}
                     </span>
                   </div>
                 </li>

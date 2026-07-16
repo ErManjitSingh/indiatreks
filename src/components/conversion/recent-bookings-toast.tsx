@@ -54,12 +54,17 @@ export function RecentBookingsToast({ className }: { className?: string }) {
         className,
       )}
     >
-      <p className="flex items-start gap-2">
+      <p className="flex items-start gap-2.5">
         <span
-          className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#2D5A27]"
+          className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eef5e6] text-[11px] font-bold text-[#2D5A27]"
           aria-hidden
-        />
-        <span>{SAMPLE_BOOKINGS[index]}</span>
+        >
+          {SAMPLE_BOOKINGS[index]?.charAt(0) ?? "T"}
+        </span>
+        <span className="pt-0.5">
+          <span className="block leading-snug">{SAMPLE_BOOKINGS[index]}</span>
+          <span className="mt-0.5 block text-[11px] text-[#6b7668]">2 minutes ago</span>
+        </span>
       </p>
     </div>
   );
