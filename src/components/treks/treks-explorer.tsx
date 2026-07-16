@@ -9,7 +9,6 @@ import { AdvancedTrekSearch } from "@/components/treks/advanced-trek-search";
 import { PopularSearches } from "@/components/treks/popular-searches";
 import { TrekFiltersPanel } from "@/components/treks/trek-filters-panel";
 import { TreksEmptyState } from "@/components/treks/treks-empty-state";
-import { TreksHelpPanel } from "@/components/treks/treks-help-panel";
 import { TreksHero } from "@/components/treks/treks-hero";
 import { TreksToolbar } from "@/components/treks/treks-toolbar";
 import { VirtualizedTrekList } from "@/components/treks/virtualized-trek-list";
@@ -170,7 +169,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
           onReset={resetFilters}
         />
 
-        <div className="mt-5 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px]">
+        <div className="mt-5 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <div className="hidden lg:block">
             <div>
               <TrekFiltersPanel
@@ -243,16 +242,6 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
               </>
             )}
           </div>
-
-          <div className="hidden xl:block">
-            <div>
-              <TreksHelpPanel />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 hidden md:block xl:hidden">
-          <TreksHelpPanel />
         </div>
       </Container>
 
