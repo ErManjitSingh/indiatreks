@@ -88,27 +88,67 @@ const staticHomepage: HomepageBundle = {
   adventureStats,
 };
 
+function pickArray<T>(cms: readonly T[] | undefined, fallback: readonly T[]): T[] {
+  return cms?.length ? [...cms] : [...fallback];
+}
+
 function pickHomepage(bootstrap: SiteBootstrap | null): HomepageBundle {
   const homepage = (bootstrap?.homepage ?? {}) as Record<string, unknown>;
+  const cmsHero = homepage.heroSearchOptions as Partial<typeof heroSearchOptions> | undefined;
   return {
-    featuredTreks: (homepage.featuredTreks as typeof featuredTreks) ?? featuredTreks,
-    destinationShowcases:
-      (homepage.destinationShowcases as typeof destinationShowcases) ?? destinationShowcases,
-    popularDestinations:
-      (homepage.popularDestinations as typeof popularDestinations) ?? popularDestinations,
-    heroSearchOptions:
-      (homepage.heroSearchOptions as typeof heroSearchOptions) ?? heroSearchOptions,
-    trekCategoryCards:
-      (homepage.trekCategoryCards as typeof trekCategoryCards) ?? trekCategoryCards,
-    whyChooseItems: (homepage.whyChooseItems as typeof whyChooseItems) ?? whyChooseItems,
-    fixedDepartures: (homepage.fixedDepartures as typeof fixedDepartures) ?? fixedDepartures,
-    galleryPhotos: (homepage.galleryPhotos as typeof galleryPhotos) ?? galleryPhotos,
-    testimonials: (homepage.testimonials as typeof testimonials) ?? testimonials,
-    latestBlogs: (homepage.latestBlogs as typeof latestBlogs) ?? latestBlogs,
-    homeFaqs: (homepage.homeFaqs as typeof homeFaqs) ?? homeFaqs,
+    featuredTreks: pickArray(
+      homepage.featuredTreks as typeof featuredTreks | undefined,
+      featuredTreks,
+    ),
+    destinationShowcases: pickArray(
+      homepage.destinationShowcases as typeof destinationShowcases | undefined,
+      destinationShowcases,
+    ),
+    popularDestinations: pickArray(
+      homepage.popularDestinations as typeof popularDestinations | undefined,
+      popularDestinations,
+    ),
+    heroSearchOptions: {
+      destinations: pickArray(cmsHero?.destinations, heroSearchOptions.destinations),
+      difficulties: pickArray(cmsHero?.difficulties, heroSearchOptions.difficulties),
+      durations: pickArray(cmsHero?.durations, heroSearchOptions.durations),
+      months: pickArray(cmsHero?.months, heroSearchOptions.months),
+      budgets: pickArray(cmsHero?.budgets, heroSearchOptions.budgets),
+    } as unknown as typeof heroSearchOptions,
+    trekCategoryCards: pickArray(
+      homepage.trekCategoryCards as typeof trekCategoryCards | undefined,
+      trekCategoryCards,
+    ),
+    whyChooseItems: pickArray(
+      homepage.whyChooseItems as typeof whyChooseItems | undefined,
+      whyChooseItems,
+    ),
+    fixedDepartures: pickArray(
+      homepage.fixedDepartures as typeof fixedDepartures | undefined,
+      fixedDepartures,
+    ),
+    galleryPhotos: pickArray(
+      homepage.galleryPhotos as typeof galleryPhotos | undefined,
+      galleryPhotos,
+    ),
+    testimonials: pickArray(
+      homepage.testimonials as typeof testimonials | undefined,
+      testimonials,
+    ),
+    latestBlogs: pickArray(
+      homepage.latestBlogs as typeof latestBlogs | undefined,
+      latestBlogs,
+    ),
+    homeFaqs: pickArray(homepage.homeFaqs as typeof homeFaqs | undefined, homeFaqs),
     heroMedia: (homepage.heroMedia as typeof heroMedia) ?? heroMedia,
-    trustBadges: (homepage.trustBadges as typeof trustBadges) ?? trustBadges,
-    adventureStats: (homepage.adventureStats as typeof adventureStats) ?? adventureStats,
+    trustBadges: pickArray(
+      homepage.trustBadges as typeof trustBadges | undefined,
+      trustBadges,
+    ),
+    adventureStats: pickArray(
+      homepage.adventureStats as typeof adventureStats | undefined,
+      adventureStats,
+    ),
   };
 }
 

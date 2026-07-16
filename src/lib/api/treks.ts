@@ -59,6 +59,27 @@ export async function fetchTreks(
   };
 }
 
+/** Paginate through API (max 100/page) until all published treks are loaded. */
+export async function fetchAllTreks(
+  params: Omit<TrekListParams, "page" | "limit"> = {},
+): Promise<TrekListingItem[]> {
+  const limit = 100;
+  const all: TrekListingItem[] = [];
+  let page = 1;
+  let total = Infinity;
+
+  while (all.length < total && page <= 10) {
+    const { items, meta } = await fetchTreks({ ...params, page, limit });
+    if (!items.length) break;
+    all.push(...items);
+    total = Number(meta?.total ?? all.length);
+    if (all.length >= total) break;
+    page += 1;
+  }
+
+  return all;
+}
+
 export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> {
   try {
     const res = await apiGet<Record<string, unknown>>(`/treks/${slug}`);

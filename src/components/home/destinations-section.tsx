@@ -186,10 +186,10 @@ function DestinationCard({
         <Link
           href={
             dest.slug === "himachal-pradesh"
-              ? "/treks?state=Himachal%20Pradesh"
+              ? "/treks?destination=Himachal%20Pradesh"
               : dest.slug === "uttarakhand"
-                ? "/treks?state=Uttarakhand"
-                : `/treks?q=${encodeURIComponent(dest.name)}`
+                ? "/treks?destination=Uttarakhand"
+                : `/treks?destination=${encodeURIComponent(dest.name)}`
           }
           className="inline-flex items-center gap-1.5 pt-1 text-[13px] font-semibold text-[#C5E063] transition hover:text-lime"
         >

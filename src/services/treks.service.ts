@@ -2,7 +2,7 @@
  * Data layer ready for CMS / API wiring.
  * Prefer REST backend when NEXT_PUBLIC_API_URL is configured.
  */
-import { fetchTrekBySlug, fetchTreks } from "@/lib/api/treks";
+import { fetchAllTreks, fetchTrekBySlug, fetchTreks } from "@/lib/api/treks";
 import { allTreks, getTrekBySlug as getStaticListing } from "@/data/treks";
 import { getTrekDetailBySlug as getStaticDetail } from "@/data/trek-details";
 import type { Trek } from "@/types";
@@ -32,7 +32,7 @@ export async function getTrekListings(params?: {
 }): Promise<TrekListingItem[]> {
   if (useApi) {
     try {
-      const { items } = await fetchTreks({ ...params, limit: params?.limit ?? 200 });
+      const items = await fetchAllTreks(params);
       if (items.length) return items;
     } catch {
       // fall through to static

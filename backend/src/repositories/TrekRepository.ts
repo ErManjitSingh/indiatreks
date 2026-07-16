@@ -30,35 +30,50 @@ export class TrekRepository extends BaseRepository<ITrek> {
 
     if (filters.destination) {
       const dest = String(filters.destination);
-      const expand: Record<string, string> = {
-        Dharamshala: "Dharamshala",
-        Manali: "Manali",
-        Kasol: "Parvati Valley",
-        "Parvati Valley": "Parvati Valley",
-        Banjar: "Banjar",
-        Chamba: "Chamba",
-        Kinnaur: "Kinnaur",
-        Spiti: "Spiti",
-        Sankri: "Sankri",
-        Gangotri: "Gangotri",
-        Joshimath: "Joshimath",
-        Lohajung: "Lohajung",
-        Bageshwar: "Bageshwar",
-        Munsiyari: "Munsiyari",
-        Chopta: "Chopta",
-        Mussoorie: "Mussoorie",
-        Pithoragarh: "Pithoragarh",
+      const stateHubs: Record<string, string> = {
+        Uttarakhand: "Uttarakhand",
+        "Himachal Pradesh": "Himachal Pradesh",
       };
-      const region = expand[dest];
-      if (region) {
-        and.push({
-          $or: [
-            { destinationName: new RegExp(`^${dest}$`, "i") },
-            { region: new RegExp(`^${region}$`, "i") },
-          ],
-        });
+      if (stateHubs[dest]) {
+        query.state = new RegExp(`^${stateHubs[dest]}$`, "i");
       } else {
-        query.destinationName = new RegExp(dest, "i");
+        const hubRegions: Record<string, string[]> = {
+          Dharamshala: ["Dharamshala"],
+          "McLeod Ganj": ["Dharamshala"],
+          "Bir Billing": ["Dharamshala"],
+          Barot: ["Banjar", "Dharamshala"],
+          Naddi: ["Dharamshala"],
+          Kangra: ["Dharamshala"],
+          Manali: ["Manali", "Kullu"],
+          Kasol: ["Parvati Valley"],
+          "Parvati Valley": ["Parvati Valley"],
+          Banjar: ["Banjar"],
+          Chamba: ["Chamba"],
+          Bharmour: ["Chamba"],
+          Kinnaur: ["Kinnaur"],
+          Spiti: ["Spiti"],
+          "Spiti Valley": ["Spiti"],
+          Sankri: ["Sankri"],
+          Gangotri: ["Gangotri"],
+          Joshimath: ["Joshimath"],
+          Lohajung: ["Lohajung"],
+          Bageshwar: ["Bageshwar"],
+          Munsiyari: ["Munsiyari"],
+          Chopta: ["Chopta"],
+          Mussoorie: ["Mussoorie"],
+          Pithoragarh: ["Pithoragarh"],
+        };
+        const regions = hubRegions[dest];
+        if (regions?.length) {
+          and.push({
+            $or: [
+              ...regions.map((region) => ({ region: new RegExp(`^${region}$`, "i") })),
+              { destinationName: new RegExp(`^${dest}$`, "i") },
+            ],
+          });
+        } else {
+          query.destinationName = new RegExp(dest, "i");
+        }
       }
     }
     if (filters.region) {

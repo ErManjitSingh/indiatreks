@@ -2,32 +2,32 @@
 
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Modal, ModalContent, ModalDescription, ModalHeader, ModalTitle } from "@/components/ui/modal";
 import { SearchBox } from "@/components/ui/search-box";
-import { featuredTreks } from "@/data/homepage";
 import { useUiStore } from "@/lib/store";
+import { useSiteContent } from "@/providers/site-content-provider";
 
 export function GlobalSearch() {
   const router = useRouter();
   const { searchOpen, setSearchOpen } = useUiStore();
+  const { featuredTreks } = useSiteContent();
   const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (!searchOpen) setQuery("");
   }, [searchOpen]);
 
-  const results = featuredTreks.filter((trek) => {
+  const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return false;
-    return (
-      trek.name.toLowerCase().includes(q) ||
-      trek.location.toLowerCase().includes(q) ||
-      trek.difficulty.toLowerCase().includes(q)
-    );
-  });
+    if (!q) return [];
+    return featuredTreks.filter((trek) => {
+      const haystack = `${trek.name} ${trek.location} ${trek.difficulty}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [featuredTreks, query]);
 
   return (
     <Modal open={searchOpen} onOpenChange={setSearchOpen}>

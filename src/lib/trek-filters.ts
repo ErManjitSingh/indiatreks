@@ -39,21 +39,50 @@ function parseList(value: string | null): string[] {
     .filter(Boolean);
 }
 
+/** Map hero / URL budget labels to price bounds (INR). */
+export function budgetLabelToPriceRange(budget: string): {
+  priceMin?: number;
+  priceMax?: number;
+} {
+  const label = budget.trim();
+  if (!label) return {};
+  if (/under/i.test(label)) return { priceMax: 8000 };
+  if (label.includes("8,000") && label.includes("15,000")) {
+    return { priceMin: 8000, priceMax: 15000 };
+  }
+  if (label.includes("15,000") && label.includes("25,000")) {
+    return { priceMin: 15000, priceMax: 25000 };
+  }
+  if (label.includes("25,000")) return { priceMin: 25000 };
+  return {};
+}
+
 export function filtersFromSearchParams(params: URLSearchParams): TrekFiltersState {
   const sort = (params.get("sort") as TrekSortOption | null) ?? "popularity";
   const view = params.get("view") === "grid" ? "grid" : "list";
 
+  const difficultyFromUrl = [
+    ...parseList(params.get("difficulty")),
+    ...parseList(params.get("level")),
+  ] as DifficultyLevel[];
+
+  const budgetRange = budgetLabelToPriceRange(params.get("budget") ?? "");
+
   return {
     q: params.get("q") ?? "",
     destination: parseList(params.get("destination")),
-    difficulty: parseList(params.get("difficulty")) as DifficultyLevel[],
+    difficulty: difficultyFromUrl,
     duration: parseList(params.get("duration")),
     season: parseList(params.get("season")) as Season[],
     month: parseList(params.get("month")),
     altitudeMin: Number(params.get("altitudeMin") ?? TREK_ALTITUDE_BOUNDS.min),
     altitudeMax: Number(params.get("altitudeMax") ?? TREK_ALTITUDE_BOUNDS.max),
-    priceMin: Number(params.get("priceMin") ?? TREK_PRICE_BOUNDS.min),
-    priceMax: Number(params.get("priceMax") ?? TREK_PRICE_BOUNDS.max),
+    priceMin: Number(
+      params.get("priceMin") ?? budgetRange.priceMin ?? TREK_PRICE_BOUNDS.min,
+    ),
+    priceMax: Number(
+      params.get("priceMax") ?? budgetRange.priceMax ?? TREK_PRICE_BOUNDS.max,
+    ),
     trekType: parseList(params.get("trekType")) as TrekTypeTag[],
     state: parseList(params.get("state")),
     region: parseList(params.get("region")),
@@ -125,6 +154,10 @@ function matchesDuration(days: number, buckets: string[]): boolean {
  */
 export const DESTINATION_REGION_ALIASES: Record<string, string> = {
   Dharamshala: "Dharamshala",
+  "McLeod Ganj": "Dharamshala",
+  "Bir Billing": "Dharamshala",
+  Barot: "Banjar",
+  Naddi: "Dharamshala",
   Kangra: "Dharamshala",
   Manali: "Manali",
   Naggar: "Manali",
@@ -143,6 +176,7 @@ export const DESTINATION_REGION_ALIASES: Record<string, string> = {
   Sirmaur: "Sirmaur",
   Spiti: "Spiti",
   "Pin Valley": "Spiti",
+  "Spiti Valley": "Spiti",
   // Uttarakhand
   Sankri: "Sankri",
   Gangotri: "Gangotri",
@@ -172,9 +206,47 @@ export const DESTINATION_REGION_ALIASES: Record<string, string> = {
   Gaurikund: "Kedarnath",
 };
 
+/** Hub filters that match multiple trek regions. */
+const DESTINATION_HUB_REGIONS: Record<string, readonly string[]> = {
+  Dharamshala: ["Dharamshala"],
+  "McLeod Ganj": ["Dharamshala"],
+  "Bir Billing": ["Dharamshala"],
+  Barot: ["Banjar", "Dharamshala"],
+  Naddi: ["Dharamshala"],
+  Kangra: ["Dharamshala"],
+  Manali: ["Manali", "Kullu"],
+  Kasol: ["Parvati Valley"],
+  "Parvati Valley": ["Parvati Valley"],
+  Banjar: ["Banjar"],
+  Chamba: ["Chamba"],
+  Bharmour: ["Chamba"],
+  Kinnaur: ["Kinnaur"],
+  Spiti: ["Spiti"],
+  "Spiti Valley": ["Spiti"],
+  Sankri: ["Sankri"],
+  Gangotri: ["Gangotri"],
+  Joshimath: ["Joshimath"],
+  Lohajung: ["Lohajung"],
+  Bageshwar: ["Bageshwar"],
+  Munsiyari: ["Munsiyari"],
+  Chopta: ["Chopta"],
+  Mussoorie: ["Mussoorie"],
+  Pithoragarh: ["Pithoragarh"],
+};
+
+/** State-level hub filters (e.g. Uttarakhand shows all UK treks). */
+const DESTINATION_HUB_STATES: Record<string, readonly string[]> = {
+  Uttarakhand: ["Uttarakhand"],
+  "Himachal Pradesh": ["Himachal Pradesh"],
+};
+
 /** When these are selected, match by region belt (full hub set). */
 const DESTINATION_EXPAND_TO_REGION = new Set([
   "Dharamshala",
+  "McLeod Ganj",
+  "Bir Billing",
+  "Barot",
+  "Naddi",
   "Manali",
   "Kasol",
   "Parvati Valley",
@@ -182,6 +254,7 @@ const DESTINATION_EXPAND_TO_REGION = new Set([
   "Chamba",
   "Kinnaur",
   "Spiti",
+  "Spiti Valley",
   "Sankri",
   "Gangotri",
   "Joshimath",
@@ -191,16 +264,37 @@ const DESTINATION_EXPAND_TO_REGION = new Set([
   "Chopta",
   "Mussoorie",
   "Pithoragarh",
+  "Uttarakhand",
+  "Himachal Pradesh",
 ]);
 
 function matchesDestination(trek: TrekListingItem, selected: string[]): boolean {
   if (!selected.length) return true;
   return selected.some((dest) => {
+    const stateHub = DESTINATION_HUB_STATES[dest];
+    if (stateHub?.length) {
+      return stateHub.some(
+        (state) => trek.state.toLowerCase() === state.toLowerCase(),
+      );
+    }
+
+    const hubRegions = DESTINATION_HUB_REGIONS[dest];
+    if (hubRegions?.length) {
+      return (
+        hubRegions.includes(trek.region) ||
+        trek.destinationName === dest ||
+        trek.destinationName === (DESTINATION_REGION_ALIASES[dest] ?? dest)
+      );
+    }
+
     if (DESTINATION_EXPAND_TO_REGION.has(dest)) {
       const region = DESTINATION_REGION_ALIASES[dest] ?? dest;
       return trek.region === region || trek.destinationName === dest;
     }
-    return trek.destinationName === dest || trek.region === (DESTINATION_REGION_ALIASES[dest] ?? dest);
+    return (
+      trek.destinationName === dest ||
+      trek.region === (DESTINATION_REGION_ALIASES[dest] ?? dest)
+    );
   });
 }
 

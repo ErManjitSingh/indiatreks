@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
 import { Container } from "@/components/ui/container";
+import { budgetLabelToPriceRange } from "@/lib/trek-filters";
 import { useSiteContent } from "@/providers/site-content-provider";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +48,11 @@ export function HeroSearch() {
       else if (duration.startsWith("10")) params.set("duration", "8+");
     }
     if (month) params.set("month", month);
-    if (budget) params.set("budget", budget);
+    if (budget) {
+      const range = budgetLabelToPriceRange(budget);
+      if (range.priceMin != null) params.set("priceMin", String(range.priceMin));
+      if (range.priceMax != null) params.set("priceMax", String(range.priceMax));
+    }
     router.push(`/treks${params.toString() ? `?${params.toString()}` : ""}`);
   };
 

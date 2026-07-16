@@ -87,5 +87,6 @@ export const popularTrekSearches = [
   { label: "Chopta", href: "/treks?destination=Chopta" },
   { label: "Valley of Flowers", href: "/treks?q=Valley%20of%20Flowers" },
   { label: "Roopkund", href: "/treks?q=Roopkund" },
-  { label: "Spiti", href: "/treks?destination=Spiti" },
+  { label: "McLeod Ganj", href: "/treks?destination=McLeod%20Ganj" },
+  { label: "Uttarakhand", href: "/treks?destination=Uttarakhand" },
 ] as const;
