@@ -33,7 +33,7 @@ export function AdvancedTrekSearch({ filters, onChange }: AdvancedTrekSearchProp
   return (
     <section aria-label="Search treks">
       <form
-        className="flex items-center gap-2 rounded-full border border-[#d0d5cc] bg-white px-4 shadow-xs focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/15 md:rounded-xl md:px-3"
+        className="flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 shadow-[0_4px_16px_rgba(17,24,39,0.06)] focus-within:border-[#22C55E]/45 focus-within:ring-2 focus-within:ring-[#22C55E]/15 md:rounded-2xl md:px-4"
         onSubmit={(event) => {
           event.preventDefault();
           update({ q: query.trim() });

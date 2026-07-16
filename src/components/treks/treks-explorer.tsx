@@ -102,6 +102,19 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   const visibleTreks = results.slice(0, visibleCount);
   const hasMore = visibleCount < results.length;
 
+  const filterOptions = useMemo(() => {
+    const destinations = [
+      ...new Set(treks.map((t) => t.destinationName).filter(Boolean)),
+    ].sort((a, b) => a.localeCompare(b));
+    const states = [...new Set(treks.map((t) => t.state).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b),
+    );
+    const regions = [...new Set(treks.map((t) => t.region).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b),
+    );
+    return { destinations, states, regions };
+  }, [treks]);
+
   // Prefer virtualizing the full filtered set once shown (after load-more expands).
   const listTreks = results.length > 0 && !hasMore ? results : visibleTreks;
 
@@ -137,7 +150,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
   };
 
   const listClass =
-    filters.view === "list" ? "space-y-4" : "grid gap-4 md:grid-cols-2";
+    filters.view === "list" ? "space-y-4" : "grid gap-4 sm:grid-cols-2";
 
   return (
     <div className="relative bg-white pb-28 md:bg-[#F7F8F6] md:pb-12">
@@ -165,6 +178,9 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
                 onChange={pushFilters}
                 onReset={resetFilters}
                 onApply={() => undefined}
+                destinations={filterOptions.destinations}
+                states={filterOptions.states}
+                regions={filterOptions.regions}
               />
             </div>
           </div>
@@ -290,6 +306,9 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
                 setTrekFiltersOpen(false);
               }}
               onApply={() => setTrekFiltersOpen(false)}
+              destinations={filterOptions.destinations}
+              states={filterOptions.states}
+              regions={filterOptions.regions}
             />
           </div>
         </DrawerContent>

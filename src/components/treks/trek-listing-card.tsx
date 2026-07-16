@@ -60,6 +60,8 @@ function formatDeparture(iso: string): string {
   });
 }
 
+const FALLBACK_COVER = "/images/treks/mountains-1.jpg";
+
 function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps) {
   const hydrated = useHasHydrated();
   const { toggle: toggleWish, has: hasWish } = useWishlistStore();
@@ -71,6 +73,8 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
   const discount = getDiscountPercent(trek.basePriceInr, trek.originalPriceInr);
   const primaryBadge = trek.badges[0];
   const nextDeparture = trek.departures[0];
+  const cover = trek.images?.[0] || FALLBACK_COVER;
+  const placeLabel = trek.destinationName || trek.region;
 
   const wishButton = (
     <button
@@ -115,7 +119,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
     <article className="overflow-hidden rounded-2xl border border-[#e8ece6] bg-white shadow-sm md:hidden">
       <div className="relative aspect-[16/10]">
         <Image
-          src={trek.images[0]}
+          src={cover}
           alt={trek.title}
           fill
           sizes="100vw"
@@ -144,7 +148,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
             </Link>
           </h3>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {trek.state} • {trek.region}
+            {trek.state} • {placeLabel}
           </p>
           <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
@@ -229,7 +233,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
           <div className="grid md:grid-cols-[220px_minmax(0,1fr)_168px] lg:grid-cols-[240px_minmax(0,1fr)_180px]">
             <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[210px]">
               <Image
-                src={trek.images[0]}
+                src={cover}
                 alt={trek.title}
                 fill
                 sizes={IMAGE_SIZES.card}
@@ -263,7 +267,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                   </Link>
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {trek.state} • {trek.region}
+                  {trek.state} • {placeLabel}
                 </p>
                 <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
@@ -348,25 +352,25 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
     );
   }
 
-  /* —— Desktop / tablet grid —— */
+  /* —— Desktop / tablet grid (mockup) —— */
   return (
     <>
       {mobileCard}
-      <article className="group hidden overflow-hidden rounded-xl border border-border/80 bg-white shadow-xs transition hover:shadow-md md:block">
-        <div className="relative aspect-[4/3]">
+      <article className="group hidden overflow-hidden rounded-2xl border border-[#E8ECF1] bg-white shadow-sm transition hover:shadow-md md:block">
+        <div className="relative aspect-[16/10]">
           <Image
-            src={trek.images[0]}
+            src={cover}
             alt={trek.title}
             fill
             sizes={IMAGE_SIZES.card}
             placeholder="blur"
             blurDataURL={BLUR_DATA_URL}
-            className="object-cover transition duration-500 group-hover:scale-105"
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
           />
           {primaryBadge ? (
             <span
               className={cn(
-                "absolute left-3 top-3 rounded px-2 py-0.5 text-[10px] font-bold tracking-wide",
+                "absolute left-0 top-3 rounded-r px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm",
                 badgeStyles[primaryBadge],
               )}
             >
@@ -378,34 +382,43 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
 
         <div className="space-y-3 p-4">
           <div>
-            <h3 className="font-heading text-lg font-bold tracking-tight">
+            <h3 className="font-heading text-lg font-bold tracking-tight text-[#111827]">
               <Link
                 href={`/treks/${trek.slug}`}
-                className="hover:text-primary"
+                className="hover:text-[#2D5A27]"
                 onClick={() => addRecent(trek.id)}
               >
                 {trek.title}
               </Link>
             </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {trek.state} • {trek.region}
+            <p className="mt-1 text-sm text-[#6B7280]">
+              {trek.state} • {placeLabel}
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#6B7280]">
             <span>{formatTrekDuration(trek.durationDays, trek.durationNights)}</span>
+            <span aria-hidden>•</span>
             <span>{formatAltitude(trek.maxAltitude)}</span>
+            <span aria-hidden>•</span>
             <span className="capitalize">{trek.difficulty}</span>
-          </div>
+          </p>
 
-          <div className="flex items-end justify-between gap-3 border-t border-border pt-3">
+          <div className="flex items-end justify-between gap-3 border-t border-[#F3F4F6] pt-3">
             <div>
-              <p className="font-heading text-xl font-bold">{formatCurrency(trek.basePriceInr)}</p>
+              <p className="font-heading text-xl font-bold text-[#111827]">
+                {formatCurrency(trek.basePriceInr)}
+              </p>
               {discount ? (
-                <p className="text-xs font-semibold text-[#2D5A27]">{discount}% OFF</p>
+                <p className="text-xs font-semibold text-[#16A34A]">{discount}% OFF</p>
               ) : null}
             </div>
-            <BookNowButton trekSlug={trek.slug} variant="primary" size="sm">
+            <BookNowButton
+              trekSlug={trek.slug}
+              variant="primary"
+              size="sm"
+              className="rounded-xl bg-[#2D5A27] px-4 hover:bg-[#244a20]"
+            >
               Book Now
             </BookNowButton>
           </div>

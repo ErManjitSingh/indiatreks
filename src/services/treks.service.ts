@@ -32,7 +32,7 @@ export async function getTrekListings(params?: {
 }): Promise<TrekListingItem[]> {
   if (useApi) {
     try {
-      const { items } = await fetchTreks({ ...params, limit: params?.limit ?? 100 });
+      const { items } = await fetchTreks({ ...params, limit: params?.limit ?? 200 });
       if (items.length) return items;
     } catch {
       // fall through to static

@@ -20,6 +20,9 @@ interface TrekFiltersPanelProps {
   onReset: () => void;
   onApply?: () => void;
   className?: string;
+  destinations?: string[];
+  states?: string[];
+  regions?: string[];
 }
 
 const difficulties: DifficultyLevel[] = ["easy", "moderate", "difficult", "challenging"];
@@ -54,8 +57,16 @@ export function TrekFiltersPanel({
   onReset,
   onApply,
   className,
+  destinations,
+  states,
+  regions,
 }: TrekFiltersPanelProps) {
   const update = (patch: Partial<TrekFiltersState>) => onChange({ ...filters, ...patch });
+  const destinationOptions = destinations?.length
+    ? destinations
+    : [...trekListingDestinations];
+  const stateOptions = states?.length ? states : [...trekListingStates];
+  const regionOptions = regions?.length ? regions : [...trekListingRegions];
 
   return (
     <aside
@@ -93,7 +104,7 @@ export function TrekFiltersPanel({
             }
           >
             <option value="">Any destination</option>
-            {trekListingDestinations.map((item) => (
+            {destinationOptions.map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -182,7 +193,7 @@ export function TrekFiltersPanel({
               }
             >
               <option value="">Any state</option>
-              {trekListingStates.map((item) => (
+              {stateOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -197,7 +208,7 @@ export function TrekFiltersPanel({
               }
             >
               <option value="">Any region</option>
-              {trekListingRegions.map((item) => (
+              {regionOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
