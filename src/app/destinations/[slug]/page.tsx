@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
         noIndex: true,
       });
     }
-    const seo = (destination as { seo?: Record<string, unknown> }).seo ?? {};
+    const seo = destination.seo ?? {};
     return createMetadata({
       title: String(seo.title || `${destination.name} Treks & Travel Guide`),
       description: String(seo.description || destination.summary || ""),
@@ -75,12 +75,9 @@ export default async function DestinationDetailPage({ params }: DestinationPageP
     )
     .slice(0, 8);
 
-  const faqs =
-    ((destination as { faqs?: Array<{ question: string; answer: string }> }).faqs as
-      | Array<{ question: string; answer: string }>
-      | undefined) ?? [];
-  const howToReach = String((destination as { howToReach?: string }).howToReach || "");
-  const weatherNotes = String(destination.weatherNotes || (destination as { weatherNotes?: string }).weatherNotes || "");
+  const faqs = destination.faqs ?? [];
+  const howToReach = String(destination.howToReach || "");
+  const weatherNotes = String(destination.weatherNotes || "");
   const description = String(destination.description || destination.summary || "");
   const highlights = destination.highlights || [];
 

@@ -12,6 +12,10 @@ export type ApiDestination = {
   trekCount?: number;
   bestSeasons?: string[];
   highlights?: string[];
+  weatherNotes?: string;
+  howToReach?: string;
+  faqs?: Array<{ question: string; answer: string }>;
+  seo?: Record<string, unknown>;
 };
 
 export async function fetchDestinations() {

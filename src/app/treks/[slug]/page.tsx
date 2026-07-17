@@ -90,19 +90,22 @@ export async function generateMetadata({ params }: TrekDetailPageProps): Promise
 
   const programmatic = await fetchProgrammaticSeoPage(slug);
   if (programmatic) {
-    const seo = (programmatic.seo as Record<string, string> | undefined) ?? {};
+    const seo = (programmatic.seo as Record<string, unknown> | undefined) ?? {};
+    const keywords = Array.isArray(seo.keywords)
+      ? (seo.keywords as string[])
+      : [slug, "treks india"];
     return createMetadata({
-      title: seo.title || String(programmatic.title),
-      description: seo.description || String(programmatic.summary || ""),
+      title: String(seo.title || programmatic.title),
+      description: String(seo.description || programmatic.summary || ""),
       canonical: String(programmatic.path || `/treks/${slug}`),
-      keywords: Array.isArray(seo.keywords) ? (seo.keywords as unknown as string[]) : [slug, "treks india"],
-      ogTitle: seo.ogTitle,
-      ogDescription: seo.ogDescription,
-      ogImage: seo.ogImage,
-      twitterTitle: seo.twitterTitle,
-      twitterDescription: seo.twitterDescription,
-      twitterImage: seo.twitterImage,
-      noIndex: seo.index === false || seo.index === ("false" as unknown as boolean),
+      keywords,
+      ogTitle: seo.ogTitle ? String(seo.ogTitle) : undefined,
+      ogDescription: seo.ogDescription ? String(seo.ogDescription) : undefined,
+      ogImage: seo.ogImage ? String(seo.ogImage) : undefined,
+      twitterTitle: seo.twitterTitle ? String(seo.twitterTitle) : undefined,
+      twitterDescription: seo.twitterDescription ? String(seo.twitterDescription) : undefined,
+      twitterImage: seo.twitterImage ? String(seo.twitterImage) : undefined,
+      noIndex: seo.index === false,
     });
   }
 
@@ -137,7 +140,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
             url: `/treks/${trek.slug}`,
             priceInr: trek.basePriceInr,
             durationDays: trek.durationDays,
-            destinationName: trek.destinationName,
+            destinationName: trek.location || trek.quickInfo?.destination || trek.region,
           })}
         />
         <JsonLd

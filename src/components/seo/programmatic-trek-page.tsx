@@ -33,7 +33,7 @@ function matchesFilter(trek: TrekListingItem, page: ProgrammaticPage): boolean {
     case "destination":
       return (
         (trek.destinationName || "").toLowerCase().includes(value) ||
-        (trek.location || "").toLowerCase().includes(value)
+        (trek.region || "").toLowerCase().includes(value)
       );
     case "difficulty":
       return (trek.difficulty || "").toLowerCase() === value;
