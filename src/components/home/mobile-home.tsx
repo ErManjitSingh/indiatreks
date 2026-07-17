@@ -70,10 +70,8 @@ function MobileHero() {
         alt="Night camping under the Milky Way in the Himalayas"
         fill
         priority
+        unoptimized
         sizes="100vw"
-        quality={75}
-        placeholder="blur"
-        blurDataURL={BLUR_DATA_URL}
         className="object-cover object-[center_30%]"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.35)_0%,rgba(8,12,20,0.25)_40%,rgba(8,12,20,0.82)_100%)]" />

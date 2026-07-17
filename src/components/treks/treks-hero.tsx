@@ -12,7 +12,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
-import { BLUR_DATA_URL } from "@/constants/media";
 import { siteConfig } from "@/config/site";
 
 const heroImage = "/images/heroes/treks-banner.jpg";
@@ -42,10 +41,8 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
           alt="Trekker overlooking snow-capped Himalayan peaks at sunrise"
           fill
           priority
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
+          unoptimized
           sizes="100vw"
-          quality={75}
           className="object-cover object-[center_40%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,12,0.28)_0%,rgba(8,18,12,0.35)_45%,rgba(8,18,12,0.88)_100%)]" />
