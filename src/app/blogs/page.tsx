@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { JsonLd } from "@/components/seo";
 import { AppImage } from "@/components/ui/app-image";
-import { createMetadata, breadcrumbJsonLd, blogJsonLd } from "@/lib/seo";
+import { createMetadata, breadcrumbJsonLd } from "@/lib/seo";
 import { apiGet } from "@/lib/api/client";
 
 export const revalidate = 3600;
