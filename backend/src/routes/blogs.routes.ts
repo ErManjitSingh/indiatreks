@@ -30,6 +30,13 @@ router.post(
   blogController.bulkGenerateBlogs,
 );
 
+router.get(
+  "/stats",
+  authenticate,
+  requirePermission("blogs.write"),
+  blogController.getBlogStats,
+);
+
 router.get("/", optionalAuth, validate(listBlogsQuerySchema, "query"), blogController.listBlogs);
 router.get("/:slug/related", validate(paramsSlugSchema, "params"), blogController.getBlogRelated);
 router.post("/:slug/view", validate(paramsSlugSchema, "params"), blogController.recordBlogView);

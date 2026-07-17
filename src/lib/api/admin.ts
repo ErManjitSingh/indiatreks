@@ -97,6 +97,35 @@ export async function adminDeleteDestination(id: string) {
 }
 
 /* ---------- Blogs ---------- */
+export type BlogAdminStats = {
+  total: number;
+  published: number;
+  draft: number;
+  scheduled: number;
+  totalViews: number;
+  createdThisMonth: number;
+  publishedPercent: number;
+  draftPercent: number;
+  categories: string[];
+};
+
+export async function adminGetBlogStats(): Promise<BlogAdminStats> {
+  const res = await apiGet<BlogAdminStats>("/blogs/stats");
+  return (
+    res.data ?? {
+      total: 0,
+      published: 0,
+      draft: 0,
+      scheduled: 0,
+      totalViews: 0,
+      createdThisMonth: 0,
+      publishedPercent: 0,
+      draftPercent: 0,
+      categories: [],
+    }
+  );
+}
+
 export async function adminListBlogs(params?: Record<string, unknown>) {
   return listResource<AdminDoc>("/blogs", { limit: 100, ...params });
 }

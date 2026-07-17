@@ -206,11 +206,47 @@ async function softDelete(id: string) {
   return blog;
 }
 
+async function getStats() {
+  const base = { deletedAt: null };
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const [total, published, draft, scheduled, createdThisMonth, viewsAgg, categories] = await Promise.all([
+    BlogModel.countDocuments(base),
+    BlogModel.countDocuments({ ...base, status: "published" }),
+    BlogModel.countDocuments({ ...base, status: "draft" }),
+    BlogModel.countDocuments({ ...base, status: "scheduled" }),
+    BlogModel.countDocuments({ ...base, createdAt: { $gte: monthStart } }),
+    BlogModel.aggregate<{ totalViews: number }>([
+      { $match: base },
+      { $group: { _id: null, totalViews: { $sum: { $ifNull: ["$views", 0] } } } },
+    ]),
+    BlogModel.distinct("category", { ...base, category: { $nin: [null, ""] } }),
+  ]);
+
+  const draftTotal = draft + scheduled;
+  const totalViews = viewsAgg[0]?.totalViews ?? 0;
+
+  return {
+    total,
+    published,
+    draft: draftTotal,
+    scheduled,
+    totalViews,
+    createdThisMonth,
+    publishedPercent: total ? Math.round((published / total) * 100) : 0,
+    draftPercent: total ? Math.round((draftTotal / total) * 100) : 0,
+    categories: categories.map(String).filter(Boolean).sort((a, b) => a.localeCompare(b)),
+  };
+}
+
 export const blogService = {
   list,
   getHub,
   getRelated,
   incrementViews,
+  getStats,
   getBySlug,
   getById,
   create,

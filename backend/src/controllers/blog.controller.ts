@@ -28,6 +28,11 @@ export const recordBlogView = asyncHandler(async (req: Request, res: Response) =
   return sendSuccess(res, data);
 });
 
+export const getBlogStats = asyncHandler(async (_req: Request, res: Response) => {
+  const stats = await blogService.getStats();
+  return sendSuccess(res, stats);
+});
+
 export const listBlogTopics = asyncHandler(async (_req: Request, res: Response) => {
   const data = aiBlogGeneratorService.listDharamshalaTopics();
   return sendSuccess(res, data);
