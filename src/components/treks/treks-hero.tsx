@@ -45,7 +45,7 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
           sizes="100vw"
-          quality={80}
+          quality={75}
           className="object-cover object-[center_40%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,12,0.28)_0%,rgba(8,18,12,0.35)_45%,rgba(8,18,12,0.88)_100%)]" />
