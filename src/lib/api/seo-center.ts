@@ -52,6 +52,19 @@ export async function centerGscSubmitSitemap(url: string) {
   return res.data;
 }
 
+export async function centerGscSubmitAllSitemaps() {
+  const res = await apiPost<{
+    base: string;
+    results: Array<{ url: string; status: string; error?: string }>;
+  }>("/seo/center/gsc/sitemaps/submit-all", {});
+  return res.data;
+}
+
+export async function centerGscPushBlogs(limit = 30) {
+  const res = await apiPost<Record<string, unknown>>("/seo/center/gsc/blogs/push", { limit });
+  return res.data;
+}
+
 export async function centerGscInspect(url: string) {
   const res = await apiPost<Record<string, unknown>>("/seo/center/gsc/inspect", { url });
   return res.data;

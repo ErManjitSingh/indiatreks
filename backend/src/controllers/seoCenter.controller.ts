@@ -10,7 +10,6 @@ import { pageSpeedService } from "../services/pageSpeed.service";
 import { keywordTrackingService } from "../services/keywordTracking.service";
 import { aiSeoService } from "../services/aiSeo.service";
 import { robotsService } from "../services/robots.service";
-import { sitemapService } from "../services/sitemap.service";
 
 export const getDashboard = asyncHandler(async (_req: Request, res: Response) => {
   const data = await seoCenterService.getDashboard();
@@ -88,6 +87,20 @@ export const gscSitemaps = asyncHandler(async (_req: Request, res: Response) => 
 export const gscSubmitSitemap = asyncHandler(async (req: Request, res: Response) => {
   const data = await googleSearchConsoleService.submitSitemap(String(req.body.url));
   return sendSuccess(res, data, "Sitemap submitted to Google");
+});
+
+export const gscSubmitAllSitemaps = asyncHandler(async (_req: Request, res: Response) => {
+  const { seoAutoIndexService } = await import("../services/seoAutoIndex.service");
+  await seoAutoIndexService.refreshSitemapCounts();
+  const data = await seoAutoIndexService.submitCoreSitemaps();
+  return sendSuccess(res, data, "Core sitemaps submitted to Google");
+});
+
+export const gscPushBlogs = asyncHandler(async (req: Request, res: Response) => {
+  const { seoAutoIndexService } = await import("../services/seoAutoIndex.service");
+  const limit = Number(req.body?.limit) || 30;
+  const data = await seoAutoIndexService.pushRecentBlogs(limit);
+  return sendSuccess(res, data, "Blogs pushed to Search Console");
 });
 
 export const gscInspect = asyncHandler(async (req: Request, res: Response) => {
@@ -177,6 +190,13 @@ export const robotsPreview = asyncHandler(async (_req: Request, res: Response) =
 });
 
 export const generateSitemaps = asyncHandler(async (_req: Request, res: Response) => {
-  const data = await sitemapService.generateAll();
-  return sendSuccess(res, data, "Sitemaps generated");
+  const { seoAutoIndexService } = await import("../services/seoAutoIndex.service");
+  const generated = await seoAutoIndexService.refreshSitemapCounts();
+  let submitted: unknown = null;
+  try {
+    submitted = await seoAutoIndexService.submitCoreSitemaps();
+  } catch {
+    submitted = null;
+  }
+  return sendSuccess(res, { generated, submitted }, "Sitemaps generated");
 });

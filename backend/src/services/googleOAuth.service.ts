@@ -7,6 +7,7 @@ import { ApiError } from "../utils/ApiError";
 
 const SCOPES = [
   "https://www.googleapis.com/auth/webmasters",
+  "https://www.googleapis.com/auth/indexing",
   "https://www.googleapis.com/auth/analytics.readonly",
   "openid",
   "email",

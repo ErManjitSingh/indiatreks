@@ -14,6 +14,8 @@ import {
   centerGoogleStatus,
   centerGscDashboard,
   centerGscInspect,
+  centerGscPushBlogs,
+  centerGscSubmitAllSitemaps,
   centerGscSubmitSitemap,
   centerGscSync,
   centerUpdateIntegrations,
@@ -34,6 +36,8 @@ export default function SearchConsolePage() {
   const [inspectUrl, setInspectUrl] = useState("https://treks.indiaholidaydestination.com/");
   const [inspect, setInspect] = useState<Record<string, unknown> | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pushResult, setPushResult] = useState<Record<string, unknown> | null>(null);
+  const [submitAllResult, setSubmitAllResult] = useState<Array<Record<string, unknown>>>([]);
 
   const load = useCallback(async () => {
     try {
@@ -115,6 +119,41 @@ export default function SearchConsolePage() {
       await load();
     } catch (err) {
       toast.error(getErrorMessage(err, "Sitemap submit failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitAllSitemaps() {
+    setBusy(true);
+    try {
+      const data = await centerGscSubmitAllSitemaps();
+      setSubmitAllResult((data?.results || []) as Array<Record<string, unknown>>);
+      const failed = (data?.results || []).filter((r) => r.status === "failed").length;
+      toast.success(
+        failed
+          ? `Submitted with ${failed} failure(s) — check results`
+          : "All core sitemaps submitted to Google",
+      );
+      await load();
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Submit all sitemaps failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function pushBlogs() {
+    setBusy(true);
+    try {
+      const data = await centerGscPushBlogs(30);
+      setPushResult(data);
+      const urls = (data?.urls as Array<Record<string, unknown>>) || [];
+      const ok = urls.filter((u) => u.status !== "failed").length;
+      toast.success(`Pushed ${ok}/${urls.length} blog URLs to Google`);
+      await load();
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Blog push failed — try Reconnect for indexing scope"));
     } finally {
       setBusy(false);
     }
@@ -202,6 +241,61 @@ export default function SearchConsolePage() {
         <SeoStatCard label="Excluded Pages" value={num(coverage.excluded)} />
         <SeoStatCard label="Pages With Errors" value={num(coverage.errors)} />
         <SeoStatCard label="Coverage Status" value={String(dash?.coverageStatus || "unknown")} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SeoPanel
+          title="Auto sitemap"
+          description="XML feeds stay live from MongoDB. New published blogs, treks, and destinations appear automatically in /sitemaps/*.xml and get resubmitted to Google."
+          action={
+            <Button variant="primary" disabled={busy || !status?.connected} onClick={() => void submitAllSitemaps()}>
+              Submit all sitemaps
+            </Button>
+          }
+        >
+          <ul className="space-y-2 text-sm text-[#374151]">
+            <li>• Index: https://treks.indiaholidaydestination.com/sitemap.xml</li>
+            <li>• Blogs: https://treks.indiaholidaydestination.com/sitemaps/blogs.xml</li>
+            <li>• Treks: https://treks.indiaholidaydestination.com/sitemaps/treks.xml</li>
+            <li>• Destinations: https://treks.indiaholidaydestination.com/sitemaps/destinations.xml</li>
+          </ul>
+          {submitAllResult.length ? (
+            <div className="mt-4">
+              <SeoSimpleTable
+                headers={["Sitemap", "Status"]}
+                rows={submitAllResult.map((r) => [String(r.url || ""), String(r.status || "")])}
+              />
+            </div>
+          ) : null}
+        </SeoPanel>
+
+        <SeoPanel
+          title="Push blogs to Search Console"
+          description="Submits the blogs sitemap, then notifies Google about the latest published blog URLs (Indexing API)."
+          action={
+            <Button variant="primary" disabled={busy || !status?.connected} onClick={() => void pushBlogs()}>
+              Push latest blogs
+            </Button>
+          }
+        >
+          <p className="text-sm text-[#6b7280]">
+            First time after this update: click <strong>Reconnect</strong> so Google grants the Indexing scope.
+            After that, publishing a blog also auto-notifies Google.
+          </p>
+          {pushResult ? (
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-[#374151]">
+                Blogs processed: {String(pushResult.blogsCount ?? 0)}
+              </p>
+              <SeoSimpleTable
+                headers={["Blog URL", "Status"]}
+                rows={((pushResult.urls as Array<Record<string, unknown>>) || [])
+                  .slice(0, 15)
+                  .map((u) => [String(u.url || u.slug || ""), String(u.status || "")])}
+              />
+            </div>
+          ) : null}
+        </SeoPanel>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

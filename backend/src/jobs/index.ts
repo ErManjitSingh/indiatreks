@@ -25,6 +25,18 @@ export function registerJobs() {
         );
         if (result.modifiedCount) {
           logger.info("Published scheduled blogs", { count: result.modifiedCount });
+          const blogs = await BlogModel.find({
+            status: "published",
+            publishedAt: { $gte: new Date(now.getTime() - 60_000) },
+            deletedAt: null,
+          })
+            .select("slug")
+            .limit(50)
+            .lean();
+          const { seoAutoIndexService } = await import("../services/seoAutoIndex.service");
+          for (const blog of blogs) {
+            seoAutoIndexService.notifyPublishedUrl(`/blogs/${blog.slug}`);
+          }
         }
       } catch (error) {
         logger.error("Scheduled blog job failed", { error });

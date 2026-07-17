@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { getErrorMessage } from "@/lib/api/admin";
 import { adminGetSitemapConfig, adminUpdateSitemapConfig } from "@/lib/api/seo";
-import { centerGenerateSitemaps } from "@/lib/api/seo-center";
+import { centerGenerateSitemaps, centerGscSubmitAllSitemaps } from "@/lib/api/seo-center";
 
 type Entry = {
   name: string;
   path?: string;
   enabled?: boolean;
   urlCount?: number;
+  lastGeneratedAt?: string;
 };
 
 export default function SitemapsPage() {
@@ -38,11 +39,26 @@ export default function SitemapsPage() {
     setBusy(true);
     try {
       const res = await centerGenerateSitemaps();
-      setGenerated((res || []) as Array<Record<string, unknown>>);
-      toast.success("Sitemaps generated");
+      const list = Array.isArray(res)
+        ? res
+        : (((res as { generated?: unknown[] } | null)?.generated || []) as Array<Record<string, unknown>>);
+      setGenerated(list as Array<Record<string, unknown>>);
+      toast.success("Sitemaps refreshed from live content");
       await load();
     } catch (err) {
       toast.error(getErrorMessage(err, "Generate failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitToGoogle() {
+    setBusy(true);
+    try {
+      await centerGscSubmitAllSitemaps();
+      toast.success("Core sitemaps submitted to Search Console");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Google submit failed — connect GSC first"));
     } finally {
       setBusy(false);
     }
@@ -62,12 +78,47 @@ export default function SitemapsPage() {
   return (
     <div className="space-y-6">
       <SeoPanel
+        title="Auto sitemap"
+        description="Sitemaps are live: every published trek, blog, and destination is included when Google crawls the XML. Publishing content also refreshes counts and notifies Search Console."
+      >
+        <div className="grid gap-3 text-sm text-[#374151] sm:grid-cols-2">
+          <p>
+            Public index:{" "}
+            <a
+              className="font-medium text-[#2D5A27] hover:underline"
+              href="https://treks.indiaholidaydestination.com/sitemap.xml"
+              target="_blank"
+              rel="noreferrer"
+            >
+              /sitemap.xml
+            </a>
+          </p>
+          <p>
+            Blogs feed:{" "}
+            <a
+              className="font-medium text-[#2D5A27] hover:underline"
+              href="https://treks.indiaholidaydestination.com/sitemaps/blogs.xml"
+              target="_blank"
+              rel="noreferrer"
+            >
+              /sitemaps/blogs.xml
+            </a>
+          </p>
+        </div>
+      </SeoPanel>
+
+      <SeoPanel
         title="Sitemap Manager"
-        description="Treks, blogs, destinations, images, videos — auto generate"
+        description="Treks, blogs, destinations, images, videos — refresh counts and push feeds to Google"
         action={
-          <Button variant="primary" disabled={busy} onClick={() => void generate()}>
-            Generate all sitemaps
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" disabled={busy} onClick={() => void submitToGoogle()}>
+              Submit to Google
+            </Button>
+            <Button variant="primary" disabled={busy} onClick={() => void generate()}>
+              Refresh all sitemaps
+            </Button>
+          </div>
         }
       >
         <SeoSimpleTable
@@ -90,7 +141,7 @@ export default function SitemapsPage() {
       </SeoPanel>
 
       {generated.length ? (
-        <SeoPanel title="Last generate result">
+        <SeoPanel title="Last refresh result">
           <SeoSimpleTable
             headers={["Name", "Count"]}
             rows={generated.map((g) => [String(g.name || ""), String(g.count ?? "")])}

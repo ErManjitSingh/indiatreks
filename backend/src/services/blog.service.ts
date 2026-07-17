@@ -156,7 +156,12 @@ async function create(data: Partial<IBlog>) {
   const baseSlug = slugify(data.slug || data.title || "post");
   const slug = await ensureUniqueSlug(baseSlug);
   const publishedAt = data.status === "published" ? new Date() : null;
-  return BlogModel.create({ ...data, slug, publishedAt });
+  const blog = await BlogModel.create({ ...data, slug, publishedAt });
+  if (blog.status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/blogs/${blog.slug}`);
+  }
+  return blog;
 }
 
 async function update(id: string, data: Partial<IBlog>) {
@@ -195,6 +200,13 @@ async function update(id: string, data: Partial<IBlog>) {
       entityId: String(existing._id),
       note: `Blog slug updated from ${existing.slug}`,
     });
+  }
+
+  const becamePublished = blog.status === "published" && existing.status !== "published";
+  const republishedUpdate = blog.status === "published" && existing.status === "published";
+  if (becamePublished || republishedUpdate) {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/blogs/${blog.slug}`);
   }
 
   return blog;

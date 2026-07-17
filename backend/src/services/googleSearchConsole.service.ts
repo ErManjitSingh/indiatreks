@@ -387,6 +387,28 @@ async function submitSitemap(sitemapUrl: string) {
   return { siteUrl, sitemapUrl, status: "submitted" };
 }
 
+/** Notify Google that a URL was updated (Indexing API). Requires indexing OAuth scope. */
+async function notifyUrlUpdated(url: string) {
+  const { client } = await googleOAuthService.getAuthedClient();
+  const indexing = google.indexing({ version: "v3", auth: client });
+  try {
+    const res = await indexing.urlNotifications.publish({
+      requestBody: {
+        url,
+        type: "URL_UPDATED",
+      },
+    });
+    return {
+      url,
+      type: "URL_UPDATED",
+      notifyTime: res.data.urlNotificationMetadata?.latestUpdate?.notifyTime || null,
+      raw: res.data,
+    };
+  } catch (err) {
+    wrapGoogleError(err, "GSC_INDEXING_NOTIFY_FAILED");
+  }
+}
+
 async function inspectUrl(inspectionUrl: string) {
   const { client } = await googleOAuthService.getAuthedClient();
   const siteUrl = await resolveProperty();
@@ -432,6 +454,7 @@ export const googleSearchConsoleService = {
   getCached,
   listSitemaps,
   submitSitemap,
+  notifyUrlUpdated,
   inspectUrl,
   listSites,
   resolveProperty,

@@ -7,6 +7,7 @@ import {
   integrationsUpdateSchema,
   submitSitemapBodySchema,
   inspectUrlBodySchema,
+  pushBlogsBodySchema,
   syncDaysBodySchema,
   cwvRunBodySchema,
   keywordCreateSchema,
@@ -44,6 +45,13 @@ router.post(
   ...staff,
   validate(submitSitemapBodySchema),
   seoCenterController.gscSubmitSitemap,
+);
+router.post("/gsc/sitemaps/submit-all", ...staff, seoCenterController.gscSubmitAllSitemaps);
+router.post(
+  "/gsc/blogs/push",
+  ...staff,
+  validate(pushBlogsBodySchema),
+  seoCenterController.gscPushBlogs,
 );
 router.post("/gsc/inspect", ...staff, validate(inspectUrlBodySchema), seoCenterController.gscInspect);
 

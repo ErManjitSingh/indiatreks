@@ -50,6 +50,10 @@ export const inspectUrlBodySchema = z.object({
   url: z.string().url(),
 });
 
+export const pushBlogsBodySchema = z.object({
+  limit: z.coerce.number().min(1).max(50).optional(),
+});
+
 export const syncDaysBodySchema = z.object({
   days: z.coerce.number().min(1).max(90).optional(),
 });

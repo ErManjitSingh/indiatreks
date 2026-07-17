@@ -162,10 +162,18 @@ export async function upsertGeneratedBlog(topic: DharamshalaBlogTopic, options?:
 
   if (existing) {
     await BlogModel.findByIdAndUpdate(existing._id, { ...payload, modifiedAt: new Date() });
+    if (payload.status === "published") {
+      const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+      seoAutoIndexService.notifyPublishedUrl(`/blogs/${topic.slug}`);
+    }
     return { action: "updated" as const, slug: topic.slug, id: String(existing._id) };
   }
 
   const created = await BlogModel.create(payload);
+  if (created.status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/blogs/${created.slug}`);
+  }
   return { action: "created" as const, slug: topic.slug, id: String(created._id) };
 }
 

@@ -111,6 +111,10 @@ async function create(data: Partial<ITrek>) {
     status,
     publishedAt: status === "published" ? new Date() : null,
   });
+  if (status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/treks/${trek.slug}`);
+  }
   return trek;
 }
 
@@ -155,6 +159,11 @@ async function update(id: string, data: Partial<ITrek>) {
       entityId: String(existing._id),
       note: `Trek slug updated from ${existing.slug}`,
     });
+  }
+
+  if (updated.status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/treks/${updated.slug}`);
   }
 
   return updated;

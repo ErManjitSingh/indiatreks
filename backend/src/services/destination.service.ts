@@ -63,7 +63,12 @@ async function ensureUniqueSlug(baseSlug: string, excludeId?: string): Promise<s
 async function create(data: Partial<IDestination>) {
   const baseSlug = slugify(data.slug || data.name || "destination");
   const slug = await ensureUniqueSlug(baseSlug);
-  return destinationRepository.create({ ...data, slug });
+  const dest = await destinationRepository.create({ ...data, slug });
+  if (dest.status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/destinations/${dest.slug}`);
+  }
+  return dest;
 }
 
 async function update(id: string, data: Partial<IDestination>) {
@@ -96,6 +101,11 @@ async function update(id: string, data: Partial<IDestination>) {
       entityId: String(existing._id),
       note: `Destination slug updated from ${existing.slug}`,
     });
+  }
+
+  if (updated.status === "published") {
+    const { seoAutoIndexService } = await import("./seoAutoIndex.service");
+    seoAutoIndexService.notifyPublishedUrl(`/destinations/${updated.slug}`);
   }
 
   return updated;
