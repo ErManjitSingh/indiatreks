@@ -86,7 +86,7 @@ export const mainNavigation: NavItem[] = [
   },
   {
     title: "Blogs",
-    href: "/blog",
+    href: "/blogs",
     description: "Guides, stories, and trail insights",
   },
   {
@@ -126,7 +126,7 @@ export const footerLinks = {
   ],
   useful: [
     { title: "Gallery", href: "/gallery" },
-    { title: "Blog", href: "/blog" },
+    { title: "Blog", href: "/blogs" },
     { title: "FAQ", href: "/faq" },
     { title: "Booking", href: "/booking" },
     { title: "Contact", href: "/contact" },

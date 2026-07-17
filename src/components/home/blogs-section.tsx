@@ -24,13 +24,13 @@ export function BlogsSection() {
           eyebrow="Latest Blogs"
           title="Field notes from the mountains"
           description="Guides, gear wisdom, and narrative travel writing from the trail."
-          action={<CtaButton href="/blog">Read the journal</CtaButton>}
+          action={<CtaButton href="/blogs">Read the journal</CtaButton>}
         />
 
         <div className="grid gap-6 lg:grid-cols-5">
           {featured ? (
             <Link
-              href={`/blog/${featured.slug}`}
+              href={`/blogs/${featured.slug}`}
               className="group relative overflow-hidden rounded-3xl lg:col-span-3"
             >
               <div className="relative aspect-[16/11] overflow-hidden rounded-3xl">
@@ -69,7 +69,7 @@ export function BlogsSection() {
             {rest.map((post) => (
               <Link
                 key={post.id}
-                href={`/blog/${post.slug}`}
+                href={`/blogs/${post.slug}`}
                 className="group flex gap-4 overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl sm:h-32 sm:w-36">

@@ -54,6 +54,12 @@ const nextConfig: NextConfig = {
       "class-variance-authority",
     ],
   },
+  async rewrites() {
+    return [
+      { source: "/blog", destination: "/blogs" },
+      { source: "/blog/:slug", destination: "/blogs/:slug" },
+    ];
+  },
   async headers() {
     return [
       {

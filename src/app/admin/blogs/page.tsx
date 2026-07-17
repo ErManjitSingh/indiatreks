@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/admin-ui";
 import { toast } from "@/components/ui/toast";
 import {
+  adminBulkGenerateBlogs,
   adminDeleteBlog,
   adminListBlogs,
   getErrorMessage,
@@ -23,6 +24,20 @@ export default function AdminBlogsPage() {
   const [total, setTotal] = useState(0);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
+
+  async function seedDharamshalaBlogs() {
+    setSeeding(true);
+    try {
+      const result = await adminBulkGenerateBlogs({ publish: true, force: false });
+      toast.success(`Generated ${result?.total ?? 0} travel blogs`);
+      await load();
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Bulk generation failed"));
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,6 +64,14 @@ export default function AdminBlogsPage() {
         actionHref="/admin/blogs/new"
         actionLabel="Add blog"
       >
+        <button
+          type="button"
+          disabled={seeding}
+          onClick={() => void seedDharamshalaBlogs()}
+          className="rounded-xl border border-[#d8e0d4] bg-white px-4 py-2 text-sm font-semibold text-[#2D5A27] hover:bg-[#F4F6F3]"
+        >
+          {seeding ? "Generating…" : "Generate 30 Dharamshala blogs"}
+        </button>
         <input
           className={`${adminInputClass} max-w-xs`}
           placeholder="Search…"
@@ -80,6 +103,13 @@ export default function AdminBlogsPage() {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/blogs/${row.slug}`}
+                      target="_blank"
+                      className="text-sm font-semibold text-[#2D5A27] hover:underline"
+                    >
+                      Preview
+                    </Link>
                     <Link
                       href={`/admin/blogs/${row._id}/edit`}
                       className="text-sm font-semibold text-[#2D5A27] hover:underline"

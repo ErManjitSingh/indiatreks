@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import {
   adminCreateBlog,
+  adminGenerateBlog,
   adminUpdateBlog,
   arrayToLines,
   getErrorMessage,
@@ -31,9 +32,12 @@ type BlogFormState = {
   excerpt: string;
   content: string;
   coverImage: string;
+  gallery: string;
   category: string;
   tags: string;
   status: string;
+  scheduledAt: string;
+  featured: boolean;
   readingTimeMinutes: string;
   authorName: string;
   faq: string;
@@ -74,6 +78,28 @@ function faqToString(value: unknown) {
     .join("\n");
 }
 
+function parseGallery(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [url, alt, caption] = line.split("|").map((part) => part.trim());
+      return { url: url || "", alt, caption };
+    })
+    .filter((row) => row.url);
+}
+
+function galleryToString(value: unknown) {
+  if (!Array.isArray(value)) return "";
+  return value
+    .map((item) => {
+      const row = item as { url?: string; alt?: string; caption?: string };
+      return `${row.url || ""} | ${row.alt || ""} | ${row.caption || ""}`;
+    })
+    .join("\n");
+}
+
 function fromDoc(doc?: AdminDoc | null): BlogFormState {
   const author = (doc?.author as { name?: string } | undefined) ?? {};
   return {
@@ -82,9 +108,12 @@ function fromDoc(doc?: AdminDoc | null): BlogFormState {
     excerpt: String(doc?.excerpt ?? ""),
     content: String(doc?.content ?? ""),
     coverImage: String(doc?.coverImage ?? ""),
+    gallery: galleryToString(doc?.gallery),
     category: String(doc?.category ?? ""),
     tags: tagsToString(doc?.tags) || arrayToLines(doc?.tags),
     status: String(doc?.status ?? "draft"),
+    scheduledAt: doc?.scheduledAt ? String(doc.scheduledAt).slice(0, 16) : "",
+    featured: Boolean(doc?.featured),
     readingTimeMinutes: String(doc?.readingTimeMinutes ?? "3"),
     authorName: String(author.name ?? ""),
     faq: faqToString(doc?.faq),
@@ -99,9 +128,12 @@ function toPayload(form: BlogFormState) {
     excerpt: form.excerpt,
     content: form.content,
     coverImage: form.coverImage,
+    gallery: parseGallery(form.gallery),
     category: form.category,
     tags: parseTags(form.tags),
     status: form.status,
+    scheduledAt: form.scheduledAt ? new Date(form.scheduledAt).toISOString() : undefined,
+    featured: form.featured,
     readingTimeMinutes: Number(form.readingTimeMinutes) || 3,
     author: { name: form.authorName.trim() },
     faq: parseFaq(form.faq),
@@ -113,7 +145,40 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
   const router = useRouter();
   const [form, setForm] = useState<BlogFormState>(() => fromDoc(initial));
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const isEdit = Boolean(initial?._id);
+
+  async function generateWithAi() {
+    setGenerating(true);
+    try {
+      const article = (await adminGenerateBlog({
+        topicSlug: form.slug || undefined,
+        title: form.title || undefined,
+        publish: false,
+        save: false,
+      })) as Record<string, unknown>;
+      setForm((prev) => ({
+        ...prev,
+        title: String(article.title || prev.title),
+        slug: String(article.slug || prev.slug),
+        excerpt: String(article.excerpt || prev.excerpt),
+        content: String(article.content || prev.content),
+        coverImage: String(article.coverImage || prev.coverImage),
+        gallery: galleryToString(article.gallery),
+        category: String(article.category || prev.category),
+        tags: Array.isArray(article.tags) ? article.tags.map(String).join(", ") : prev.tags,
+        readingTimeMinutes: String(article.readingTimeMinutes || prev.readingTimeMinutes),
+        authorName: String((article.author as { name?: string })?.name || prev.authorName),
+        faq: faqToString(article.faq),
+        seo: seoFromDoc(article.seo as Record<string, unknown> | undefined),
+      }));
+      toast.success("AI article generated — review and save");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "AI generation failed"));
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   function set<K extends keyof BlogFormState>(key: K, value: BlogFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -160,6 +225,20 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
             ))}
           </select>
         </AdminField>
+        <AdminField label="Schedule publish (if scheduled)">
+          <input
+            type="datetime-local"
+            className={adminInputClass}
+            value={form.scheduledAt}
+            onChange={(e) => set("scheduledAt", e.target.value)}
+          />
+        </AdminField>
+        <AdminField label="Featured">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} />
+            Show in featured blog sections
+          </label>
+        </AdminField>
         <AdminField label="Cover image URL">
           <input className={adminInputClass} value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} />
         </AdminField>
@@ -178,8 +257,11 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
         <AdminField label="Excerpt">
           <textarea className={adminTextareaClass} value={form.excerpt} onChange={(e) => set("excerpt", e.target.value)} />
         </AdminField>
-        <AdminField label="Content">
-          <textarea className={`${adminTextareaClass} min-h-[220px]`} value={form.content} onChange={(e) => set("content", e.target.value)} rows={12} />
+        <AdminField label="Gallery (url | alt | caption per line)">
+          <textarea className={adminTextareaClass} value={form.gallery} onChange={(e) => set("gallery", e.target.value)} />
+        </AdminField>
+        <AdminField label="Content (Markdown)">
+          <textarea className={`${adminTextareaClass} min-h-[320px] font-mono text-sm`} value={form.content} onChange={(e) => set("content", e.target.value)} rows={18} />
         </AdminField>
         <AdminField label="FAQ (one per line: Question | Answer)">
           <textarea className={adminTextareaClass} value={form.faq} onChange={(e) => set("faq", e.target.value)} />
@@ -214,7 +296,15 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
         />
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" disabled={generating} onClick={() => void generateWithAi()}>
+          {generating ? "Generating…" : "Generate with AI"}
+        </Button>
+        {form.slug ? (
+          <Button type="button" variant="outline" onClick={() => window.open(`/blogs/${form.slug}`, "_blank")}>
+            Preview
+          </Button>
+        ) : null}
         <Button type="submit" variant="primary" disabled={saving}>
           {saving ? "Saving…" : isEdit ? "Update blog" : "Create blog"}
         </Button>

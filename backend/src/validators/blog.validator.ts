@@ -7,6 +7,9 @@ export const createBlogSchema = z.object({
   excerpt: z.string().default(""),
   content: z.string().default(""),
   coverImage: z.string().default(""),
+  gallery: z
+    .array(z.object({ url: z.string(), alt: z.string().optional(), caption: z.string().optional() }))
+    .optional(),
   author: z
     .object({
       name: z.string().default(""),
@@ -27,6 +30,11 @@ export const createBlogSchema = z.object({
     .array(z.object({ title: z.string(), url: z.string(), anchor: z.string().optional() }))
     .optional(),
   faq: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
+  relatedTreks: z.array(z.object({ slug: z.string(), title: z.string().optional() })).optional(),
+  relatedDestinations: z.array(z.object({ slug: z.string(), title: z.string().optional() })).optional(),
+  relatedBlogs: z.array(z.object({ slug: z.string(), title: z.string().optional() })).optional(),
+  featured: z.boolean().optional(),
+  views: z.number().min(0).optional(),
 });
 
 export const updateBlogSchema = createBlogSchema.partial();
@@ -38,4 +46,19 @@ export const listBlogsQuerySchema = z.object({
   category: z.string().optional(),
   tag: z.string().optional(),
   status: z.enum(["draft", "published", "scheduled"]).optional(),
+  featured: z.coerce.boolean().optional(),
+  sort: z.enum(["latest", "popular", "trending"]).optional(),
+});
+
+export const generateBlogSchema = z.object({
+  topicSlug: z.string().optional(),
+  title: z.string().optional(),
+  publish: z.boolean().optional().default(false),
+  force: z.boolean().optional().default(false),
+  save: z.boolean().optional().default(false),
+});
+
+export const bulkGenerateBlogsSchema = z.object({
+  publish: z.boolean().optional().default(true),
+  force: z.boolean().optional().default(false),
 });

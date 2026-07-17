@@ -5,6 +5,17 @@ import type { ISeo } from "./Trek.model";
 
 export type BlogStatus = "draft" | "published" | "scheduled";
 
+export interface IBlogGalleryImage {
+  url: string;
+  alt?: string;
+  caption?: string;
+}
+
+export interface IBlogRelatedRef {
+  slug: string;
+  title?: string;
+}
+
 export interface IBlogInternalLink {
   title: string;
   url: string;
@@ -18,6 +29,7 @@ export interface IBlog extends Document {
   excerpt: string;
   content: string;
   coverImage: string;
+  gallery?: IBlogGalleryImage[];
   author: {
     name: string;
     avatar?: string;
@@ -34,6 +46,11 @@ export interface IBlog extends Document {
   tableOfContents?: Array<{ id: string; title: string; level: number }>;
   internalLinks?: IBlogInternalLink[];
   faq?: Array<{ question: string; answer: string }>;
+  relatedTreks?: IBlogRelatedRef[];
+  relatedDestinations?: IBlogRelatedRef[];
+  relatedBlogs?: IBlogRelatedRef[];
+  featured?: boolean;
+  views?: number;
   modifiedAt?: Date | null;
   deletedAt?: Date | null;
   createdAt: Date;
@@ -47,6 +64,13 @@ const BlogSchema = new Schema<IBlog>(
     excerpt: { type: String, default: "" },
     content: { type: String, default: "" },
     coverImage: { type: String, default: "" },
+    gallery: [
+      {
+        url: { type: String, required: true },
+        alt: { type: String },
+        caption: { type: String },
+      },
+    ],
     author: {
       name: { type: String, default: "" },
       avatar: { type: String },
@@ -80,6 +104,11 @@ const BlogSchema = new Schema<IBlog>(
         answer: { type: String, required: true },
       },
     ],
+    relatedTreks: [{ slug: { type: String, required: true }, title: { type: String } }],
+    relatedDestinations: [{ slug: { type: String, required: true }, title: { type: String } }],
+    relatedBlogs: [{ slug: { type: String, required: true }, title: { type: String } }],
+    featured: { type: Boolean, default: false, index: true },
+    views: { type: Number, default: 0, index: true },
     modifiedAt: { type: Date, default: null },
   },
   { timestamps: true },

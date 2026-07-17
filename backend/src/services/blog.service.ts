@@ -1,4 +1,6 @@
 import { BlogModel, IBlog } from "../models/Blog.model";
+import { TrekModel } from "../models/Trek.model";
+import { DestinationModel } from "../models/Destination.model";
 import { slugify } from "../utils/slugify";
 import { getPagination, paginateMeta } from "../utils/pagination";
 import { ApiError } from "../utils/ApiError";
@@ -10,6 +12,8 @@ interface ListQuery {
   category?: string;
   tag?: string;
   status?: string;
+  featured?: boolean;
+  sort?: "latest" | "popular" | "trending";
 }
 
 async function ensureUniqueSlug(baseSlug: string, excludeId?: string): Promise<string> {
@@ -28,20 +32,110 @@ async function list(query: ListQuery) {
   if (query.status) filter.status = query.status;
   if (query.category) filter.category = new RegExp(`^${query.category}$`, "i");
   if (query.tag) filter.tags = query.tag;
+  if (query.featured) filter.featured = true;
   if (query.q) {
     filter.$or = [{ title: new RegExp(query.q, "i") }, { excerpt: new RegExp(query.q, "i") }];
   }
 
+  const sortMap = {
+    latest: { publishedAt: -1, createdAt: -1 },
+    popular: { views: -1, publishedAt: -1 },
+    trending: { views: -1, updatedAt: -1 },
+  } as const;
+  const sort = sortMap[query.sort || "latest"];
+
   const [items, total] = await Promise.all([
     BlogModel.find(filter)
-      .select("slug title excerpt coverImage category tags status publishedAt readingTimeMinutes author createdAt updatedAt")
-      .sort({ publishedAt: -1, createdAt: -1 })
+      .select(
+        "slug title excerpt coverImage category tags status publishedAt readingTimeMinutes author featured views createdAt updatedAt",
+      )
+      .sort(sort as never)
       .skip(skip)
       .limit(limit)
       .lean(),
     BlogModel.countDocuments(filter),
   ]);
   return { items, meta: paginateMeta(total, page, limit) };
+}
+
+async function getHub() {
+  const base = { status: "published" as const };
+  const [latest, popular, trending, featured, categories] = await Promise.all([
+    BlogModel.find(base)
+      .sort({ publishedAt: -1 })
+      .limit(6)
+      .select("slug title excerpt coverImage readingTimeMinutes category publishedAt views")
+      .lean(),
+    BlogModel.find(base)
+      .sort({ views: -1, publishedAt: -1 })
+      .limit(6)
+      .select("slug title excerpt coverImage readingTimeMinutes category publishedAt views")
+      .lean(),
+    BlogModel.find(base)
+      .sort({ views: -1, updatedAt: -1 })
+      .limit(6)
+      .select("slug title excerpt coverImage readingTimeMinutes category publishedAt views")
+      .lean(),
+    BlogModel.find({ ...base, featured: true })
+      .sort({ publishedAt: -1 })
+      .limit(6)
+      .select("slug title excerpt coverImage readingTimeMinutes category publishedAt views")
+      .lean(),
+    BlogModel.aggregate([
+      { $match: base },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 12 },
+    ]),
+  ]);
+  return {
+    latest,
+    popular,
+    trending,
+    featured,
+    categories: categories.map((c: { _id: string; count: number }) => ({ name: c._id, count: c.count })),
+  };
+}
+
+async function incrementViews(slug: string) {
+  const blog = await BlogModel.findOneAndUpdate(
+    { slug, status: "published" },
+    { $inc: { views: 1 } },
+    { new: true },
+  ).select("slug views");
+  if (!blog) throw new ApiError(404, "Blog post not found", "BLOG_NOT_FOUND");
+  return { slug: blog.slug, views: blog.views || 0 };
+}
+
+async function getRelated(slug: string) {
+  const blog = await getBySlug(slug, false);
+  const doc = blog.toObject();
+  const tagFilter = doc.tags?.length ? { tags: { $in: doc.tags } } : {};
+  const [blogs, treks, destinations] = await Promise.all([
+    BlogModel.find({ status: "published", slug: { $ne: slug }, ...tagFilter })
+      .select("slug title excerpt coverImage readingTimeMinutes")
+      .limit(6)
+      .lean(),
+    doc.relatedTreks?.length
+      ? TrekModel.find({ slug: { $in: doc.relatedTreks.map((t) => t.slug) }, status: "published" })
+          .select("slug title summary heroImages basePriceInr durationDays")
+          .lean()
+      : TrekModel.find({ status: "published", destinationName: /dharamshala/i })
+          .select("slug title summary heroImages basePriceInr durationDays")
+          .limit(4)
+          .lean(),
+    doc.relatedDestinations?.length
+      ? DestinationModel.find({
+          slug: { $in: doc.relatedDestinations.map((d) => d.slug) },
+          status: "published",
+        })
+          .select("slug name summary coverImage")
+          .lean()
+      : DestinationModel.find({ status: "published", slug: "dharamshala" })
+          .select("slug name summary coverImage")
+          .lean(),
+  ]);
+  return { blogs, treks, destinations };
 }
 
 async function getBySlug(slug: string, includeUnpublished = false) {
@@ -114,6 +208,9 @@ async function softDelete(id: string) {
 
 export const blogService = {
   list,
+  getHub,
+  getRelated,
+  incrementViews,
   getBySlug,
   getById,
   create,

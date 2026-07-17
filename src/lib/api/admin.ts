@@ -120,6 +120,16 @@ export async function adminDeleteBlog(id: string) {
   await apiDelete(`/blogs/${id}`);
 }
 
+export async function adminGenerateBlog(body: Record<string, unknown>) {
+  const res = await apiPost<Record<string, unknown>>("/blogs/ai/generate", body);
+  return res.data;
+}
+
+export async function adminBulkGenerateBlogs(body?: Record<string, unknown>) {
+  const res = await apiPost<{ results: unknown[]; total: number }>("/blogs/ai/bulk-generate", body || {});
+  return res.data;
+}
+
 /* ---------- FAQs ---------- */
 export async function adminListFaqs(params?: Record<string, unknown>) {
   return listResource<AdminDoc>("/faqs", { limit: 100, ...params });
