@@ -105,7 +105,6 @@ export const footerLinks = {
   about: [
     { title: "Our Story", href: "/about" },
     { title: "Safety Standards", href: "/about#safety" },
-    { title: "Trek Leaders", href: "/about#leaders" },
     { title: "Careers", href: "/about#careers" },
   ],
   treks: [

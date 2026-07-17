@@ -59,33 +59,6 @@ const safetyPoints = [
   "24×7 operations desk for on-trail coordination",
 ];
 
-const leaders = [
-  {
-    name: "Rajesh Thakur",
-    role: "Lead Trek Guide · Dhauladhar",
-    experience: "12+ years",
-    image: trekImages.avatar1,
-  },
-  {
-    name: "Priya Sharma",
-    role: "High Altitude Specialist",
-    experience: "9+ years",
-    image: trekImages.avatar2,
-  },
-  {
-    name: "Amit Rawat",
-    role: "Operations & Safety Head",
-    experience: "15+ years",
-    image: trekImages.avatar3,
-  },
-  {
-    name: "Neha Kaul",
-    role: "Guest Experience Manager",
-    experience: "7+ years",
-    image: trekImages.avatar4,
-  },
-];
-
 export function AboutPageContent() {
   const { site } = useSiteContent();
 
@@ -250,56 +223,6 @@ export function AboutPageContent() {
                 </div>
               ))}
             </div>
-          </div>
-        </Container>
-      </section>
-
-      <section id="leaders" className="scroll-mt-24 py-12 md:py-16">
-        <Container>
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[11px] font-bold tracking-[0.2em] text-[#2D5A27] uppercase">
-                Trek Leaders
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-[#1a1a1a]">
-                Meet the People Behind the Trail
-              </h2>
-              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[#6b7668]">
-                Our guides are locals and seasoned mountaineers who carry decades of combined
-                Himalayan experience — and genuine love for sharing the mountains with you.
-              </p>
-            </div>
-            <Button asChild variant="secondary" className="shrink-0">
-              <Link href="/contact">Plan Your Trek</Link>
-            </Button>
-          </div>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {leaders.map((leader) => (
-              <article
-                key={leader.name}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.05]"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={leader.image}
-                    alt={leader.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 25vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-heading text-base font-bold text-[#14201a]">
-                    {leader.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-[#6b7668]">{leader.role}</p>
-                  <p className="mt-2 inline-flex rounded-full bg-[#eef4e8] px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#2D5A27] uppercase">
-                    {leader.experience}
-                  </p>
-                </div>
-              </article>
-            ))}
           </div>
         </Container>
       </section>
