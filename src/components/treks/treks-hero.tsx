@@ -60,8 +60,8 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
               4.9 Rated by 15,000+ Trekkers
             </p>
 
-            <h1 className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight text-white">
-              Explore India&apos;s Best{" "}
+            <h1 className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight !text-white">
+              <span className="!text-white">Explore India&apos;s Best</span>{" "}
               <span className="text-[#B8E04A]">Himalayan Treks</span>
             </h1>
 

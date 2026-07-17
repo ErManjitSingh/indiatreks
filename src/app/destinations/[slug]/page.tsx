@@ -116,7 +116,7 @@ export default async function DestinationDetailPage({ params }: DestinationPageP
           <p className="text-sm text-white/80">
             {[destination.region, destination.state].filter(Boolean).join(" · ")}
           </p>
-          <h1 className="mt-2 font-heading text-4xl font-bold text-white md:text-5xl">{destination.name}</h1>
+          <h1 className="mt-2 font-heading text-4xl font-bold !text-white md:text-5xl">{destination.name}</h1>
           <p className="mt-3 max-w-2xl text-base text-white/90">{destination.summary}</p>
         </div>
       </section>

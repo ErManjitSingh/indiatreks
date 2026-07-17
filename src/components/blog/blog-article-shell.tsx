@@ -202,7 +202,7 @@ export function BlogArticleShell({
             </span>
           </div>
 
-          <h1 className="mt-4 max-w-4xl font-heading text-[clamp(1.9rem,4.5vw,3.4rem)] font-bold leading-[1.1] tracking-tight text-white">
+          <h1 className="mt-4 max-w-4xl font-heading text-[clamp(1.9rem,4.5vw,3.4rem)] font-bold leading-[1.1] tracking-tight !text-white">
             {blog.title}
           </h1>
           {blog.excerpt ? (
