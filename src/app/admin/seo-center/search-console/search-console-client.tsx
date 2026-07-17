@@ -456,7 +456,7 @@ export default function SearchConsolePage() {
               rows={sitemaps.map((s) => [
                 String(s.path || ""),
                 String(Boolean(s.isPending)),
-                num(s.errors),
+                num(s.errorCount ?? s.errors),
                 num(s.warnings),
               ])}
             />

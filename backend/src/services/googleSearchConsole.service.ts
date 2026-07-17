@@ -214,9 +214,9 @@ async function syncSearchAnalytics(rangeDays = 28) {
     lastSubmitted: s.lastSubmitted || undefined,
     isPending: Boolean(s.isPending),
     warnings: Number(s.warnings || 0),
-    errors: Number(s.errors || 0),
+    errorCount: Number(s.errors || 0),
     contents: (s.contents || []).map((c) => ({
-      type: c.type || undefined,
+      type: String(c.type || "web"),
       submitted: Number(c.submitted || 0),
       indexed: Number(c.indexed || 0),
     })),
@@ -229,7 +229,7 @@ async function syncSearchAnalytics(rangeDays = 28) {
     noindex: 0,
     crawled: 0,
     discovered: 0,
-    errors: sitemaps.reduce((sum, s) => sum + (s.errors || 0), 0),
+    errors: sitemaps.reduce((sum, s) => sum + (s.errorCount || 0), 0),
     excluded: 0,
   };
 
@@ -328,7 +328,16 @@ async function getDashboard(rangeDays = 28, forceSync = false) {
     },
     topPages: cache?.topPages || [],
     topQueries: cache?.topQueries || [],
-    sitemaps: cache?.sitemaps || [],
+    sitemaps: (cache?.sitemaps || []).map((s) => ({
+      path: s.path,
+      lastSubmitted: s.lastSubmitted,
+      isPending: s.isPending,
+      warnings: s.warnings || 0,
+      errorCount: s.errorCount || 0,
+      // Alias for older UI that still reads `errors`
+      errors: s.errorCount || 0,
+      contents: s.contents || [],
+    })),
     connectedProperties,
     lastError: status.lastError || null,
     submittedSitemap: (cache?.sitemaps || [])[0]?.path || null,

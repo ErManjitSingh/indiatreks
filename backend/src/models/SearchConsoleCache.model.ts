@@ -43,7 +43,8 @@ export interface ISearchConsoleCache extends Document {
     lastSubmitted?: string;
     isPending?: boolean;
     warnings?: number;
-    errors?: number;
+    /** Google sitemap error count (named errorCount to avoid Mongoose reserved `errors`) */
+    errorCount?: number;
     contents?: Array<{ type?: string; submitted?: number; indexed?: number }>;
   }>;
   raw?: Record<string, unknown>;
@@ -99,12 +100,20 @@ const SearchConsoleCacheSchema = new Schema<ISearchConsoleCache>(
     },
     sitemaps: [
       {
-        path: String,
-        lastSubmitted: String,
-        isPending: Boolean,
-        warnings: Number,
-        errors: Number,
-        contents: [{ type: String, submitted: Number, indexed: Number }],
+        path: { type: String, default: "" },
+        lastSubmitted: { type: String },
+        isPending: { type: Boolean, default: false },
+        warnings: { type: Number, default: 0 },
+        // Do not use field name `errors` — reserved by Mongoose documents.
+        errorCount: { type: Number, default: 0 },
+        contents: [
+          {
+            // Field named `type` must use nested `{ type: String }` form.
+            type: { type: String },
+            submitted: { type: Number, default: 0 },
+            indexed: { type: Number, default: 0 },
+          },
+        ],
       },
     ],
     raw: { type: Schema.Types.Mixed },
