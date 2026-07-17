@@ -34,23 +34,20 @@ async function findRelatedTreks(topic: AnyBlogTopic) {
   const trekSlug = "trekSlug" in topic ? topic.trekSlug : undefined;
   const shimla = isShimlaTopic(topic);
 
+  // Shimla is a hill-station content hub for now — do not attach sightseeing "tour packages" as treks.
+  if (shimla && !trekSlug) {
+    return [];
+  }
+
   const filter = trekSlug
     ? { slug: trekSlug }
-    : shimla
-      ? {
-          $or: [
-            { destinationName: /shimla/i },
-            { slug: /shimla/i },
-            { title: /shimla|kufri|chail/i },
-          ],
-        }
-      : {
-          $or: [
-            { destinationName: /dharamshala/i },
-            { region: /kangra|dhauladhar|himachal/i },
-            { title: /dharamshala|triund|kareri|indrahar|mcleod/i },
-          ],
-        };
+    : {
+        $or: [
+          { destinationName: /dharamshala/i },
+          { region: /kangra|dhauladhar|himachal/i },
+          { title: /dharamshala|triund|kareri|indrahar|mcleod/i },
+        ],
+      };
 
   const treks = await TrekModel.find({ status: "published", ...filter })
     .select("slug title destinationName")
@@ -90,9 +87,8 @@ async function buildInternalLinks(topic: AnyBlogTopic) {
   const links: Array<{ title: string; url: string; anchor?: string }> = shimla
     ? [
         { title: "Shimla destination guide", url: "/destinations/shimla" },
-        { title: "Shimla tour packages", url: "/treks?destination=shimla" },
+        { title: "Himachal Pradesh treks", url: "/treks?state=himachal-pradesh" },
         { title: "All travel blogs", url: "/blogs" },
-        { title: "Treks in Himachal Pradesh", url: "/treks?state=himachal-pradesh" },
       ]
     : [
         { title: "Dharamshala destination guide", url: "/destinations/dharamshala" },

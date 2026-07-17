@@ -655,9 +655,9 @@ Continue exploring: ${hubLinks()}.
 function buildCta(_topic: ShimlaBlogTopic) {
   return `## Book Shimla Tour CTA
 
-Ready to turn this plan into confirmed stays and transfers? Explore curated Shimla tour packages, honeymoon escapes, and family itineraries with India Holiday Destinations—built for real Himalayan road timings, not brochure fantasy.
+Ready to turn this plan into a real Himachal trip? Explore published Himalayan treks, destination guides, and practical Shimla blogs on India Holiday Destinations—built for real road timings, not brochure fantasy.
 
-> **Call to action:** Browse [Shimla tour packages](/treks?destination=shimla), read the [Shimla Tour Packages Guide](/blogs/shimla-tour-packages-guide), check the [Shimla destination page](/destinations/shimla), and compare related packages below before you book.
+> **Call to action:** Browse [Himachal treks](/treks?state=himachal-pradesh), read the [Shimla Tour Packages Guide](/blogs/shimla-tour-packages-guide) for planning notes, and check the [Shimla destination page](/destinations/shimla).
 
 Prefer DIY? Start with ${link("Complete Shimla Travel Planner", "complete-shimla-travel-planner")} and ${link("First Time Visiting Shimla Guide", "first-time-visiting-shimla-guide")}.
 `;
@@ -690,16 +690,15 @@ function buildRelatedBlogsSection(topic: ShimlaBlogTopic) {
 }
 
 function buildRelatedPackagesSection(_topic: ShimlaBlogTopic) {
-  return `## Related Packages
+  return `## Related Treks
 
-Explore these Shimla tour package ideas on India Holiday Destinations:
+Shimla is primarily a hill-station base. For trek bookings on India Holiday Destinations, explore published Himalayan treks (not sightseeing packages):
 
-- [Shimla Sightseeing Tour Package](/treks/shimla-sightseeing-tour-package)
-- [Shimla Kufri Chail Tour Package](/treks/shimla-kufri-chail-tour-package)
-- [Shimla Honeymoon Tour Package](/treks/shimla-honeymoon-tour-package)
-- [Shimla Manali Tour Package](/treks/shimla-manali-tour-package)
+- Browse [all treks](/treks)
+- Filter [Himachal Pradesh treks](/treks?state=himachal-pradesh)
+- Read planning notes in the [Shimla Tour Packages Guide](/blogs/shimla-tour-packages-guide)
 
-Or browse all options: [Shimla tours & packages](/treks?destination=shimla).
+When new Shimla-region treks are published, they will appear here automatically.
 `;
 }
 

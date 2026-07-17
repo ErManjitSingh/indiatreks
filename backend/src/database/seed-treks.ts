@@ -16,10 +16,7 @@ async function seedTreks() {
   if (!fs.existsSync(file)) {
     throw new Error(`Missing ${file}. Run: node scripts/build-catalog-treks.mjs`);
   }
-  const treks = [
-    ...loadJsonArray(file),
-    ...loadJsonArray(path.join(process.cwd(), "seed-data/shimla-packages.json")),
-  ];
+  const treks = loadJsonArray(file);
   const catalogSlugs = new Set(treks.map((trek) => String(trek.slug)));
 
   let upserted = 0;
