@@ -20,6 +20,17 @@ type DestSeed = {
 
 const destinations: DestSeed[] = [
   {
+    slug: "shimla",
+    name: "Shimla",
+    region: "Shimla Hills",
+    state: "Himachal Pradesh",
+    summary: "Heritage hill station with Mall Road, Kufri, Chail and Kinnaur gateway tours.",
+    description:
+      "Himachal's capital hill station — colonial Ridge walks, toy-train nostalgia, and day trips to Kufri, Chail, Naldehra, and Mashobra.",
+    coverImage: "/images/treks/mountains-1.jpg",
+    highlights: ["The Ridge", "Mall Road", "Kufri", "Chail", "Jakhoo Temple", "Viceregal Lodge"],
+  },
+  {
     slug: "dharamshala",
     name: "Dharamshala",
     region: "Dhauladhar Range",

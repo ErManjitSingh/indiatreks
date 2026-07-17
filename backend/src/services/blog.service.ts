@@ -120,7 +120,14 @@ async function getRelated(slug: string) {
       ? TrekModel.find({ slug: { $in: doc.relatedTreks.map((t) => t.slug) }, status: "published" })
           .select("slug title summary heroImages basePriceInr durationDays")
           .lean()
-      : TrekModel.find({ status: "published", destinationName: /dharamshala/i })
+      : TrekModel.find({
+          status: "published",
+          $or: [
+            { destinationName: new RegExp(String(doc.category || "Shimla"), "i") },
+            { destinationName: /shimla|dharamshala/i },
+            { slug: /shimla/i },
+          ],
+        })
           .select("slug title summary heroImages basePriceInr durationDays")
           .limit(4)
           .lean(),
@@ -131,8 +138,16 @@ async function getRelated(slug: string) {
         })
           .select("slug name summary coverImage")
           .lean()
-      : DestinationModel.find({ status: "published", slug: "dharamshala" })
+      : DestinationModel.find({
+          status: "published",
+          $or: [
+            { slug: String(doc.category || "").toLowerCase() },
+            { name: new RegExp(String(doc.category || "Shimla|Dharamshala"), "i") },
+            { slug: /shimla|dharamshala/i },
+          ],
+        })
           .select("slug name summary coverImage")
+          .limit(2)
           .lean(),
   ]);
   return { blogs, treks, destinations };

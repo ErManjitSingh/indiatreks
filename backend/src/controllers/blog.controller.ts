@@ -33,8 +33,14 @@ export const getBlogStats = asyncHandler(async (_req: Request, res: Response) =>
   return sendSuccess(res, stats);
 });
 
-export const listBlogTopics = asyncHandler(async (_req: Request, res: Response) => {
-  const data = aiBlogGeneratorService.listDharamshalaTopics();
+export const listBlogTopics = asyncHandler(async (req: Request, res: Response) => {
+  const destination = String(req.query.destination || "all").toLowerCase();
+  const data =
+    destination === "shimla"
+      ? aiBlogGeneratorService.listShimlaTopics()
+      : destination === "dharamshala"
+        ? aiBlogGeneratorService.listDharamshalaTopics()
+        : aiBlogGeneratorService.listAllBlogTopics();
   return sendSuccess(res, data);
 });
 
@@ -48,9 +54,7 @@ export const generateBlog = asyncHandler(async (req: Request, res: Response) => 
   };
   const topic =
     (topicSlug && aiBlogGeneratorService.getTopicBySlug(topicSlug)) ||
-    (title
-      ? aiBlogGeneratorService.listDharamshalaTopics().find((t) => t.title === title)
-      : null);
+    (title ? aiBlogGeneratorService.listAllBlogTopics().find((t) => t.title === title) : null);
   if (!topic) {
     return res.status(404).json({ success: false, message: "Topic not found", code: "TOPIC_NOT_FOUND" });
   }
@@ -64,9 +68,17 @@ export const generateBlog = asyncHandler(async (req: Request, res: Response) => 
 });
 
 export const bulkGenerateBlogs = asyncHandler(async (req: Request, res: Response) => {
-  const { publish, force } = req.body as { publish?: boolean; force?: boolean };
-  const results = await aiBlogGeneratorService.generateAllDharamshalaBlogs({ publish, force });
-  return sendSuccess(res, { results, total: results.length }, "Bulk blog generation complete");
+  const { publish, force, destination } = req.body as {
+    publish?: boolean;
+    force?: boolean;
+    destination?: string;
+  };
+  const dest = String(destination || "dharamshala").toLowerCase();
+  const results =
+    dest === "shimla"
+      ? await aiBlogGeneratorService.generateAllShimlaBlogs({ publish, force, relink: true })
+      : await aiBlogGeneratorService.generateAllDharamshalaBlogs({ publish, force });
+  return sendSuccess(res, { results, total: results.length, destination: dest }, "Bulk blog generation complete");
 });
 
 export const getBlogBySlug = asyncHandler(async (req: Request, res: Response) => {

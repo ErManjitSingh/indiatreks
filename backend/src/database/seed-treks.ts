@@ -5,13 +5,21 @@ import { TrekModel } from "../models/Trek.model";
 import { DestinationModel } from "../models/Destination.model";
 import { logger } from "../utils/logger";
 
+function loadJsonArray(filePath: string): Array<Record<string, unknown>> {
+  if (!fs.existsSync(filePath)) return [];
+  return JSON.parse(fs.readFileSync(filePath, "utf8")) as Array<Record<string, unknown>>;
+}
+
 async function seedTreks() {
   await connectDatabase();
   const file = path.join(process.cwd(), "seed-data/treks.json");
   if (!fs.existsSync(file)) {
     throw new Error(`Missing ${file}. Run: node scripts/build-catalog-treks.mjs`);
   }
-  const treks = JSON.parse(fs.readFileSync(file, "utf8")) as Array<Record<string, unknown>>;
+  const treks = [
+    ...loadJsonArray(file),
+    ...loadJsonArray(path.join(process.cwd(), "seed-data/shimla-packages.json")),
+  ];
   const catalogSlugs = new Set(treks.map((trek) => String(trek.slug)));
 
   let upserted = 0;

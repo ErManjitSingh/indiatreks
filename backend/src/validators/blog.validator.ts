@@ -61,4 +61,5 @@ export const generateBlogSchema = z.object({
 export const bulkGenerateBlogsSchema = z.object({
   publish: z.boolean().optional().default(true),
   force: z.boolean().optional().default(false),
+  destination: z.enum(["dharamshala", "shimla"]).optional().default("dharamshala"),
 });
