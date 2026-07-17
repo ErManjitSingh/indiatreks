@@ -22,7 +22,6 @@ import { siteConfig } from "@/config/site";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { recordBlogView, type BlogCard } from "@/lib/api/blogs";
 import { useUiStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 type TocItem = { id: string; title: string; level: number };
 type FaqItem = { question: string; answer: string };
@@ -87,13 +86,11 @@ export function BlogArticleShell({
 }: BlogArticleProps) {
   const setEnquireModalOpen = useUiStore((s) => s.setEnquireModalOpen);
   const [progress, setProgress] = useState(0);
-  const [activeId, setActiveId] = useState("");
   const [copied, setCopied] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const toc = useMemo(() => blog.tableOfContents ?? [], [blog.tableOfContents]);
   const faqs = blog.faq ?? [];
   const gallery = blog.gallery ?? [];
   const internalLinks = blog.internalLinks ?? [];
@@ -120,20 +117,11 @@ export function BlogArticleShell({
       const scrolled = el.scrollTop;
       const height = el.scrollHeight - el.clientHeight;
       setProgress(height > 0 ? Math.min(100, (scrolled / height) * 100) : 0);
-
-      const headings = toc
-        .map((item) => document.getElementById(item.id))
-        .filter(Boolean) as HTMLElement[];
-      let current = toc[0]?.id || "";
-      for (const heading of headings) {
-        if (heading.getBoundingClientRect().top <= 140) current = heading.id;
-      }
-      setActiveId(current);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [toc]);
+  }, []);
 
   async function copyLink() {
     try {
@@ -251,80 +239,7 @@ export function BlogArticleShell({
 
       <section className="bg-[#F7FAF6] py-8 md:py-12">
         <Container>
-          <div className="grid gap-8 xl:grid-cols-[240px_minmax(0,1fr)_280px]">
-            {/* Left sidebar */}
-            <aside className="hidden space-y-5 xl:block">
-              <div className="sticky top-24 space-y-5">
-                {toc.length ? (
-                  <div className="rounded-2xl border border-[#E5EBE3] bg-white p-4 shadow-sm">
-                    <p className="text-[11px] font-bold tracking-[0.14em] text-[#6B7668] uppercase">
-                      On This Page
-                    </p>
-                    <ul className="mt-3 max-h-[50vh] space-y-1 overflow-auto">
-                      {toc.map((item) => (
-                        <li key={item.id}>
-                          <a
-                            href={`#${item.id}`}
-                            className={cn(
-                              "flex items-start gap-2 rounded-lg px-2 py-1.5 text-sm transition",
-                              activeId === item.id
-                                ? "bg-[#EAF4E8] font-semibold text-[#2D5A27]"
-                                : "text-[#4F5D4E] hover:bg-[#F4F8F2]",
-                            )}
-                          >
-                            <span
-                              className={cn(
-                                "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                                activeId === item.id ? "bg-[#2D5A27]" : "bg-transparent",
-                              )}
-                            />
-                            <span className="leading-snug">{item.title}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                <div className="relative overflow-hidden rounded-2xl border border-[#E5EBE3] shadow-sm">
-                  <div className="relative aspect-[4/5]">
-                    <Image
-                      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80"
-                      alt="Plan your trip"
-                      fill
-                      sizes="240px"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
-                    <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                      <p className="font-heading text-lg font-bold leading-snug">
-                        Plan Your {blog.category || "Himalayan"} Trip
-                      </p>
-                      <p className="mt-1 text-xs text-white/80">
-                        Customized itineraries, expert guides & best prices.
-                      </p>
-                      <Link
-                        href="/booking"
-                        className="mt-3 inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#2D5A27] px-3.5 text-sm font-bold text-white transition hover:bg-[#244820]"
-                      >
-                        Plan My Trip
-                        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setEnquireModalOpen(true)}
-                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1F4A1F] px-5 text-sm font-bold text-white shadow-[0_10px_28px_rgba(31,74,31,0.35)] transition hover:bg-[#183A18]"
-                >
-                  <Phone className="h-4 w-4" aria-hidden />
-                  Request Callback
-                </button>
-              </div>
-            </aside>
-
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
             {/* Main content */}
             <article className="min-w-0 rounded-2xl border border-[#E5EBE3] bg-white p-5 shadow-sm md:p-8">
               <div className="flex flex-wrap items-center gap-3 border-b border-[#EEF2EC] pb-5">
