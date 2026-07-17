@@ -13,6 +13,8 @@
     "seed:treks": "tsx src/database/seed-treks.ts",
     "seed:site": "tsx src/database/seed-site-content.ts",
     "seed:all": "tsx src/database/seed.ts && tsx src/database/seed-treks.ts && tsx src/database/seed-site-content.ts",
+    "seo:apply": "tsx src/scripts/apply-ai-seo.ts",
+    "seo:apply:force": "FORCE=1 tsx src/scripts/apply-ai-seo.ts",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
