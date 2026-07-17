@@ -47,7 +47,7 @@ async function buildBootstrap(): Promise<BootstrapPayload> {
       .lean()
       .catch(() => []),
     BlogModel.find({ status: "published" })
-      .select("slug title excerpt coverImage category tags publishedAt readingTimeMinutes")
+      .select("slug title excerpt coverImage category tags publishedAt readingTimeMinutes author views")
       .sort({ publishedAt: -1 })
       .limit(8)
       .lean(),

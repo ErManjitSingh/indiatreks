@@ -105,6 +105,7 @@ export interface BlogCard {
   author: string;
   publishedAt: string;
   image: string;
+  views?: number;
 }
 
 export interface TrustBadge {

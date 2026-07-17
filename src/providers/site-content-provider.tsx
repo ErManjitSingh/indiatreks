@@ -116,6 +116,7 @@ function mapBootstrapBlogs(
         author,
         publishedAt: String(b.publishedAt ?? ""),
         image: String(b.coverImage || b.image || "/images/og-default.jpg"),
+        views: Number(b.views ?? 0),
       };
     })
     .filter(Boolean) as typeof latestBlogs;
