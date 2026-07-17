@@ -2,9 +2,22 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  AlertTriangle,
+  Eye,
+  FileWarning,
+  MousePointerClick,
+  Search,
+  ShieldAlert,
+} from "lucide-react";
 
 import { AdminField, adminInputClass } from "@/components/admin/admin-ui";
-import { SeoPanel, SeoSimpleTable, SeoStatCard } from "@/components/admin/seo-center/seo-center-ui";
+import {
+  SeoMetricCard,
+  SeoPanel,
+  SeoPerformanceChart,
+  SeoSimpleTable,
+} from "@/components/admin/seo-center/seo-center-ui";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { getErrorMessage } from "@/lib/api/admin";
@@ -179,16 +192,17 @@ export default function SearchConsolePage() {
   const connectedProperties = (dash?.connectedProperties || []) as Array<Record<string, unknown>>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Google Account — mockup card */}
       <SeoPanel
-        title="Google account"
+        title="Google Account"
         description="Connect with official Google OAuth. Tokens are encrypted at rest and never exposed to the browser."
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {status?.connected ? (
               <>
                 <Button variant="outline" disabled={busy} onClick={() => void sync()}>
-                  Sync data
+                  Sync Data
                 </Button>
                 <Button variant="outline" disabled={busy} onClick={() => void disconnect()}>
                   Disconnect
@@ -205,59 +219,166 @@ export default function SearchConsolePage() {
           </div>
         }
       >
-        <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <p>
-            Status:{" "}
-            <strong>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-bold text-[#166534]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
               {status?.connected ? "Connected" : status?.configured ? "Ready" : "Not configured"}
-            </strong>
-          </p>
-          <p>Email: {String(status?.email || "—")}</p>
-          <p>Configured: {String(Boolean(status?.configured))}</p>
-          <p className="truncate">Redirect: {String(status?.redirectUri || "—")}</p>
-        </div>
-        {status?.lastError ? <p className="mt-3 text-sm text-amber-700">{String(status.lastError)}</p> : null}
-        <div className="mt-4 flex flex-wrap items-end gap-3">
-          <AdminField label="Search Console property URL" className="min-w-[280px] flex-1">
-            <input
-              className={adminInputClass}
-              value={property}
-              onChange={(e) => setProperty(e.target.value)}
-              placeholder="sc-domain:treks.indiaholidaydestination.com"
-            />
-          </AdminField>
-          <Button variant="outline" disabled={busy} onClick={() => void saveProperty()}>
-            Save property
-          </Button>
+            </div>
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <p>
+                <span className="text-[#6B7280]">Email:</span>{" "}
+                <strong className="text-[#111827]">{String(status?.email || "—")}</strong>
+              </p>
+              <p>
+                <span className="text-[#6B7280]">Configured:</span>{" "}
+                <strong className="text-[#111827]">{status?.configured ? "Yes" : "No"}</strong>
+              </p>
+              <p className="sm:col-span-2 truncate">
+                <span className="text-[#6B7280]">Redirect URI:</span>{" "}
+                <strong className="text-[#111827]">{String(status?.redirectUri || "—")}</strong>
+              </p>
+            </div>
+            {status?.lastError ? (
+              <p className="mt-3 text-sm text-amber-700">{String(status.lastError)}</p>
+            ) : null}
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <AdminField label="Search Console Property" className="min-w-[280px] flex-1">
+                <input
+                  className={adminInputClass}
+                  value={property}
+                  onChange={(e) => setProperty(e.target.value)}
+                  placeholder="sc-domain:treks.indiaholidaydestination.com"
+                />
+              </AdminField>
+              <Button variant="outline" disabled={busy} onClick={() => void saveProperty()}>
+                Save Property
+              </Button>
+            </div>
+          </div>
+          <div className="hidden items-center justify-center rounded-2xl border border-[#E8ECF1] bg-[#F7FAF6] p-4 lg:flex">
+            <div className="text-center">
+              <div className="mx-auto mb-2 flex h-16 w-20 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-[#E5EBE3]">
+                <BarChartMini />
+              </div>
+              <p className="text-xs font-semibold text-[#6B7280]">Search Console live</p>
+            </div>
+          </div>
         </div>
       </SeoPanel>
 
+      {/* Metric cards with sparklines */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <SeoStatCard label="Total Clicks" value={num(totals.clicks).toLocaleString()} />
-        <SeoStatCard label="Total Impressions" value={num(totals.impressions).toLocaleString()} />
-        <SeoStatCard label="Average CTR" value={`${(num(totals.ctr) * 100).toFixed(2)}%`} />
-        <SeoStatCard label="Average Position" value={num(totals.position).toFixed(1)} />
-        <SeoStatCard label="Indexed Pages" value={num(coverage.indexed)} />
-        <SeoStatCard label="Excluded Pages" value={num(coverage.excluded)} />
-        <SeoStatCard label="Pages With Errors" value={num(coverage.errors)} />
-        <SeoStatCard label="Coverage Status" value={String(dash?.coverageStatus || "unknown")} />
+        <SeoMetricCard
+          label="Total Clicks"
+          value={num(totals.clicks).toLocaleString()}
+          icon={MousePointerClick}
+          iconTone="bg-[#DCFCE7] text-[#16A34A]"
+          spark="green"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Total Impressions"
+          value={num(totals.impressions).toLocaleString()}
+          icon={Eye}
+          iconTone="bg-[#DBEAFE] text-[#2563EB]"
+          spark="blue"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Average CTR"
+          value={`${(num(totals.ctr) * 100).toFixed(2)}%`}
+          icon={Search}
+          iconTone="bg-[#FFEDD5] text-[#EA580C]"
+          spark="orange"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Average Position"
+          value={num(totals.position).toFixed(1)}
+          icon={Search}
+          iconTone="bg-[#F3E8FF] text-[#9333EA]"
+          spark="purple"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Indexed Pages"
+          value={num(coverage.indexed)}
+          icon={FileWarning}
+          iconTone="bg-[#CCFBF1] text-[#0F766E]"
+          spark="teal"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Excluded Pages"
+          value={num(coverage.excluded)}
+          icon={AlertTriangle}
+          iconTone="bg-[#FEE2E2] text-[#DC2626]"
+          spark="red"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Pages With Errors"
+          value={num(coverage.errors)}
+          icon={ShieldAlert}
+          iconTone="bg-[#FFEDD5] text-[#EA580C]"
+          spark="orange"
+          hint="No data yet"
+        />
+        <SeoMetricCard
+          label="Coverage Status"
+          value={String(dash?.coverageStatus || "Unknown")}
+          icon={Eye}
+          iconTone="bg-[#E5E7EB] text-[#4B5563]"
+          spark="blue"
+          hint="No data yet"
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <SeoPerformanceChart title="Performance Over Time" />
         <SeoPanel
-          title="Auto sitemap"
-          description="XML feeds stay live from MongoDB. New published blogs, treks, and destinations appear automatically in /sitemaps/*.xml and get resubmitted to Google."
+          title="Top Queries"
           action={
-            <Button variant="primary" disabled={busy || !status?.connected} onClick={() => void submitAllSitemaps()}>
-              Submit all sitemaps
+            <Button variant="outline" className="h-8 px-2.5 text-xs" disabled>
+              View All
+            </Button>
+          }
+        >
+          <SeoSimpleTable
+            headers={["Query", "Clicks", "Impressions", "CTR", "Position"]}
+            empty="No data available yet"
+            rows={topQueries.slice(0, 12).map((q) => [
+              String(q.query || ""),
+              num(q.clicks),
+              num(q.impressions),
+              `${(num(q.ctr) * 100).toFixed(2)}%`,
+              num(q.position).toFixed(1),
+            ])}
+          />
+        </SeoPanel>
+      </div>
+
+      {/* Auto sitemap + push blogs */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SeoPanel
+          title="Auto Sitemap"
+          description="XML feeds stay live from MongoDB. New published blogs/treks/destinations appear automatically and can be resubmitted to Google."
+          action={
+            <Button
+              variant="primary"
+              disabled={busy || !status?.connected}
+              onClick={() => void submitAllSitemaps()}
+            >
+              Submit All Sitemaps
             </Button>
           }
         >
           <ul className="space-y-2 text-sm text-[#374151]">
-            <li>• Index: https://treks.indiaholidaydestination.com/sitemap.xml</li>
-            <li>• Blogs: https://treks.indiaholidaydestination.com/sitemaps/blogs.xml</li>
-            <li>• Treks: https://treks.indiaholidaydestination.com/sitemaps/treks.xml</li>
-            <li>• Destinations: https://treks.indiaholidaydestination.com/sitemaps/destinations.xml</li>
+            <li>• Index: /sitemap.xml</li>
+            <li>• Blogs: /sitemaps/blogs.xml</li>
+            <li>• Treks: /sitemaps/treks.xml</li>
+            <li>• Destinations: /sitemaps/destinations.xml</li>
           </ul>
           {submitAllResult.length ? (
             <div className="mt-4">
@@ -270,17 +391,21 @@ export default function SearchConsolePage() {
         </SeoPanel>
 
         <SeoPanel
-          title="Push blogs to Search Console"
-          description="Submits the blogs sitemap, then notifies Google about the latest published blog URLs (Indexing API)."
+          title="Push Blogs to Search Console"
+          description="Submits blogs sitemap, then notifies Google about latest published blog URLs."
           action={
-            <Button variant="primary" disabled={busy || !status?.connected} onClick={() => void pushBlogs()}>
-              Push latest blogs
+            <Button
+              variant="primary"
+              disabled={busy || !status?.connected}
+              onClick={() => void pushBlogs()}
+            >
+              Push Latest Blogs
             </Button>
           }
         >
           <p className="text-sm text-[#6b7280]">
-            First time after this update: click <strong>Reconnect</strong> so Google grants the Indexing scope.
-            After that, publishing a blog also auto-notifies Google.
+            First time: click <strong>Reconnect</strong> for Indexing scope. Publishing a blog also
+            auto-notifies Google.
           </p>
           {pushResult ? (
             <div className="mt-4 space-y-3">
@@ -290,7 +415,7 @@ export default function SearchConsolePage() {
               <SeoSimpleTable
                 headers={["Blog URL", "Status"]}
                 rows={((pushResult.urls as Array<Record<string, unknown>>) || [])
-                  .slice(0, 15)
+                  .slice(0, 12)
                   .map((u) => [String(u.url || u.slug || ""), String(u.status || "")])}
               />
             </div>
@@ -299,7 +424,7 @@ export default function SearchConsolePage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <SeoPanel title="Connected properties">
+        <SeoPanel title="Connected Properties">
           <SeoSimpleTable
             headers={["Property", "Permission"]}
             rows={connectedProperties.map((site) => [
@@ -309,31 +434,21 @@ export default function SearchConsolePage() {
           />
         </SeoPanel>
 
-        <SeoPanel title="Indexing snapshot">
-          <SeoSimpleTable
-            headers={["State", "Count"]}
-            rows={[
-              ["Indexed", num(coverage.indexed)],
-              ["Not indexed", num(coverage.notIndexed)],
-              ["Blocked", num(coverage.blocked)],
-              ["Noindex", num(coverage.noindex)],
-              ["Crawled", num(coverage.crawled)],
-              ["Discovered", num(coverage.discovered)],
-            ]}
-          />
-        </SeoPanel>
-
         <SeoPanel
-          title="Sitemap"
-          description="Submit or resubmit sitemap via Search Console API"
+          title="Submit Sitemap"
+          description="Submit or resubmit a single sitemap feed"
           action={
             <Button variant="primary" disabled={busy} onClick={() => void submitSitemap()}>
-              Submit sitemap
+              Submit Sitemap
             </Button>
           }
         >
           <AdminField label="Sitemap URL">
-            <input className={adminInputClass} value={sitemapUrl} onChange={(e) => setSitemapUrl(e.target.value)} />
+            <input
+              className={adminInputClass}
+              value={sitemapUrl}
+              onChange={(e) => setSitemapUrl(e.target.value)}
+            />
           </AdminField>
           <div className="mt-4">
             <SeoSimpleTable
@@ -349,7 +464,7 @@ export default function SearchConsolePage() {
         </SeoPanel>
       </div>
 
-      <SeoPanel title="Top landing pages">
+      <SeoPanel title="Top Landing Pages">
         <SeoSimpleTable
           headers={["Page", "Clicks", "Impressions", "CTR", "Position"]}
           rows={topPages.slice(0, 25).map((p) => [
@@ -358,20 +473,6 @@ export default function SearchConsolePage() {
             num(p.impressions),
             `${(num(p.ctr) * 100).toFixed(2)}%`,
             num(p.position).toFixed(1),
-          ])}
-        />
-      </SeoPanel>
-
-      <SeoPanel title="Top keywords">
-        <SeoSimpleTable
-          headers={["Keyword", "Clicks", "Impressions", "CTR", "Position", "Landing Page"]}
-          rows={topQueries.slice(0, 25).map((q) => [
-            String(q.query || ""),
-            num(q.clicks),
-            num(q.impressions),
-            `${(num(q.ctr) * 100).toFixed(2)}%`,
-            num(q.position).toFixed(1),
-            String(q.landingPage || "—"),
           ])}
         />
       </SeoPanel>
@@ -386,7 +487,11 @@ export default function SearchConsolePage() {
         }
       >
         <AdminField label="URL">
-          <input className={adminInputClass} value={inspectUrl} onChange={(e) => setInspectUrl(e.target.value)} />
+          <input
+            className={adminInputClass}
+            value={inspectUrl}
+            onChange={(e) => setInspectUrl(e.target.value)}
+          />
         </AdminField>
         {inspect ? (
           <div className="mt-4 grid gap-2 text-sm text-[#374151] sm:grid-cols-2">
@@ -402,5 +507,16 @@ export default function SearchConsolePage() {
         ) : null}
       </SeoPanel>
     </div>
+  );
+}
+
+function BarChartMini() {
+  return (
+    <svg viewBox="0 0 64 48" className="h-10 w-14 text-[#2D5A27]" aria-hidden>
+      <rect x="6" y="28" width="8" height="14" rx="2" fill="currentColor" opacity="0.35" />
+      <rect x="20" y="18" width="8" height="24" rx="2" fill="currentColor" opacity="0.55" />
+      <rect x="34" y="10" width="8" height="32" rx="2" fill="currentColor" opacity="0.75" />
+      <rect x="48" y="20" width="8" height="22" rx="2" fill="currentColor" />
+    </svg>
   );
 }
