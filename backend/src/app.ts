@@ -46,6 +46,17 @@ export function createApp() {
   app.use(mongoSanitize());
   app.use(hpp());
 
+  // Cache / ETag support for public GETs
+  app.set("etag", "strong");
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.includes("/admin") && !req.path.includes("/auth")) {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+      res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    }
+    next();
+  });
+
   if (env.NODE_ENV !== "test") {
     app.use(
       morgan(env.NODE_ENV === "production" ? "combined" : "dev", {

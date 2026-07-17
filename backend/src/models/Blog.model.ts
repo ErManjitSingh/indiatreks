@@ -1,8 +1,15 @@
 import { Schema, model, Document, Types } from "mongoose";
 import { softDeletePlugin } from "./plugins/softDelete.plugin";
-import { ISeo } from "./Trek.model";
+import { EnterpriseSeoSchema, type IEnterpriseSeo } from "./schemas/enterpriseSeo.schema";
+import type { ISeo } from "./Trek.model";
 
 export type BlogStatus = "draft" | "published" | "scheduled";
+
+export interface IBlogInternalLink {
+  title: string;
+  url: string;
+  anchor?: string;
+}
 
 export interface IBlog extends Document {
   _id: Types.ObjectId;
@@ -22,8 +29,12 @@ export interface IBlog extends Document {
   status: BlogStatus;
   publishedAt?: Date | null;
   scheduledAt?: Date | null;
-  seo: ISeo;
+  seo: ISeo | IEnterpriseSeo;
   readingTimeMinutes: number;
+  tableOfContents?: Array<{ id: string; title: string; level: number }>;
+  internalLinks?: IBlogInternalLink[];
+  faq?: Array<{ question: string; answer: string }>;
+  modifiedAt?: Date | null;
   deletedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -47,13 +58,29 @@ const BlogSchema = new Schema<IBlog>(
     status: { type: String, enum: ["draft", "published", "scheduled"], default: "draft", index: true },
     publishedAt: { type: Date, default: null },
     scheduledAt: { type: Date, default: null },
-    seo: {
-      title: { type: String },
-      description: { type: String },
-      canonical: { type: String },
-      ogImage: { type: String },
-    },
+    seo: { type: EnterpriseSeoSchema, default: () => ({}) },
     readingTimeMinutes: { type: Number, default: 3 },
+    tableOfContents: [
+      {
+        id: { type: String },
+        title: { type: String },
+        level: { type: Number, default: 2 },
+      },
+    ],
+    internalLinks: [
+      {
+        title: { type: String, required: true },
+        url: { type: String, required: true },
+        anchor: { type: String },
+      },
+    ],
+    faq: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
+    modifiedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

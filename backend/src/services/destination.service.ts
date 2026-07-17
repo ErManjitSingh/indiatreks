@@ -75,8 +75,29 @@ async function update(id: string, data: Partial<IDestination>) {
       slug = await ensureUniqueSlug(baseSlug, id);
     }
   }
-  const updated = await destinationRepository.updateById(id, { ...data, slug });
+
+  const seoPayload = data.seo
+    ? { ...data.seo, lastSeoUpdate: new Date() }
+    : undefined;
+
+  const updated = await destinationRepository.updateById(id, {
+    ...data,
+    slug,
+    ...(seoPayload ? { seo: { ...(existing.seo as object), ...seoPayload } } : {}),
+  });
   if (!updated) throw new ApiError(404, "Destination not found", "DESTINATION_NOT_FOUND");
+
+  if (slug !== existing.slug) {
+    const { redirectService } = await import("./redirect.service");
+    await redirectService.createSlugRedirect({
+      fromPath: `/destinations/${existing.slug}`,
+      toPath: `/destinations/${slug}`,
+      entityType: "destination",
+      entityId: String(existing._id),
+      note: `Destination slug updated from ${existing.slug}`,
+    });
+  }
+
   return updated;
 }
 

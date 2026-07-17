@@ -4,6 +4,7 @@ import { authenticate, requirePermission } from "../middlewares/auth";
 
 const router = Router();
 
+router.get("/config", analyticsController.getPublicAnalyticsConfig);
 router.get("/dashboard", authenticate, requirePermission("analytics.read"), analyticsController.getDashboardStats);
 
 export default router;

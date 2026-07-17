@@ -1,6 +1,7 @@
 import { Schema, model, Document, Types } from "mongoose";
 import { softDeletePlugin } from "./plugins/softDelete.plugin";
-import { ISeo } from "./Trek.model";
+import { EnterpriseSeoSchema, type IEnterpriseSeo } from "./schemas/enterpriseSeo.schema";
+import type { ISeo } from "./Trek.model";
 
 export type DestinationStatus = "draft" | "published" | "archived";
 
@@ -19,8 +20,10 @@ export interface IDestination extends Document {
   altitudeRange: { min: number; max: number };
   highlights: string[];
   travelGuide: string;
+  howToReach?: string;
   weatherNotes: string;
-  seo: ISeo;
+  faqs?: Array<{ question: string; answer: string }>;
+  seo: ISeo | IEnterpriseSeo;
   status: DestinationStatus;
   deletedAt?: Date | null;
   createdAt: Date;
@@ -45,13 +48,15 @@ const DestinationSchema = new Schema<IDestination>(
     },
     highlights: { type: [String], default: [] },
     travelGuide: { type: String, default: "" },
+    howToReach: { type: String, default: "" },
     weatherNotes: { type: String, default: "" },
-    seo: {
-      title: { type: String },
-      description: { type: String },
-      canonical: { type: String },
-      ogImage: { type: String },
-    },
+    faqs: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
+    seo: { type: EnterpriseSeoSchema, default: () => ({}) },
     status: { type: String, enum: ["draft", "published", "archived"], default: "draft", index: true },
   },
   { timestamps: true },

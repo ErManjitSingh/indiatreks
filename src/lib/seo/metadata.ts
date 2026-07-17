@@ -10,26 +10,44 @@ export function createMetadata({
   canonical,
   keywords,
   ogImage,
+  ogTitle,
+  ogDescription,
+  twitterCard,
+  twitterTitle,
+  twitterDescription,
+  twitterImage,
   noIndex = false,
+  noFollow = false,
   type = "website",
+  authors,
+  publishedTime,
+  modifiedTime,
+  alternatesLanguages,
 }: SeoMeta): Metadata {
   const fullTitle = title.includes(siteConfig.name)
     ? title
     : `${title} | ${siteConfig.name}`;
   const url = absoluteUrl(canonical ?? "");
   const image = absoluteUrl(ogImage ?? siteConfig.ogImage);
+  const resolvedOgTitle = ogTitle ?? fullTitle;
+  const resolvedOgDescription = ogDescription ?? description;
+  const resolvedTwitterTitle = twitterTitle ?? resolvedOgTitle;
+  const resolvedTwitterDescription = twitterDescription ?? resolvedOgDescription;
+  const resolvedTwitterImage = absoluteUrl(twitterImage ?? ogImage ?? siteConfig.ogImage);
 
   return {
     title: fullTitle,
     description,
     keywords,
+    authors: authors?.map((name) => ({ name })),
     metadataBase: new URL(siteConfig.url),
     alternates: {
       canonical: url,
+      languages: alternatesLanguages ?? { "en-IN": url },
     },
     openGraph: {
-      title: fullTitle,
-      description,
+      title: resolvedOgTitle,
+      description: resolvedOgDescription,
       url,
       siteName: siteConfig.name,
       locale: siteConfig.locale,
@@ -39,19 +57,40 @@ export function createMetadata({
           url: image,
           width: 1200,
           height: 630,
-          alt: fullTitle,
+          alt: resolvedOgTitle,
         },
       ],
+      ...(publishedTime ? { publishedTime } : {}),
+      ...(modifiedTime ? { modifiedTime } : {}),
     },
     twitter: {
-      card: "summary_large_image",
-      title: fullTitle,
-      description,
-      images: [image],
+      card: twitterCard ?? "summary_large_image",
+      title: resolvedTwitterTitle,
+      description: resolvedTwitterDescription,
+      images: [resolvedTwitterImage],
     },
-    robots: noIndex
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    robots: {
+      index: !noIndex,
+      follow: !noFollow && !noIndex,
+      googleBot: {
+        index: !noIndex,
+        follow: !noFollow && !noIndex,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
+    icons: {
+      icon: [
+        { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      ],
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+    },
+    manifest: "/manifest.webmanifest",
+    other: {
+      "format-detection": "telephone=no",
+    },
   };
 }
 
@@ -71,6 +110,20 @@ export function organizationJsonLd() {
       streetAddress: siteConfig.address.line1,
       addressLocality: siteConfig.address.city,
       addressCountry: siteConfig.address.country,
+    },
+  };
+}
+
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteConfig.url}/treks?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
     },
   };
 }
@@ -144,6 +197,22 @@ export function tourJsonLd(input: {
   };
 }
 
+export function touristDestinationJsonLd(input: {
+  name: string;
+  description: string;
+  image: string;
+  url: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TouristDestination",
+    name: input.name,
+    description: input.description,
+    image: absoluteUrl(input.image),
+    url: absoluteUrl(input.url),
+  };
+}
+
 export function blogJsonLd(input: {
   title: string;
   description: string;
@@ -174,6 +243,27 @@ export function blogJsonLd(input: {
         url: absoluteUrl("/icons/logo.png"),
       },
     },
+  };
+}
+
+export function itemListJsonLd(input: {
+  name: string;
+  description: string;
+  url: string;
+  items: Array<{ name: string; url: string; position?: number }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.url),
+    itemListElement: input.items.map((item, index) => ({
+      "@type": "ListItem",
+      position: item.position ?? index + 1,
+      name: item.name,
+      url: absoluteUrl(item.url),
+    })),
   };
 }
 
@@ -215,33 +305,6 @@ export function bookingJsonLd(input: {
         name: siteConfig.name,
       },
     },
-    ...(input.departureDate
-      ? {
-          event: {
-            "@type": "Event",
-            name: input.name,
-            startDate: input.departureDate,
-            eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-            eventStatus: "https://schema.org/EventScheduled",
-            location: {
-              "@type": "Place",
-              name: "Himalayas, India",
-            },
-            organizer: {
-              "@type": "Organization",
-              name: siteConfig.name,
-              url: siteConfig.url,
-            },
-            offers: {
-              "@type": "Offer",
-              price: input.priceInr,
-              priceCurrency: "INR",
-              url: absoluteUrl(input.url),
-              availability: input.availability ?? "https://schema.org/InStock",
-            },
-          },
-        }
-      : {}),
   };
 }
 

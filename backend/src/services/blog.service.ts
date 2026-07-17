@@ -75,8 +75,34 @@ async function update(id: string, data: Partial<IBlog>) {
   const publishedAt =
     data.status === "published" && existing.status !== "published" ? new Date() : existing.publishedAt;
 
-  const blog = await BlogModel.findByIdAndUpdate(id, { ...data, slug, publishedAt }, { new: true, runValidators: true });
+  const seoPayload = data.seo
+    ? { ...data.seo, lastSeoUpdate: new Date() }
+    : undefined;
+
+  const blog = await BlogModel.findByIdAndUpdate(
+    id,
+    {
+      ...data,
+      slug,
+      publishedAt,
+      modifiedAt: new Date(),
+      ...(seoPayload ? { seo: { ...(existing.seo as object), ...seoPayload } } : {}),
+    },
+    { new: true, runValidators: true },
+  );
   if (!blog) throw new ApiError(404, "Blog post not found", "BLOG_NOT_FOUND");
+
+  if (slug !== existing.slug) {
+    const { redirectService } = await import("./redirect.service");
+    await redirectService.createSlugRedirect({
+      fromPath: `/blogs/${existing.slug}`,
+      toPath: `/blogs/${slug}`,
+      entityType: "blog",
+      entityId: String(existing._id),
+      note: `Blog slug updated from ${existing.slug}`,
+    });
+  }
+
   return blog;
 }
 

@@ -128,15 +128,35 @@ async function update(id: string, data: Partial<ITrek>) {
   const publishedAt =
     data.status === "published" && existing.status !== "published" ? new Date() : existing.publishedAt;
 
+  const seoPayload = data.seo
+    ? {
+        ...data.seo,
+        lastSeoUpdate: new Date(),
+      }
+    : undefined;
+
   const updated = await trekRepository.updateById(id, {
     ...data,
     slug,
     publishedAt,
+    ...(seoPayload ? { seo: { ...(existing.seo as object), ...seoPayload } } : {}),
   } as Partial<ITrek>);
 
   if (!updated) {
     throw new ApiError(404, "Trek not found", "TREK_NOT_FOUND");
   }
+
+  if (slug !== existing.slug) {
+    const { redirectService } = await import("./redirect.service");
+    await redirectService.createSlugRedirect({
+      fromPath: `/treks/${existing.slug}`,
+      toPath: `/treks/${slug}`,
+      entityType: "trek",
+      entityId: String(existing._id),
+      note: `Trek slug updated from ${existing.slug}`,
+    });
+  }
+
   return updated;
 }
 

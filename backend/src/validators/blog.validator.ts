@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { enterpriseSeoSchema } from "./seo.validator";
 
 export const createBlogSchema = z.object({
   slug: z.string().trim().toLowerCase().optional(),
@@ -17,15 +18,15 @@ export const createBlogSchema = z.object({
   tags: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "scheduled"]).default("draft"),
   scheduledAt: z.coerce.date().optional(),
-  seo: z
-    .object({
-      title: z.string().optional(),
-      description: z.string().optional(),
-      canonical: z.string().optional(),
-      ogImage: z.string().optional(),
-    })
-    .optional(),
+  seo: enterpriseSeoSchema,
   readingTimeMinutes: z.number().min(1).default(3),
+  tableOfContents: z
+    .array(z.object({ id: z.string(), title: z.string(), level: z.number().default(2) }))
+    .optional(),
+  internalLinks: z
+    .array(z.object({ title: z.string(), url: z.string(), anchor: z.string().optional() }))
+    .optional(),
+  faq: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
 });
 
 export const updateBlogSchema = createBlogSchema.partial();

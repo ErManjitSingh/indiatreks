@@ -228,8 +228,19 @@ export interface SeoMeta {
   canonical?: string;
   keywords?: string[];
   ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player";
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
   noIndex?: boolean;
+  noFollow?: boolean;
   type?: "website" | "article";
+  authors?: string[];
+  publishedTime?: string;
+  modifiedTime?: string;
+  alternatesLanguages?: Record<string, string>;
 }
 
 export interface BreadcrumbItem {

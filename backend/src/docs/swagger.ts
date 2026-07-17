@@ -143,12 +143,116 @@ export const swaggerSpec = {
         responses: { "200": { description: "Results" } },
       },
     },
+    "/search/autocomplete": {
+      get: {
+        tags: ["Search"],
+        summary: "Autocomplete suggestions",
+        parameters: [{ name: "q", in: "query", required: true, schema: { type: "string" } }],
+        responses: { "200": { description: "Suggestions" } },
+      },
+    },
+    "/search/popular": {
+      get: {
+        tags: ["Search"],
+        summary: "Popular searches",
+        responses: { "200": { description: "Popular queries" } },
+      },
+    },
+    "/search/trending": {
+      get: {
+        tags: ["Search"],
+        summary: "Trending searches",
+        responses: { "200": { description: "Trending queries" } },
+      },
+    },
+    "/seo/bootstrap": {
+      get: {
+        tags: ["SEO"],
+        summary: "Public SEO bootstrap (settings, analytics, verification)",
+        responses: { "200": { description: "SEO bootstrap payload" } },
+      },
+    },
+    "/seo/robots.txt": {
+      get: {
+        tags: ["SEO"],
+        summary: "Generated robots.txt",
+        responses: { "200": { description: "text/plain robots.txt" } },
+      },
+    },
+    "/seo/sitemaps/{name}": {
+      get: {
+        tags: ["SEO"],
+        summary: "Generate sitemap XML by name (index|treks|blogs|destinations|images|videos|categories|programmatic)",
+        parameters: [{ name: "name", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": { description: "application/xml sitemap" } },
+      },
+    },
+    "/seo/treks/{slug}": {
+      get: {
+        tags: ["SEO"],
+        summary: "Trek SEO bundle (meta, schemas, related/nearby/similar)",
+        parameters: [{ name: "slug", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": { description: "Trek SEO payload" } },
+      },
+    },
+    "/seo/destinations/{slug}": {
+      get: {
+        tags: ["SEO"],
+        summary: "Destination SEO bundle",
+        parameters: [{ name: "slug", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": { description: "Destination SEO payload" } },
+      },
+    },
+    "/seo/blogs/{slug}": {
+      get: {
+        tags: ["SEO"],
+        summary: "Blog SEO bundle",
+        parameters: [{ name: "slug", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": { description: "Blog SEO payload" } },
+      },
+    },
+    "/seo/settings": {
+      get: {
+        tags: ["SEO"],
+        summary: "Get global SEO settings (admin)",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Settings" } },
+      },
+      put: {
+        tags: ["SEO"],
+        summary: "Update global SEO settings (admin)",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Updated" } },
+      },
+    },
+    "/seo/score": {
+      post: {
+        tags: ["SEO"],
+        summary: "Calculate and persist SEO score for trek/blog/destination",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Score breakdown" } },
+      },
+    },
+    "/seo/schema/generate": {
+      post: {
+        tags: ["SEO"],
+        summary: "Generate JSON-LD by schema type",
+        responses: { "200": { description: "JSON-LD object" } },
+      },
+    },
     "/analytics/dashboard": {
       get: {
         tags: ["Analytics"],
         summary: "Admin dashboard metrics",
         security: [{ bearerAuth: [] }],
         responses: { "200": { description: "Stats" } },
+      },
+    },
+    "/analytics/config": {
+      get: {
+        tags: ["Analytics"],
+        summary: "Public analytics tag config (GA4, GTM, Pixel, Clarity)",
+        responses: { "200": { description: "Config" } },
       },
     },
     "/enquiries": {

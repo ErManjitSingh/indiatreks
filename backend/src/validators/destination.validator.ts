@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { enterpriseSeoSchema } from "./seo.validator";
 
 export const createDestinationSchema = z.object({
   slug: z.string().trim().toLowerCase().optional(),
@@ -13,15 +14,10 @@ export const createDestinationSchema = z.object({
   altitudeRange: z.object({ min: z.number().default(0), max: z.number().default(0) }).optional(),
   highlights: z.array(z.string()).default([]),
   travelGuide: z.string().default(""),
+  howToReach: z.string().default(""),
   weatherNotes: z.string().default(""),
-  seo: z
-    .object({
-      title: z.string().optional(),
-      description: z.string().optional(),
-      canonical: z.string().optional(),
-      ogImage: z.string().optional(),
-    })
-    .optional(),
+  faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
+  seo: enterpriseSeoSchema,
   status: z.enum(["draft", "published", "archived"]).default("draft"),
 });
 

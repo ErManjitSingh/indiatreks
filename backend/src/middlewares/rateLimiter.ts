@@ -36,3 +36,16 @@ export const authLimiter = rateLimit({
     code: "AUTH_RATE_LIMITED",
   },
 });
+
+/** Stricter limit for AI SEO generation endpoints */
+export const aiSeoLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many AI SEO requests, please try again later.",
+    code: "AI_SEO_RATE_LIMITED",
+  },
+});

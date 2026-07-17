@@ -28,6 +28,13 @@ import {
 
 import { toast } from "@/components/ui/toast";
 import {
+  AdminSeoFields,
+  seoFromDoc,
+  seoToPayload,
+  type EnterpriseSeoForm,
+} from "@/components/admin/admin-seo-fields";
+import { AiSeoAssistPanel } from "@/components/admin/ai-seo-assist-panel";
+import {
   adminCreateTrek,
   adminUpdateTrek,
   adminUploadMedia,
@@ -75,8 +82,7 @@ type TrekFormState = {
   months: string;
   relatedSlugs: string;
   itinerary: ItineraryDayForm[];
-  seoTitle: string;
-  seoDescription: string;
+  seo: EnterpriseSeoForm;
 };
 
 type TabId =
@@ -135,7 +141,7 @@ function parseItinerary(raw: unknown): ItineraryDayForm[] {
 }
 
 function fromDoc(doc?: AdminDoc | null): TrekFormState {
-  const seo = (doc?.seo as { title?: string; description?: string } | undefined) ?? {};
+  const seo = (doc?.seo as Record<string, unknown> | undefined) ?? {};
   return {
     title: String(doc?.title ?? ""),
     slug: String(doc?.slug ?? ""),
@@ -163,8 +169,7 @@ function fromDoc(doc?: AdminDoc | null): TrekFormState {
     months: arrayToLines(doc?.months),
     relatedSlugs: arrayToLines(doc?.relatedSlugs),
     itinerary: parseItinerary(doc?.itinerary),
-    seoTitle: String(seo.title ?? ""),
-    seoDescription: String(seo.description ?? ""),
+    seo: seoFromDoc(seo),
   };
 }
 
@@ -211,10 +216,7 @@ function toPayload(form: TrekFormState) {
     months: linesToArray(form.months),
     relatedSlugs: linesToArray(form.relatedSlugs),
     itinerary,
-    seo: {
-      title: form.seoTitle || undefined,
-      description: form.seoDescription || undefined,
-    },
+    seo: seoToPayload(form.seo),
   };
 }
 
@@ -1033,38 +1035,44 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
           <div>
             <h2 className="font-heading text-lg font-bold text-[#111827]">SEO & Settings</h2>
             <p className="mt-1 text-sm text-[#6B7280]">
-              Search metadata and publish settings for this trek.
+              Search metadata, social previews, schema, and publish settings for this trek.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <FieldShell label="SEO title">
-              <IconInput
-                icon={Type}
-                value={form.seoTitle}
-                onChange={(e) => set("seoTitle", e.target.value)}
-              />
-            </FieldShell>
-            <FieldShell label="Status">
-              <IconSelect
-                icon={Settings2}
-                value={form.status}
-                onChange={(e) => set("status", e.target.value)}
-              >
-                {["draft", "published", "archived"].map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </IconSelect>
-            </FieldShell>
-          </div>
-          <FieldShell label="SEO description">
-            <textarea
-              className={textareaClass}
-              value={form.seoDescription}
-              onChange={(e) => set("seoDescription", e.target.value)}
-            />
+          <FieldShell label="Status">
+            <IconSelect
+              icon={Settings2}
+              value={form.status}
+              onChange={(e) => set("status", e.target.value)}
+            >
+              {["draft", "published", "archived"].map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </IconSelect>
           </FieldShell>
+          <AiSeoAssistPanel
+            entityType="trek"
+            payload={{
+              title: form.title,
+              destinationName: form.destinationName,
+              region: form.region,
+              difficulty: form.difficulty,
+              durationDays: Number(form.durationDays) || undefined,
+              maxAltitude: Number(form.maxAltitude) || undefined,
+              summary: form.summary,
+              overview: form.overview,
+              months: linesToArray(form.months),
+              basePriceInr: Number(form.basePriceInr) || undefined,
+            }}
+            onApplyMeta={(seo) => setForm((prev) => ({ ...prev, seo }))}
+          />
+          <AdminSeoFields
+            value={form.seo}
+            onChange={(seo) => setForm((prev) => ({ ...prev, seo }))}
+            previewTitle={form.title}
+            previewUrl={form.slug ? `https://treks.indiaholidaydestination.com/treks/${form.slug}` : undefined}
+          />
         </section>
       </form>
     </div>

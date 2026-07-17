@@ -4,6 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
+  AdminSeoFields,
+  seoFromDoc,
+  seoToPayload,
+  type EnterpriseSeoForm,
+} from "@/components/admin/admin-seo-fields";
+import { AiSeoAssistPanel } from "@/components/admin/ai-seo-assist-panel";
+import {
   AdminField,
   adminInputClass,
   adminTextareaClass,
@@ -29,6 +36,8 @@ type BlogFormState = {
   status: string;
   readingTimeMinutes: string;
   authorName: string;
+  faq: string;
+  seo: EnterpriseSeoForm;
 };
 
 function parseTags(value: string) {
@@ -41,6 +50,28 @@ function parseTags(value: string) {
 function tagsToString(value: unknown) {
   if (Array.isArray(value)) return value.map(String).join(", ");
   return "";
+}
+
+function parseFaq(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [question, ...rest] = line.split("|");
+      return { question: question?.trim() || "", answer: rest.join("|").trim() };
+    })
+    .filter((f) => f.question && f.answer);
+}
+
+function faqToString(value: unknown) {
+  if (!Array.isArray(value)) return "";
+  return value
+    .map((item) => {
+      const row = item as { question?: string; answer?: string };
+      return `${row.question || ""} | ${row.answer || ""}`;
+    })
+    .join("\n");
 }
 
 function fromDoc(doc?: AdminDoc | null): BlogFormState {
@@ -56,6 +87,8 @@ function fromDoc(doc?: AdminDoc | null): BlogFormState {
     status: String(doc?.status ?? "draft"),
     readingTimeMinutes: String(doc?.readingTimeMinutes ?? "3"),
     authorName: String(author.name ?? ""),
+    faq: faqToString(doc?.faq),
+    seo: seoFromDoc(doc?.seo as Record<string, unknown> | undefined),
   };
 }
 
@@ -71,6 +104,8 @@ function toPayload(form: BlogFormState) {
     status: form.status,
     readingTimeMinutes: Number(form.readingTimeMinutes) || 3,
     author: { name: form.authorName.trim() },
+    faq: parseFaq(form.faq),
+    seo: seoToPayload(form.seo),
   };
 }
 
@@ -146,6 +181,37 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
         <AdminField label="Content">
           <textarea className={`${adminTextareaClass} min-h-[220px]`} value={form.content} onChange={(e) => set("content", e.target.value)} rows={12} />
         </AdminField>
+        <AdminField label="FAQ (one per line: Question | Answer)">
+          <textarea className={adminTextareaClass} value={form.faq} onChange={(e) => set("faq", e.target.value)} />
+        </AdminField>
+      </div>
+
+      <div className="space-y-4 rounded-2xl border border-[#d8e0d4] bg-white p-5 shadow-sm">
+        <h2 className="font-heading text-lg font-bold text-[#111827]">SEO</h2>
+        <AiSeoAssistPanel
+          entityType="blog"
+          payload={{
+            title: form.title,
+            excerpt: form.excerpt,
+            content: form.content,
+            category: form.category,
+            tags: parseTags(form.tags),
+            author: { name: form.authorName },
+          }}
+          onApplyMeta={(seo) => set("seo", seo)}
+          onApplyFaqs={(faqs) =>
+            set(
+              "faq",
+              faqs.map((f) => `${f.question} | ${f.answer}`).join("\n"),
+            )
+          }
+        />
+        <AdminSeoFields
+          value={form.seo}
+          onChange={(seo) => set("seo", seo)}
+          previewTitle={form.title}
+          previewUrl={form.slug ? `https://treks.indiaholidaydestination.com/blogs/${form.slug}` : undefined}
+        />
       </div>
 
       <div className="flex gap-2">

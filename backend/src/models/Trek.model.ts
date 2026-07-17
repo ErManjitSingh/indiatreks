@@ -1,5 +1,6 @@
 import { Schema, model, Document, Types } from "mongoose";
 import { softDeletePlugin } from "./plugins/softDelete.plugin";
+import { EnterpriseSeoSchema, type IEnterpriseSeo } from "./schemas/enterpriseSeo.schema";
 
 export type Difficulty = "easy" | "moderate" | "difficult" | "challenging";
 export type Season = "spring" | "summer" | "monsoon" | "autumn" | "winter";
@@ -103,12 +104,9 @@ export interface IEmbeddedReview {
   helpfulCount: number;
 }
 
-export interface ISeo {
-  title?: string;
-  description?: string;
-  canonical?: string;
-  ogImage?: string;
-}
+/** @deprecated Use IEnterpriseSeo — alias kept for existing imports */
+export type ISeo = IEnterpriseSeo;
+export type { IEnterpriseSeo };
 
 export interface ITrek extends Document {
   _id: Types.ObjectId;
@@ -278,15 +276,7 @@ const EmbeddedReviewSchema = new Schema<IEmbeddedReview>({
   helpfulCount: { type: Number, default: 0 },
 });
 
-const SeoSchema = new Schema<ISeo>(
-  {
-    title: { type: String },
-    description: { type: String },
-    canonical: { type: String },
-    ogImage: { type: String },
-  },
-  { _id: false },
-);
+const SeoSchema = EnterpriseSeoSchema;
 
 const TrekSchema = new Schema<ITrek>(
   {

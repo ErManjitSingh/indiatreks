@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 
 import { SiteShell } from "@/components/layout";
 import { Seo } from "@/components/seo";
+import { AnalyticsScripts } from "@/components/seo/analytics-scripts";
 import { fontBody, fontBrush, fontDisplay, fontHeading } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import { fetchBootstrap } from "@/lib/api/content";
@@ -52,6 +53,7 @@ export default async function RootLayout({
           ) : (
             <>
               <Seo />
+              <AnalyticsScripts />
               <SiteShell>{children}</SiteShell>
             </>
           )}

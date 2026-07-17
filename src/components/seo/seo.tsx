@@ -6,6 +6,7 @@ import {
   faqJsonLd,
   organizationJsonLd,
   tourJsonLd,
+  websiteJsonLd,
 } from "@/lib/seo";
 import type { BreadcrumbItem } from "@/types";
 
@@ -26,6 +27,7 @@ interface SeoProps {
   children?: ReactNode;
   breadcrumbs?: BreadcrumbItem[];
   includeOrganization?: boolean;
+  includeWebsite?: boolean;
   faqs?: Array<{ question: string; answer: string }>;
   tour?: Parameters<typeof tourJsonLd>[0];
   blog?: Parameters<typeof blogJsonLd>[0];
@@ -35,6 +37,7 @@ export function Seo({
   children,
   breadcrumbs,
   includeOrganization = true,
+  includeWebsite = true,
   faqs,
   tour,
   blog,
@@ -42,6 +45,7 @@ export function Seo({
   return (
     <>
       {includeOrganization ? <JsonLd data={organizationJsonLd()} /> : null}
+      {includeWebsite ? <JsonLd data={websiteJsonLd()} /> : null}
       {breadcrumbs?.length ? <JsonLd data={breadcrumbJsonLd(breadcrumbs)} /> : null}
       {faqs?.length ? <JsonLd data={faqJsonLd(faqs)} /> : null}
       {tour ? <JsonLd data={tourJsonLd(tour)} /> : null}
