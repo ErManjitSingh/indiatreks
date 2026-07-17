@@ -26,7 +26,7 @@ export type TrekSortOption =
   | "price-desc"
   | "duration";
 
-export type TrekViewMode = "grid" | "list";
+export type TrekViewMode = "grid" | "list" | "map";
 
 export interface TrekListingItem {
   id: string;

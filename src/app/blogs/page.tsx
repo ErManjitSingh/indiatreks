@@ -70,7 +70,10 @@ export default async function BlogsPage({
 
   const categories = hub?.categories || [];
   const totalFound = Number(meta?.total ?? items.length);
-  const totalPages = Math.max(1, Number(meta?.totalPages ?? Math.ceil(totalFound / BLOGS_PER_PAGE) || 1));
+  const totalPages = Math.max(
+    1,
+    Number(meta?.totalPages ?? Math.ceil(totalFound / BLOGS_PER_PAGE) ?? 1),
+  );
   const page = Math.min(requestedPage, totalPages);
   const allCount = categories.reduce((sum, c) => sum + Number(c.count || 0), 0) || totalFound;
   const chipCategories = categories.slice(0, 7);

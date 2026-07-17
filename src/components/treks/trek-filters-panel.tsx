@@ -23,6 +23,8 @@ interface TrekFiltersPanelProps {
   destinations?: string[];
   states?: string[];
   regions?: string[];
+  difficultyCounts?: Partial<Record<DifficultyLevel, number>>;
+  durationCounts?: Record<string, number>;
 }
 
 const difficulties: DifficultyLevel[] = ["easy", "moderate", "difficult", "challenging"];
@@ -60,6 +62,8 @@ export function TrekFiltersPanel({
   destinations,
   states,
   regions,
+  difficultyCounts,
+  durationCounts,
 }: TrekFiltersPanelProps) {
   const update = (patch: Partial<TrekFiltersState>) => onChange({ ...filters, ...patch });
   const destinationOptions = destinations?.length
@@ -116,7 +120,9 @@ export function TrekFiltersPanel({
           <CheckboxGroup
             options={difficulties.map((item) => ({
               value: item,
-              label: item.charAt(0).toUpperCase() + item.slice(1),
+              label: `${item.charAt(0).toUpperCase() + item.slice(1)}${
+                difficultyCounts?.[item] != null ? ` (${difficultyCounts[item]})` : ""
+              }`,
             }))}
             selected={filters.difficulty}
             onToggle={(value) =>
@@ -127,7 +133,12 @@ export function TrekFiltersPanel({
 
         <FilterBlock title="Duration" value="duration">
           <CheckboxGroup
-            options={durations}
+            options={durations.map((item) => ({
+              value: item.value,
+              label: `${item.label}${
+                durationCounts?.[item.value] != null ? ` (${durationCounts[item.value]})` : ""
+              }`,
+            }))}
             selected={filters.duration}
             onToggle={(value) => update({ duration: toggleValue(filters.duration, value) })}
           />

@@ -1,9 +1,9 @@
-import { MessageCircle, Phone } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { Headphones, MessageCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { Section } from "@/components/ui/section";
+import { BLUR_DATA_URL } from "@/constants/media";
 import { siteConfig } from "@/config/site";
 
 export function TreksCtaSection() {
@@ -12,42 +12,53 @@ export function TreksCtaSection() {
   )}`;
 
   return (
-    <Section spacing="md" className="bg-dark text-white">
+    <section className="bg-[#F7F8F6] py-8 md:py-10">
       <Container>
-        <div className="grid items-center gap-8 rounded-[2rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md md:grid-cols-[1.4fr_1fr] md:p-12">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Need help choosing?
-            </p>
-            <h2 className="mt-3 font-heading text-3xl font-bold md:text-4xl">
-              Talk to a Trek Expert
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">
-              Tell us your fitness, dates, and mountain mood — we&apos;ll match you with the right
-              trail, season, and group departure.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
-            <Button asChild variant="accent" size="lg" className="flex-1">
-              <Link href={whatsapp} target="_blank" rel="noopener noreferrer">
+        <div className="overflow-hidden rounded-2xl bg-[#163528] text-white shadow-[0_16px_40px_rgba(22,53,40,0.25)]">
+          <div className="grid items-center gap-6 p-5 md:grid-cols-[140px_minmax(0,1fr)_auto] md:gap-8 md:p-7 lg:p-8">
+            <div className="relative hidden h-[110px] overflow-hidden rounded-xl md:block">
+              <Image
+                src="/images/treks/camp-1.jpg"
+                alt="Camping under the stars on a Himalayan trek"
+                fill
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
+                className="object-cover"
+                sizes="140px"
+              />
+            </div>
+
+            <div>
+              <h2 className="font-heading text-2xl font-bold tracking-tight md:text-[1.7rem]">
+                Plan Your Trek With Experts
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/75">
+                Not sure which trail fits your fitness, dates, or group? Talk to our trek advisors
+                and get a free personalized shortlist.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:flex-row md:flex-col lg:flex-row">
+              <Link
+                href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-transparent px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                <Headphones className="h-4 w-4" aria-hidden />
+                Talk to Expert
+              </Link>
+              <Link
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2D5A27] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#244820]"
+              >
                 <MessageCircle className="h-4 w-4" aria-hidden />
-                WhatsApp
+                WhatsApp Now
               </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="flex-1 border-white/25 bg-transparent text-white hover:bg-white/10"
-            >
-              <Link href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}>
-                <Phone className="h-4 w-4" aria-hidden />
-                Call Now
-              </Link>
-            </Button>
+            </div>
           </div>
         </div>
       </Container>
-    </Section>
+    </section>
   );
 }

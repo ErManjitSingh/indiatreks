@@ -3,12 +3,16 @@
 import { memo } from "react";
 import {
   BarChart3,
-  CalendarDays,
   Clock3,
   Heart,
+  MapPin,
   Mountain,
   Scale,
+  Shield,
+  Soup,
   Star,
+  Tent,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,18 +34,25 @@ interface TrekListingCardProps {
 }
 
 const badgeStyles = {
-  trending: "bg-[#2D5A27] text-white",
+  trending: "bg-[#EA580C] text-white",
   bestseller: "bg-[#2563EB] text-white",
-  limited: "bg-[#EA580C] text-white",
+  limited: "bg-[#B45309] text-white",
   new: "bg-[#0F766E] text-white",
 } as const;
 
 const badgeCopy = {
-  trending: "TRENDING",
-  bestseller: "POPULAR",
-  limited: "ADVENTURE",
+  trending: "MOST BOOKED",
+  bestseller: "TOP SELLER",
+  limited: "LIMITED",
   new: "NEW",
 } as const;
+
+const difficultyStyles: Record<string, string> = {
+  easy: "bg-[#16A34A] text-white",
+  moderate: "bg-[#CA8A04] text-white",
+  difficult: "bg-[#DC2626] text-white",
+  challenging: "bg-[#7C2D12] text-white",
+};
 
 function formatReviewCount(count: number): string {
   if (count >= 1000) {
@@ -62,7 +73,22 @@ function formatDeparture(iso: string): string {
 
 const FALLBACK_COVER = "/images/treks/mountains-1.jpg";
 
-function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps) {
+function inclusionIcons(trek: TrekListingItem) {
+  const items = [
+    { id: "guide", label: "Guide", icon: Users, show: true },
+    { id: "meals", label: "Meals", icon: Soup, show: true },
+    {
+      id: "camping",
+      label: "Camping",
+      icon: Tent,
+      show: trek.trekTypes.includes("camping") || trek.durationNights > 0,
+    },
+    { id: "permits", label: "Permits", icon: Shield, show: true },
+  ];
+  return items.filter((item) => item.show).slice(0, 4);
+}
+
+function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps) {
   const hydrated = useHasHydrated();
   const { toggle: toggleWish, has: hasWish } = useWishlistStore();
   const { toggle: toggleCompare, has: hasCompare } = useCompareStore();
@@ -75,6 +101,8 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
   const nextDeparture = trek.departures[0];
   const cover = trek.images?.[0] || FALLBACK_COVER;
   const placeLabel = trek.destinationName || trek.region;
+  const emi = Math.max(999, Math.ceil(trek.basePriceInr / 3));
+  const inclusions = inclusionIcons(trek);
 
   const wishButton = (
     <button
@@ -114,7 +142,24 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
     </div>
   );
 
-  /* —— Mobile card (mockup) —— */
+  const durationOverlay = (
+    <span className="absolute bottom-3 left-3 rounded-md bg-black/65 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+      {trek.durationDays} Days | {trek.durationNights} Night{trek.durationNights === 1 ? "" : "s"}
+    </span>
+  );
+
+  const difficultyBadge = (
+    <span
+      className={cn(
+        "absolute right-3 bottom-3 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide capitalize shadow-sm",
+        difficultyStyles[trek.difficulty] || "bg-[#2D5A27] text-white",
+      )}
+    >
+      {trek.difficulty}
+    </span>
+  );
+
+  /* —— Mobile card —— */
   const mobileCard = (
     <article className="overflow-hidden rounded-2xl border border-[#e8ece6] bg-white shadow-sm md:hidden">
       <div className="relative aspect-[16/10]">
@@ -130,7 +175,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
         {primaryBadge ? (
           <span
             className={cn(
-              "absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
+              "absolute left-3 top-3 rounded-md px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
               badgeStyles[primaryBadge],
             )}
           >
@@ -138,6 +183,8 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
           </span>
         ) : null}
         <div className="absolute right-3 top-3">{actionButtons}</div>
+        {durationOverlay}
+        {difficultyBadge}
       </div>
 
       <div className="space-y-3 p-4">
@@ -147,8 +194,9 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
               {trek.title}
             </Link>
           </h3>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {trek.state} • {placeLabel}
+          <p className="mt-0.5 inline-flex items-center gap-1 text-sm text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5" aria-hidden />
+            {placeLabel}, {trek.state}
           </p>
           <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
@@ -159,30 +207,32 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#444]">
-          <span className="inline-flex items-center gap-1">
-            <CalendarDays className="h-3.5 w-3.5 text-primary" aria-hidden />
-            {trek.durationDays} Days
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Mountain className="h-3.5 w-3.5 text-primary" aria-hidden />
-            {formatAltitude(trek.maxAltitude)}
-          </span>
-          <span className="inline-flex items-center gap-1 capitalize">
-            <BarChart3 className="h-3.5 w-3.5 text-primary" aria-hidden />
-            {trek.difficulty}
-          </span>
+        <p className="line-clamp-2 text-sm text-[#6B7668]">{trek.summary}</p>
+
+        <div className="flex flex-wrap gap-3">
+          {inclusions.map((item) => {
+            const Icon = item.icon;
+            return (
+              <span
+                key={item.id}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-[#4B5563]"
+              >
+                <Icon className="h-3.5 w-3.5 text-[#2D5A27]" aria-hidden />
+                {item.label}
+              </span>
+            );
+          })}
         </div>
 
         <div className="flex flex-wrap items-end gap-2">
-          <p className="font-heading text-xl font-bold text-[#1A1A1A]">
-            {formatCurrency(trek.basePriceInr)}
-          </p>
           {trek.originalPriceInr ? (
             <p className="pb-0.5 text-sm text-muted-foreground line-through">
               {formatCurrency(trek.originalPriceInr)}
             </p>
           ) : null}
+          <p className="font-heading text-xl font-bold text-[#1A1A1A]">
+            {formatCurrency(trek.basePriceInr)}
+          </p>
           {discount ? (
             <span className="rounded-full border border-[#C8E6C9] bg-[#E8F5E9] px-2 py-0.5 text-[11px] font-bold text-[#2D5A27]">
               {discount}% OFF
@@ -190,41 +240,18 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-2 text-xs">
-          {nextDeparture ? (
-            <p className="text-muted-foreground">
-              Next Departure:{" "}
-              <span className="font-semibold text-foreground">
-                {formatDeparture(nextDeparture)}
-              </span>
-            </p>
-          ) : (
-            <span />
-          )}
-          <p className="shrink-0 font-semibold text-red-600">Seats Left: {trek.seatsLeft}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 pt-0.5">
-          <Button asChild variant="outline" size="sm" className="rounded-full border-[#d0d5cc] bg-white">
-            <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
-              View Details
-            </Link>
-          </Button>
-          <BookNowButton
-            trekSlug={trek.slug}
-            variant="primary"
-            size="sm"
-            className="rounded-full"
-            onClick={() => addRecent(trek.id)}
-          >
-            Book Now
-          </BookNowButton>
-        </div>
+        <Button asChild size="sm" className="w-full rounded-xl bg-[#2D5A27] hover:bg-[#244820]">
+          <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
+            View Details
+          </Link>
+        </Button>
+        <p className="text-center text-[11px] text-[#6B7668]">
+          EMI starting ₹{emi.toLocaleString("en-IN")}/month
+        </p>
       </div>
     </article>
   );
 
-  /* —— Desktop list —— */
   if (view === "list") {
     return (
       <>
@@ -251,11 +278,11 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                   {badgeCopy[primaryBadge]}
                 </span>
               ) : null}
+              {durationOverlay}
             </div>
 
             <div className="relative flex flex-col gap-2.5 p-4 md:p-5">
               <div className="absolute right-4 top-4">{actionButtons}</div>
-
               <div className="pr-10">
                 <h3 className="font-heading text-xl font-bold tracking-tight text-[#1A1A1A]">
                   <Link
@@ -327,6 +354,9 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                     </span>
                   ) : null}
                 </div>
+                <p className="mt-1 text-[11px] text-[#6B7668]">
+                  EMI from ₹{emi.toLocaleString("en-IN")}/mo
+                </p>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -352,7 +382,7 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
     );
   }
 
-  /* —— Desktop / tablet grid (mockup) —— */
+  /* —— Grid (mockup default) —— */
   return (
     <>
       {mobileCard}
@@ -377,7 +407,16 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
               {badgeCopy[primaryBadge]}
             </span>
           ) : null}
-          <div className="absolute right-3 top-3">{actionButtons}</div>
+          <div className="absolute right-3 top-3">{wishButton}</div>
+          {durationOverlay}
+          <span
+            className={cn(
+              "absolute right-3 bottom-3 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide capitalize shadow-sm",
+              difficultyStyles[trek.difficulty] || "bg-[#2D5A27] text-white",
+            )}
+          >
+            {trek.difficulty}
+          </span>
         </div>
 
         <div className="space-y-3 p-4">
@@ -391,36 +430,66 @@ function TrekListingCardComponent({ trek, view = "list" }: TrekListingCardProps)
                 {trek.title}
               </Link>
             </h3>
-            <p className="mt-1 text-sm text-[#6B7280]">
-              {trek.state} • {placeLabel}
+            <p className="mt-1 inline-flex items-center gap-1 text-sm text-[#6B7280]">
+              <MapPin className="h-3.5 w-3.5" aria-hidden />
+              {placeLabel}, {trek.state}
+            </p>
+            <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
+              <span className="text-[#111827]">{trek.rating.toFixed(1)}</span>
+              <span className="font-medium text-[#6B7280]">
+                ({formatReviewCount(trek.reviewCount)} reviews)
+              </span>
             </p>
           </div>
 
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#6B7280]">
-            <span>{formatTrekDuration(trek.durationDays, trek.durationNights)}</span>
-            <span aria-hidden>•</span>
-            <span>{formatAltitude(trek.maxAltitude)}</span>
-            <span aria-hidden>•</span>
-            <span className="capitalize">{trek.difficulty}</span>
-          </p>
+          <p className="line-clamp-2 text-sm leading-relaxed text-[#6B7280]">{trek.summary}</p>
+
+          <div className="flex flex-wrap gap-3 border-t border-[#F3F4F6] pt-3">
+            {inclusions.map((item) => {
+              const Icon = item.icon;
+              return (
+                <span
+                  key={item.id}
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-[#4B5563]"
+                >
+                  <Icon className="h-3.5 w-3.5 text-[#2D5A27]" aria-hidden />
+                  {item.label}
+                </span>
+              );
+            })}
+          </div>
 
           <div className="flex items-end justify-between gap-3 border-t border-[#F3F4F6] pt-3">
             <div>
-              <p className="font-heading text-xl font-bold text-[#111827]">
-                {formatCurrency(trek.basePriceInr)}
+              <div className="flex flex-wrap items-center gap-2">
+                {trek.originalPriceInr ? (
+                  <p className="text-sm text-[#9CA3AF] line-through">
+                    {formatCurrency(trek.originalPriceInr)}
+                  </p>
+                ) : null}
+                <p className="font-heading text-xl font-bold text-[#111827]">
+                  {formatCurrency(trek.basePriceInr)}
+                </p>
+                {discount ? (
+                  <span className="rounded bg-[#E8F5E9] px-1.5 py-0.5 text-[11px] font-bold text-[#2D5A27]">
+                    {discount}% OFF
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-[11px] text-[#6B7280]">
+                EMI starting ₹{emi.toLocaleString("en-IN")}/month
               </p>
-              {discount ? (
-                <p className="text-xs font-semibold text-[#16A34A]">{discount}% OFF</p>
-              ) : null}
             </div>
-            <BookNowButton
-              trekSlug={trek.slug}
-              variant="primary"
+            <Button
+              asChild
               size="sm"
               className="rounded-xl bg-[#2D5A27] px-4 hover:bg-[#244a20]"
             >
-              Book Now
-            </BookNowButton>
+              <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
+                View Details
+              </Link>
+            </Button>
           </div>
         </div>
       </article>

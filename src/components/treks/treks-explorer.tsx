@@ -8,9 +8,11 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { AdvancedTrekSearch } from "@/components/treks/advanced-trek-search";
 import { PopularSearches } from "@/components/treks/popular-searches";
 import { TrekFiltersPanel } from "@/components/treks/trek-filters-panel";
+import { TreksCtaSection } from "@/components/treks/treks-cta-section";
 import { TreksEmptyState } from "@/components/treks/treks-empty-state";
 import { TreksHero } from "@/components/treks/treks-hero";
 import { TreksToolbar } from "@/components/treks/treks-toolbar";
+import { TreksTrustBar } from "@/components/treks/treks-trust-bar";
 import { VirtualizedTrekList } from "@/components/treks/virtualized-trek-list";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -37,6 +39,7 @@ import type {
   TrekSortOption,
   TrekViewMode,
 } from "@/types/trek-listing";
+import type { DifficultyLevel } from "@/types";
 
 const TrekPreviewDrawer = dynamic(
   () => import("@/components/treks/trek-preview-drawer").then((m) => m.TrekPreviewDrawer),
@@ -53,7 +56,7 @@ const CompareBar = dynamic(
   { ssr: false },
 );
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 9;
 
 const sortLabels: Record<TrekSortOption, string> = {
   popularity: "Popularity",
@@ -66,6 +69,13 @@ const sortLabels: Record<TrekSortOption, string> = {
 
 interface TreksExplorerProps {
   initialTreks?: TrekListingItem[];
+}
+
+function durationBucket(days: number): string {
+  if (days <= 2) return "1-2";
+  if (days <= 4) return "3-4";
+  if (days <= 7) return "5-7";
+  return "8+";
 }
 
 export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
@@ -113,10 +123,23 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
     const regions = [...new Set(treks.map((t) => t.region).filter(Boolean))].sort((a, b) =>
       a.localeCompare(b),
     );
-    return { destinations, states, regions };
+
+    const difficultyCounts: Partial<Record<DifficultyLevel, number>> = {};
+    const durationCounts: Record<string, number> = {};
+    for (const trek of treks) {
+      difficultyCounts[trek.difficulty] = (difficultyCounts[trek.difficulty] || 0) + 1;
+      const bucket = durationBucket(trek.durationDays);
+      durationCounts[bucket] = (durationCounts[bucket] || 0) + 1;
+    }
+
+    return { destinations, states, regions, difficultyCounts, durationCounts };
   }, [treks]);
 
   const listTreks = visibleTreks;
+  const listClass =
+    filters.view === "list"
+      ? "space-y-4"
+      : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3";
 
   useEffect(() => {
     setPage(1);
@@ -147,50 +170,63 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
     setPage(Math.max(1, Math.min(nextPage, totalPages)));
   };
 
-  const listClass =
-    filters.view === "list" ? "space-y-4" : "grid gap-4 sm:grid-cols-2";
-
   return (
-    <div className="relative bg-white pb-28 md:bg-[#F7F8F6] md:pb-12">
-      <TreksHero
-        totalTreks={treks.length}
-        sort={filters.sort}
-        onSortChange={(sort: TrekSortOption) => pushFilters({ ...filters, sort })}
-        onOpenSort={() => setTrekSortOpen(true)}
+    <div className="relative bg-[#F7F8F6] pb-28 md:pb-0">
+      <TreksHero totalTreks={treks.length} />
+
+      <AdvancedTrekSearch
+        filters={filters}
+        onChange={pushFilters}
+        onReset={resetFilters}
+        destinations={filterOptions.destinations}
       />
 
-      <PopularSearches />
+      <div className="pt-5 md:pt-6">
+        <PopularSearches />
+      </div>
 
-      <Container className="py-4 md:py-8">
-        <AdvancedTrekSearch
-          filters={filters}
-          onChange={pushFilters}
-          onReset={resetFilters}
-        />
-
-        <div className="mt-5 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <Container id="trek-results" className="scroll-mt-24 py-6 md:py-8">
+        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <div className="hidden lg:block">
-            <div>
-              <TrekFiltersPanel
-                filters={filters}
-                onChange={pushFilters}
-                onReset={resetFilters}
-                onApply={() => undefined}
-                destinations={filterOptions.destinations}
-                states={filterOptions.states}
-                regions={filterOptions.regions}
-              />
-            </div>
+            <TrekFiltersPanel
+              filters={filters}
+              onChange={pushFilters}
+              onReset={resetFilters}
+              onApply={() => undefined}
+              destinations={filterOptions.destinations}
+              states={filterOptions.states}
+              regions={filterOptions.regions}
+              difficultyCounts={filterOptions.difficultyCounts}
+              durationCounts={filterOptions.durationCounts}
+            />
           </div>
 
           <div className="min-w-0 space-y-4">
             <TreksToolbar
               resultsCount={results.length}
               view={filters.view}
+              sort={filters.sort}
+              compareCount={displayCompare}
               onViewChange={(view: TrekViewMode) => pushFilters({ ...filters, view })}
+              onSortChange={(sort: TrekSortOption) => pushFilters({ ...filters, sort })}
+              onOpenCompare={() => setTrekCompareOpen(true)}
             />
 
-            {isPending ? (
+            {filters.view === "map" ? (
+              <div className="rounded-2xl border border-dashed border-[#D8E2D4] bg-white px-6 py-16 text-center">
+                <p className="font-heading text-lg font-semibold text-[#122016]">Map view coming soon</p>
+                <p className="mt-2 text-sm text-[#6B7668]">
+                  Switch to Grid or List to browse all {results.length} treks.
+                </p>
+                <Button
+                  type="button"
+                  className="mt-5 bg-[#2D5A27] hover:bg-[#244820]"
+                  onClick={() => pushFilters({ ...filters, view: "grid" })}
+                >
+                  Back to Grid
+                </Button>
+              </div>
+            ) : isPending ? (
               <div className={listClass}>
                 {Array.from({ length: PAGE_SIZE }).map((_, index) => (
                   <TrekCardSkeleton key={index} />
@@ -246,6 +282,9 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
         </div>
       </Container>
 
+      <TreksCtaSection />
+      <TreksTrustBar />
+
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#e8ece6] bg-white/95 p-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden">
         <div className="mx-auto flex max-w-lg gap-2">
           <button
@@ -299,6 +338,8 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
               destinations={filterOptions.destinations}
               states={filterOptions.states}
               regions={filterOptions.regions}
+              difficultyCounts={filterOptions.difficultyCounts}
+              durationCounts={filterOptions.durationCounts}
             />
           </div>
         </DrawerContent>
@@ -378,7 +419,7 @@ function Pagination({
           className={cn(
             "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-semibold transition",
             item === page
-              ? "border border-[#d0d5cc] bg-white text-[#1A1A1A] shadow-sm"
+              ? "border border-[#2D5A27] bg-[#2D5A27] text-white shadow-sm"
               : "border border-border bg-white text-foreground hover:bg-muted",
           )}
           onClick={() => onChange(item)}

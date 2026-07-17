@@ -28,7 +28,7 @@ export const defaultTrekFilters: TrekFiltersState = {
   region: [],
   suitableFor: [],
   sort: "popularity",
-  view: "list",
+  view: "grid",
 };
 
 function parseList(value: string | null): string[] {
@@ -59,7 +59,11 @@ export function budgetLabelToPriceRange(budget: string): {
 
 export function filtersFromSearchParams(params: URLSearchParams): TrekFiltersState {
   const sort = (params.get("sort") as TrekSortOption | null) ?? "popularity";
-  const view = params.get("view") === "grid" ? "grid" : "list";
+  const viewParam = params.get("view");
+  const view =
+    viewParam === "list" || viewParam === "map" || viewParam === "grid"
+      ? viewParam
+      : "grid";
 
   const difficultyFromUrl = [
     ...parseList(params.get("difficulty")),
@@ -131,7 +135,7 @@ export function filtersToSearchParams(filters: TrekFiltersState): URLSearchParam
     params.set("priceMax", String(filters.priceMax));
   }
   if (filters.sort !== "popularity") params.set("sort", filters.sort);
-  if (filters.view !== "list") params.set("view", filters.view);
+  if (filters.view !== "grid") params.set("view", filters.view);
 
   return params;
 }
