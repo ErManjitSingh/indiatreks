@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { BlogArticleShell } from "@/components/blog/blog-article-shell";
 import { JsonLd } from "@/components/seo";
 import { blogJsonLd, breadcrumbJsonLd, createMetadata, faqJsonLd } from "@/lib/seo";
-import { fetchBlog, fetchBlogRelated, fetchBlogs } from "@/lib/api/blogs";
+import { fetchBlog, fetchBlogHub, fetchBlogRelated, fetchBlogs } from "@/lib/api/blogs";
 
 export const revalidate = 3600;
 
@@ -55,10 +55,11 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
 export default async function BlogDetailPage({ params }: BlogPageProps) {
   const { slug } = await params;
-  const [blog, relatedBundle, list] = await Promise.all([
+  const [blog, relatedBundle, list, hub] = await Promise.all([
     fetchBlog(slug),
     fetchBlogRelated(slug).catch(() => null),
     fetchBlogs({ status: "published", limit: 100 }),
+    fetchBlogHub().catch(() => null),
   ]);
   if (!blog) notFound();
 
@@ -67,6 +68,7 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
   const previous = index > 0 ? blogs[index - 1] : null;
   const next = index >= 0 && index < blogs.length - 1 ? blogs[index + 1] : null;
   const faqs = blog.faq ?? [];
+  const trending = (hub?.trending || hub?.popular || []).filter((item) => item.slug !== slug);
 
   return (
     <>
@@ -95,6 +97,8 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
         previous={previous}
         next={next}
         related={relatedBundle || undefined}
+        trending={trending}
+        categories={hub?.categories || []}
       />
     </>
   );
