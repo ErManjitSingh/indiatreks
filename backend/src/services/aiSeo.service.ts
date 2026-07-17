@@ -129,16 +129,17 @@ function generateBlogMeta(input: { title?: string; excerpt?: string; category?: 
 function generateDestinationMeta(input: { name?: string; region?: string; state?: string; summary?: string }) {
   const name = input.name?.trim() || "Destination";
   const slug = slugify(name);
-  const place = [input.region, input.state].filter(Boolean).join(", ");
+  const placeParts = [...new Set([input.region, input.state].filter(Boolean).map((v) => String(v).trim()))];
+  const place = placeParts.join(", ");
   const title = trimLen(
-    place ? `${name} Treks & Travel Guide | ${place.split(",")[0].trim()}` : `${name} Treks & Travel Guide`,
+    place ? `${name} Treks & Travel Guide | ${placeParts[0]}` : `${name} Treks & Travel Guide`,
     60,
   );
   const summary = (input.summary || "").trim();
   const description = trimLen(
     summary.length >= 80
       ? summary
-      : `Explore ${name}${place ? ` in ${place}` : ""} treks — best seasons, how to reach, nearby trails, and curated packages with India Holiday Destinations.`,
+      : `Explore ${name}${place ? ` (${place})` : ""} treks — best seasons, how to reach, nearby trails, and curated packages with India Holiday Destinations.`,
     160,
   );
   return {
