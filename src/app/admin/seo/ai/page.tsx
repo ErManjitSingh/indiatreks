@@ -224,14 +224,19 @@ export default function AdminAiSeoPage() {
               ["Avg Position", sections.averagePosition],
               ["Clicks", sections.clicks],
               ["Impressions", sections.impressions],
-            ].map(([label, val]) => (
+            ].map(([label, val]) => {
+              const metric = val as { value?: unknown; status?: string } | undefined;
+              const display =
+                metric?.value === null || metric?.value === undefined
+                  ? "Awaiting data"
+                  : String(metric.value);
+              return (
               <div key={String(label)} className="rounded-xl bg-[#f9fafb] p-3">
                 <p className="text-xs text-[#6b7280]">{String(label)}</p>
-                <p className="mt-1 font-medium text-[#111827]">
-                  {(val as { value?: unknown; status?: string } | undefined)?.value ?? "Awaiting data"}
-                </p>
+                <p className="mt-1 font-medium text-[#111827]">{display}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
           <p className="mt-3 text-xs text-[#6b7280]">{String(analytics.note || "")}</p>
         </div>
