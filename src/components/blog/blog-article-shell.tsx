@@ -93,7 +93,7 @@ export function BlogArticleShell({
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const toc = blog.tableOfContents ?? [];
+  const toc = useMemo(() => blog.tableOfContents ?? [], [blog.tableOfContents]);
   const faqs = blog.faq ?? [];
   const gallery = blog.gallery ?? [];
   const internalLinks = blog.internalLinks ?? [];
