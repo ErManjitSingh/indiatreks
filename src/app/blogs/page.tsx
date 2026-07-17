@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronDown, Filter, PencilLine } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Filter, PencilLine } from "lucide-react";
 
 import { BlogListingCard } from "@/components/blog/blog-listing-card";
 import { BlogsHero } from "@/components/blog/blogs-hero";
@@ -12,6 +12,8 @@ import { breadcrumbJsonLd, createMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 3600;
+
+const BLOGS_PER_PAGE = 9;
 
 export const metadata: Metadata = createMetadata({
   title: "Travel Blog & Himalayan Guide",
@@ -37,17 +39,27 @@ function buildHref(base: Record<string, string | undefined>, patch: Record<strin
   return qs ? `/blogs?${qs}` : "/blogs";
 }
 
+function paginationWindow(current: number, totalPages: number) {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages = new Set<number>([1, totalPages, current, current - 1, current + 1]);
+  if (current <= 3) [2, 3, 4].forEach((p) => pages.add(p));
+  if (current >= totalPages - 2) [totalPages - 1, totalPages - 2, totalPages - 3].forEach((p) => pages.add(p));
+  return [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+}
+
 export default async function BlogsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; tag?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; tag?: string; sort?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const sort = params.sort || "latest";
+  const requestedPage = Math.max(1, Number(params.page) || 1);
   const [{ items, meta }, hub] = await Promise.all([
     fetchBlogs({
       status: "published",
-      limit: 60,
+      page: requestedPage,
+      limit: BLOGS_PER_PAGE,
       q: params.q,
       category: params.category,
       tag: params.tag,
@@ -58,17 +70,23 @@ export default async function BlogsPage({
 
   const categories = hub?.categories || [];
   const totalFound = Number(meta?.total ?? items.length);
+  const totalPages = Math.max(1, Number(meta?.totalPages ?? Math.ceil(totalFound / BLOGS_PER_PAGE) || 1));
+  const page = Math.min(requestedPage, totalPages);
   const allCount = categories.reduce((sum, c) => sum + Number(c.count || 0), 0) || totalFound;
   const chipCategories = categories.slice(0, 7);
-  const queryBase = {
+  const pageNumbers = paginationWindow(page, totalPages);
+  const showingFrom = totalFound === 0 ? 0 : (page - 1) * BLOGS_PER_PAGE + 1;
+  const showingTo = Math.min(page * BLOGS_PER_PAGE, totalFound);
+
+  const sortLabel =
+    sort === "popular" ? "Most Popular" : sort === "trending" ? "Trending" : "Most Recent";
+
+  const filterBase = {
     q: params.q,
     category: params.category,
     tag: params.tag,
     sort,
   };
-
-  const sortLabel =
-    sort === "popular" ? "Most Popular" : sort === "trending" ? "Trending" : "Most Recent";
 
   return (
     <>
@@ -98,7 +116,9 @@ export default async function BlogsPage({
                     {params.q ? "Search Results" : params.category || "All Articles"}
                   </h2>
                   <p className="mt-1 text-sm text-[#6B7668]">
-                    {totalFound} article{totalFound === 1 ? "" : "s"} found
+                    {totalFound === 0
+                      ? "0 articles found"
+                      : `Showing ${showingFrom}–${showingTo} of ${totalFound} article${totalFound === 1 ? "" : "s"}`}
                     {params.q ? ` for “${params.q}”` : ""}.
                   </p>
                 </div>
@@ -118,7 +138,7 @@ export default async function BlogsPage({
                         ].map((option) => (
                           <Link
                             key={option.value}
-                            href={buildHref(queryBase, { sort: option.value })}
+                            href={buildHref(filterBase, { sort: option.value, page: undefined })}
                             className={cn(
                               "block px-3 py-2 text-sm hover:bg-[#F4F8F2]",
                               sort === option.value
@@ -153,7 +173,7 @@ export default async function BlogsPage({
 
               <div className="mt-5 flex flex-wrap gap-2">
                 <Link
-                  href={buildHref(queryBase, { category: undefined })}
+                  href={buildHref(filterBase, { category: undefined, page: undefined })}
                   className={cn(
                     "inline-flex h-9 items-center rounded-full border px-3.5 text-sm font-semibold transition",
                     !params.category
@@ -169,7 +189,7 @@ export default async function BlogsPage({
                   return (
                     <Link
                       key={cat.name}
-                      href={buildHref(queryBase, { category: cat.name })}
+                      href={buildHref(filterBase, { category: cat.name, page: undefined })}
                       className={cn(
                         "inline-flex h-9 items-center rounded-full border px-3.5 text-sm font-semibold transition",
                         active
@@ -191,7 +211,7 @@ export default async function BlogsPage({
                       {categories.slice(7).map((cat) => (
                         <Link
                           key={cat.name}
-                          href={buildHref(queryBase, { category: cat.name })}
+                          href={buildHref(filterBase, { category: cat.name, page: undefined })}
                           className="block px-3 py-2 text-sm text-[#374151] hover:bg-[#F4F8F2]"
                         >
                           {cat.name} ({cat.count})
@@ -203,11 +223,85 @@ export default async function BlogsPage({
               </div>
 
               {items.length ? (
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {items.map((blog) => (
-                    <BlogListingCard key={blog.slug} blog={blog} />
-                  ))}
-                </div>
+                <>
+                  <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    {items.map((blog) => (
+                      <BlogListingCard key={blog.slug} blog={blog} />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 ? (
+                    <nav
+                      aria-label="Blog pagination"
+                      className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between"
+                    >
+                      <p className="text-sm text-[#6B7668]">
+                        Page {page} of {totalPages}
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
+                        <Link
+                          href={buildHref(filterBase, {
+                            page: page > 2 ? String(page - 1) : undefined,
+                          })}
+                          aria-disabled={page <= 1}
+                          className={cn(
+                            "inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#D8E2D4] bg-white text-[#314034] shadow-sm transition",
+                            page <= 1
+                              ? "pointer-events-none opacity-40"
+                              : "hover:bg-[#F4F8F2]",
+                          )}
+                          aria-label="Previous page"
+                        >
+                          <ChevronLeft className="h-4 w-4" aria-hidden />
+                        </Link>
+
+                        {pageNumbers.map((n, idx) => {
+                          const prev = pageNumbers[idx - 1];
+                          const showEllipsis = prev !== undefined && n - prev > 1;
+                          return (
+                            <span key={n} className="contents">
+                              {showEllipsis ? (
+                                <span className="px-1 text-sm text-[#8A9484]" aria-hidden>
+                                  …
+                                </span>
+                              ) : null}
+                              <Link
+                                href={buildHref(filterBase, {
+                                  page: n > 1 ? String(n) : undefined,
+                                })}
+                                aria-current={n === page ? "page" : undefined}
+                                className={cn(
+                                  "inline-flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-semibold transition",
+                                  n === page
+                                    ? "border-[#2D5A27] bg-[#2D5A27] text-white"
+                                    : "border-[#D8E2D4] bg-white text-[#314034] hover:bg-[#F4F8F2]",
+                                )}
+                              >
+                                {n}
+                              </Link>
+                            </span>
+                          );
+                        })}
+
+                        <Link
+                          href={buildHref(filterBase, {
+                            page: page < totalPages ? String(page + 1) : String(page),
+                          })}
+                          aria-disabled={page >= totalPages}
+                          className={cn(
+                            "inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#D8E2D4] bg-white text-[#314034] shadow-sm transition",
+                            page >= totalPages
+                              ? "pointer-events-none opacity-40"
+                              : "hover:bg-[#F4F8F2]",
+                          )}
+                          aria-label="Next page"
+                        >
+                          <ChevronRight className="h-4 w-4" aria-hidden />
+                        </Link>
+                      </div>
+                    </nav>
+                  ) : null}
+                </>
               ) : (
                 <div className="mt-8 rounded-2xl border border-dashed border-[#D8E2D4] bg-white px-6 py-16 text-center">
                   <p className="font-heading text-lg font-semibold text-[#122016]">No articles found</p>
