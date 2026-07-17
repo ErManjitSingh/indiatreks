@@ -2,20 +2,18 @@ import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestCo
 
 /**
  * Browser: always use same-origin `/api/v1` (nginx proxies to Express) — no CORS.
- * Server: use env absolute URL, falling back to the live site API.
+ * Server: prefer internal `API_URL` (loopback) so SSR avoids public rate limits / nginx hop.
  */
 function resolveApiBaseUrl(): string {
-  const fromEnv = (
-    process.env.NEXT_PUBLIC_API_URL ||
-    process.env.API_URL ||
-    ""
-  ).replace(/\/$/, "");
-
   if (typeof window !== "undefined") {
     return "/api/v1";
   }
 
-  if (fromEnv) return fromEnv;
+  const serverOnly = (process.env.API_URL || "").replace(/\/$/, "");
+  if (serverOnly) return serverOnly;
+
+  const fromPublic = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (fromPublic) return fromPublic;
 
   return "https://treks.indiaholidaydestination.com/api/v1";
 }

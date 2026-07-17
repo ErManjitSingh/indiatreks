@@ -3,8 +3,10 @@ import { apiGet, apiPut, apiPost, apiPatch, apiDelete, type ApiSuccess } from "@
 export type SeoDoc = Record<string, unknown> & { _id?: string };
 
 function resolveApiBaseUrl(): string {
-  const fromEnv = (process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "").replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
+  const serverOnly = (process.env.API_URL || "").replace(/\/$/, "");
+  if (serverOnly) return serverOnly;
+  const fromPublic = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (fromPublic) return fromPublic;
   return "https://treks.indiaholidaydestination.com/api/v1";
 }
 

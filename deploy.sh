@@ -24,9 +24,9 @@ else
   echo "WARNING: $ENV_FILE missing — enquiry emails / API URL may fail until env is set."
 fi
 
-# Ensure public API base is available at Next.js build time (SSR + client).
+# Browser uses public URL; SSR should hit the API on loopback to avoid rate limits.
 export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-https://treks.indiaholidaydestination.com/api/v1}"
-export API_URL="${API_URL:-$NEXT_PUBLIC_API_URL}"
+export API_URL="${API_URL:-http://127.0.0.1:4000/api/v1}"
 
 npm ci
 npm run build

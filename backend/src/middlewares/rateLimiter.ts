@@ -2,14 +2,36 @@ import rateLimit from "express-rate-limit";
 import type { Request } from "express";
 import { env } from "../config/env";
 
-function skipHotPublicPaths(req: Request) {
-  const path = req.path;
+function isLoopback(req: Request) {
+  const ip = String(req.ip || "");
   return (
+    ip === "127.0.0.1" ||
+    ip === "::1" ||
+    ip === "::ffff:127.0.0.1" ||
+    ip.endsWith("127.0.0.1")
+  );
+}
+
+function skipHotPublicPaths(req: Request) {
+  // Next.js SSR on the same host must not share the public rate-limit bucket.
+  if (isLoopback(req)) return true;
+
+  const path = req.path;
+  if (
     path === "/health" ||
     path.startsWith("/health/") ||
     path === "/content/bootstrap" ||
     path.startsWith("/content/")
-  );
+  ) {
+    return true;
+  }
+
+  // Public blog reads are high-churn during SSR (listing + detail + hub + related).
+  if (req.method === "GET" && (path === "/blogs" || path.startsWith("/blogs/"))) {
+    return true;
+  }
+
+  return false;
 }
 
 export const apiLimiter = rateLimit({

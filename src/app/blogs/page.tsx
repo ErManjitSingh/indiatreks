@@ -52,7 +52,7 @@ export default async function BlogsPage({
       category: params.category,
       tag: params.tag,
       sort,
-    }),
+    }).catch(() => ({ items: [], meta: undefined })),
     fetchBlogHub().catch(() => null),
   ]);
 
