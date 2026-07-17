@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRight,
   BadgeCheck,
   CalendarDays,
   ChevronDown,
@@ -8,9 +9,11 @@ import {
   Headphones,
   MapPin,
   Mountain,
+  RefreshCcw,
   Search,
   Shield,
   Wallet,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -23,13 +26,12 @@ import { cn } from "@/lib/utils";
 import type { DifficultyLevel } from "@/types";
 import type { TrekFiltersState } from "@/types/trek-listing";
 
-const guarantees = [
+const featureRow = [
   { label: "Best Price Guarantee", icon: BadgeCheck },
   { label: "Certified Trek Leaders", icon: Shield },
-  { label: "Medical Support", icon: Headphones },
-  { label: "24x7 Customer Support", icon: Headphones },
-  { label: "Easy Cancellation", icon: Wallet },
-  { label: "Instant Booking", icon: BadgeCheck },
+  { label: "24x7 Support", icon: Headphones },
+  { label: "Easy Cancellation", icon: RefreshCcw },
+  { label: "Instant Booking", icon: Zap },
 ];
 
 interface AdvancedTrekSearchProps {
@@ -77,10 +79,7 @@ export function AdvancedTrekSearch({
   }, [debouncedQuery]);
 
   const destinationOptions = useMemo(
-    () =>
-      destinations.length
-        ? destinations
-        : [...heroSearchOptions.destinations],
+    () => (destinations.length ? destinations : [...heroSearchOptions.destinations]),
     [destinations, heroSearchOptions.destinations],
   );
 
@@ -100,9 +99,105 @@ export function AdvancedTrekSearch({
     document.getElementById("trek-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const durationOptions = [
+    "1–3 Days",
+    "4–6 Days",
+    "5–7 Days",
+    "8+ Days",
+    ...heroSearchOptions.durations,
+  ];
+
   return (
-    <div className="relative z-20 -mt-10 md:-mt-16 lg:-mt-20">
-      <Container>
+    <div className="relative z-20 -mt-[5.5rem] md:-mt-16 lg:-mt-20" id="trek-search">
+      {/* —— Mobile search card (3×2 mockup) —— */}
+      <div className="px-4 md:hidden">
+        <form
+          className="rounded-[1.25rem] bg-white p-3.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] ring-1 ring-black/[0.04]"
+          onSubmit={(e) => {
+            e.preventDefault();
+            applySearch();
+          }}
+          aria-label="Search Himalayan treks"
+        >
+          <div className="grid grid-cols-3 gap-2">
+            <MobileField
+              icon={Search}
+              label="Search Trek"
+              placeholder="Any Trek"
+              value={query}
+              onChange={setQuery}
+              type="text"
+            />
+            <MobileSelect
+              icon={MapPin}
+              label="Destination"
+              placeholder="Any Destination"
+              value={destination}
+              onChange={setDestination}
+              options={destinationOptions}
+            />
+            <MobileSelect
+              icon={Clock3}
+              label="Duration"
+              placeholder="Any Duration"
+              value={duration}
+              onChange={setDuration}
+              options={durationOptions}
+            />
+            <MobileSelect
+              icon={Mountain}
+              label="Difficulty"
+              placeholder="Any Level"
+              value={difficulty}
+              onChange={setDifficulty}
+              options={heroSearchOptions.difficulties}
+            />
+            <MobileSelect
+              icon={CalendarDays}
+              label="Month"
+              placeholder="Any Month"
+              value={month}
+              onChange={setMonth}
+              options={heroSearchOptions.months}
+            />
+            <MobileSelect
+              icon={Wallet}
+              label="Price Range"
+              placeholder="Any Budget"
+              value={budget}
+              onChange={setBudget}
+              options={heroSearchOptions.budgets}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2D5A27] py-3.5 text-[14px] font-bold !text-white"
+          >
+            Search Treks
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </button>
+        </form>
+
+        <ul className="mt-4 flex justify-between gap-1 px-0.5">
+          {featureRow.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.label} className="flex w-[18%] flex-col items-center text-center">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2EC] text-[#2D5A27]">
+                  <Icon className="h-4 w-4" aria-hidden />
+                </span>
+                <p className="mt-1.5 text-[9px] leading-tight font-medium text-[#4B5563]">
+                  {item.label}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* —— Desktop search bar —— */}
+      <Container className="hidden md:block">
         <form
           className="overflow-hidden rounded-2xl border border-[#e4e9df] bg-white text-[#14201a] shadow-[0_20px_48px_rgba(15,23,42,0.14)]"
           onSubmit={(e) => {
@@ -126,7 +221,7 @@ export function AdvancedTrekSearch({
               />
             </label>
 
-            <SearchSelect
+            <DesktopSelect
               icon={MapPin}
               label="Destination"
               placeholder="Any"
@@ -135,16 +230,16 @@ export function AdvancedTrekSearch({
               options={destinationOptions}
               className="lg:border-l lg:border-[#e8ece6]"
             />
-            <SearchSelect
+            <DesktopSelect
               icon={Clock3}
               label="Duration"
               placeholder="Any"
               value={duration}
               onChange={setDuration}
-              options={["1–3 Days", "4–6 Days", "5–7 Days", "8+ Days", ...heroSearchOptions.durations]}
+              options={durationOptions}
               className="sm:border-l sm:border-[#e8ece6]"
             />
-            <SearchSelect
+            <DesktopSelect
               icon={Mountain}
               label="Difficulty"
               placeholder="Any"
@@ -153,7 +248,7 @@ export function AdvancedTrekSearch({
               options={heroSearchOptions.difficulties}
               className="lg:border-l lg:border-[#e8ece6]"
             />
-            <SearchSelect
+            <DesktopSelect
               icon={CalendarDays}
               label="Month"
               placeholder="Any"
@@ -162,7 +257,7 @@ export function AdvancedTrekSearch({
               options={heroSearchOptions.months}
               className="sm:border-l sm:border-[#e8ece6]"
             />
-            <SearchSelect
+            <DesktopSelect
               icon={Wallet}
               label="Price Range"
               placeholder="Any"
@@ -175,16 +270,16 @@ export function AdvancedTrekSearch({
             <div className="flex items-stretch p-2.5 sm:col-span-2 lg:col-span-1 lg:p-3">
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2D5A27] px-4 py-3 text-xs font-extrabold text-white transition hover:bg-[#244820] sm:text-sm lg:min-w-[9.5rem]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2D5A27] px-4 py-3 text-xs font-extrabold !text-white transition hover:bg-[#244820] sm:text-sm lg:min-w-[9.5rem]"
               >
                 Search Treks
-                <Search className="h-3.5 w-3.5" aria-hidden />
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
               </button>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-[#e8ece6] bg-[#eef5e6] px-4 py-2.5 md:px-5">
-            {guarantees.map((item) => {
+            {featureRow.map((item) => {
               const Icon = item.icon;
               return (
                 <span
@@ -203,7 +298,81 @@ export function AdvancedTrekSearch({
   );
 }
 
-function SearchSelect({
+function MobileField({
+  icon: Icon,
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  icon: LucideIcon;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+}) {
+  return (
+    <label className="flex min-h-[4.5rem] flex-col rounded-xl bg-[#F6F7F5] px-2 py-2">
+      <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-[#6B7668]">
+        <Icon className="h-3 w-3 text-[#2D5A27]" aria-hidden />
+        {label}
+      </span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1 w-full bg-transparent text-[11px] font-semibold text-[#14201a] outline-none placeholder:font-medium placeholder:text-[#9AA39A]"
+        aria-label={label}
+      />
+    </label>
+  );
+}
+
+function MobileSelect({
+  icon: Icon,
+  label,
+  placeholder,
+  value,
+  onChange,
+  options,
+}: {
+  icon: LucideIcon;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+}) {
+  const unique = [...new Set(options)];
+  return (
+    <label className="relative flex min-h-[4.5rem] flex-col rounded-xl bg-[#F6F7F5] px-2 py-2">
+      <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-[#6B7668]">
+        <Icon className="h-3 w-3 text-[#2D5A27]" aria-hidden />
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full appearance-none bg-transparent pr-3 text-[11px] font-semibold text-[#14201a] outline-none"
+        aria-label={label}
+      >
+        <option value="">{placeholder}</option>
+        {unique.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute right-2 bottom-2.5 h-3 w-3 text-[#9AA39A]"
+        aria-hidden
+      />
+    </label>
+  );
+}
+
+function DesktopSelect({
   icon: Icon,
   label,
   placeholder,

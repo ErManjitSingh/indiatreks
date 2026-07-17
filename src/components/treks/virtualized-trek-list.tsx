@@ -16,7 +16,13 @@ export function VirtualizedTrekList({ treks, view }: VirtualizedTrekListProps) {
   const isList = view === "list";
 
   return (
-    <div className={cn(isList ? "space-y-4" : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3")}>
+    <div
+      className={cn(
+        isList
+          ? "space-y-3.5 md:space-y-4"
+          : "grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3",
+      )}
+    >
       {treks.map((trek) => (
         <TrekListingCard key={trek.id} trek={trek} view={view} />
       ))}

@@ -34,24 +34,24 @@ interface TrekListingCardProps {
 }
 
 const badgeStyles = {
-  trending: "bg-[#EA580C] text-white",
-  bestseller: "bg-[#2563EB] text-white",
-  limited: "bg-[#B45309] text-white",
-  new: "bg-[#0F766E] text-white",
+  trending: "bg-[#2563EB] text-white",
+  bestseller: "bg-[#EA580C] text-white",
+  limited: "bg-[#7C3AED] text-white",
+  new: "bg-[#1B4332] text-white",
 } as const;
 
 const badgeCopy = {
   trending: "MOST BOOKED",
   bestseller: "TOP SELLER",
-  limited: "LIMITED",
-  new: "NEW",
+  limited: "SNOW TREK",
+  new: "BEST FOR BEGINNERS",
 } as const;
 
 const difficultyStyles: Record<string, string> = {
-  easy: "bg-[#16A34A] text-white",
-  moderate: "bg-[#CA8A04] text-white",
-  difficult: "bg-[#DC2626] text-white",
-  challenging: "bg-[#7C2D12] text-white",
+  easy: "bg-[#22C55E] text-white",
+  moderate: "bg-[#F59E0B] text-white",
+  difficult: "bg-[#EF4444] text-white",
+  challenging: "bg-[#B91C1C] text-white",
 };
 
 function formatReviewCount(count: number): string {
@@ -143,7 +143,7 @@ function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps)
   );
 
   const durationOverlay = (
-    <span className="absolute bottom-3 left-3 rounded-md bg-black/65 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+    <span className="absolute inset-x-0 bottom-0 bg-black/55 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-[2px]">
       {trek.durationDays} Days | {trek.durationNights} Night{trek.durationNights === 1 ? "" : "s"}
     </span>
   );
@@ -151,7 +151,7 @@ function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps)
   const difficultyBadge = (
     <span
       className={cn(
-        "absolute right-3 bottom-3 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide capitalize shadow-sm",
+        "absolute top-3 right-12 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide capitalize shadow-sm",
         difficultyStyles[trek.difficulty] || "bg-[#2D5A27] text-white",
       )}
     >
@@ -161,7 +161,7 @@ function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps)
 
   /* —— Mobile card —— */
   const mobileCard = (
-    <article className="overflow-hidden rounded-2xl border border-[#e8ece6] bg-white shadow-sm md:hidden">
+    <article className="overflow-hidden rounded-[1rem] border border-[#E8ECE6] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.06)] md:hidden">
       <div className="relative aspect-[16/10]">
         <Image
           src={cover}
@@ -175,78 +175,87 @@ function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps)
         {primaryBadge ? (
           <span
             className={cn(
-              "absolute left-3 top-3 rounded-md px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
+              "absolute top-3 left-3 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide",
               badgeStyles[primaryBadge],
             )}
           >
             {badgeCopy[primaryBadge]}
           </span>
         ) : null}
-        <div className="absolute right-3 top-3">{actionButtons}</div>
-        {durationOverlay}
         {difficultyBadge}
+        <div className="absolute top-2.5 right-2.5">{wishButton}</div>
+        {durationOverlay}
       </div>
 
-      <div className="space-y-3 p-4">
+      <div className="space-y-2.5 p-3.5">
         <div>
-          <h3 className="font-heading text-lg font-bold tracking-tight text-[#1A1A1A]">
+          <h3 className="font-heading text-[1.05rem] font-bold leading-snug tracking-tight text-[#122016]">
             <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
               {trek.title}
             </Link>
           </h3>
-          <p className="mt-0.5 inline-flex items-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" aria-hidden />
-            {placeLabel}, {trek.state}
+          <p className="mt-0.5 text-[12px] text-[#6B7668]">
+            {placeLabel}
+            {trek.state ? `, ${trek.state}` : ""}
           </p>
-          <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold">
+          <p className="mt-1 inline-flex items-center gap-1 text-[12px] font-semibold">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
-            <span className="text-[#2D5A27]">{trek.rating.toFixed(1)}</span>
-            <span className="font-medium text-muted-foreground">
+            <span className="text-[#122016]">{trek.rating.toFixed(1)}</span>
+            <span className="font-medium text-[#9AA39A]">
               ({formatReviewCount(trek.reviewCount)})
             </span>
           </p>
         </div>
 
-        <p className="line-clamp-2 text-sm text-[#6B7668]">{trek.summary}</p>
+        <p className="line-clamp-2 text-[12px] leading-relaxed text-[#6B7668]">{trek.summary}</p>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5">
           {inclusions.map((item) => {
             const Icon = item.icon;
             return (
               <span
                 key={item.id}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-[#4B5563]"
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6B7668]"
               >
-                <Icon className="h-3.5 w-3.5 text-[#2D5A27]" aria-hidden />
+                <Icon className="h-3.5 w-3.5 text-[#6B7668]" aria-hidden />
                 {item.label}
               </span>
             );
           })}
         </div>
 
-        <div className="flex flex-wrap items-end gap-2">
-          {trek.originalPriceInr ? (
-            <p className="pb-0.5 text-sm text-muted-foreground line-through">
-              {formatCurrency(trek.originalPriceInr)}
-            </p>
-          ) : null}
-          <p className="font-heading text-xl font-bold text-[#1A1A1A]">
-            {formatCurrency(trek.basePriceInr)}
-          </p>
-          {discount ? (
-            <span className="rounded-full border border-[#C8E6C9] bg-[#E8F5E9] px-2 py-0.5 text-[11px] font-bold text-[#2D5A27]">
-              {discount}% OFF
-            </span>
-          ) : null}
+        <div className="flex items-end justify-between gap-3 pt-0.5">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-baseline gap-1.5">
+              {trek.originalPriceInr ? (
+                <p className="text-[12px] text-[#9AA39A] line-through">
+                  {formatCurrency(trek.originalPriceInr)}
+                </p>
+              ) : null}
+              <p className="font-heading text-lg font-bold text-[#2D5A27]">
+                {formatCurrency(trek.basePriceInr)}
+              </p>
+              {discount ? (
+                <span className="text-[11px] font-bold text-[#DC2626]">{discount}% OFF</span>
+              ) : null}
+            </div>
+          </div>
+          <Button
+            asChild
+            size="sm"
+            className="h-9 shrink-0 rounded-lg bg-[#2D5A27] px-3.5 text-[12px] font-bold hover:bg-[#244820]"
+          >
+            <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
+              View Details
+            </Link>
+          </Button>
         </div>
 
-        <Button asChild size="sm" className="w-full rounded-xl bg-[#2D5A27] hover:bg-[#244820]">
-          <Link href={`/treks/${trek.slug}`} onClick={() => addRecent(trek.id)}>
-            View Details
-          </Link>
-        </Button>
-        <p className="text-center text-[11px] text-[#6B7668]">
-          EMI starting ₹{emi.toLocaleString("en-IN")}/month
+        <p className="inline-flex items-center gap-1 text-[11px] text-[#6B7668]">
+          EMI starting at ₹{emi.toLocaleString("en-IN")}/month
+          <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#C5CDC0] text-[8px] font-bold text-[#9AA39A]">
+            i
+          </span>
         </p>
       </div>
     </article>
@@ -408,15 +417,15 @@ function TrekListingCardComponent({ trek, view = "grid" }: TrekListingCardProps)
             </span>
           ) : null}
           <div className="absolute right-3 top-3">{wishButton}</div>
-          {durationOverlay}
           <span
             className={cn(
-              "absolute right-3 bottom-3 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide capitalize shadow-sm",
+              "absolute top-3 right-12 rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide capitalize shadow-sm",
               difficultyStyles[trek.difficulty] || "bg-[#2D5A27] text-white",
             )}
           >
             {trek.difficulty}
           </span>
+          {durationOverlay}
         </div>
 
         <div className="space-y-3 p-4">
