@@ -1,6 +1,6 @@
 "use client";
 
-import { Filter, Headphones, RefreshCw, Search } from "lucide-react";
+import { Filter, RefreshCw, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +24,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { TrekCardSkeleton } from "@/components/ui/skeleton";
-import { siteConfig } from "@/config/site";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 import {
   countActiveFilters,
@@ -163,12 +162,8 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
     setPage(Math.max(1, Math.min(nextPage, totalPages)));
   };
 
-  const whatsappHref = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(
-    "Hi! I want help choosing a Himalayan trek.",
-  )}`;
-
   return (
-    <div className="relative bg-[#F8F8F8] pb-[7.5rem] md:bg-[#F7F8F6] md:pb-0">
+    <div className="relative bg-[#F8F8F8] pb-24 md:bg-[#F7F8F6] md:pb-0">
       <TreksHero totalTreks={treks.length} />
 
       <AdvancedTrekSearch
@@ -321,30 +316,6 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
       <TreksCtaSection />
       <TreksTrustBar />
 
-      {/* Mobile sticky: Talk to Expert + WhatsApp (above bottom nav) */}
-      <div className="fixed inset-x-0 bottom-[3.75rem] z-50 border-t border-[#E8ECE6] bg-white p-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-6px_20px_rgba(15,23,42,0.06)] md:hidden">
-        <div className="mx-auto flex max-w-lg gap-2">
-          <Link
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#D1D5DB] bg-white px-3 py-3 text-[13px] font-bold text-[#122016]"
-          >
-            <Headphones className="h-4 w-4 text-[#2D5A27]" aria-hidden />
-            Talk to Expert
-          </Link>
-          <Link
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#2D5A27] px-3 py-3 text-[13px] font-bold !text-white"
-          >
-            <WhatsAppGlyph />
-            WhatsApp Now
-          </Link>
-        </div>
-      </div>
-
       <Drawer open={trekFiltersOpen} onOpenChange={setTrekFiltersOpen}>
         <DrawerContent side="bottom" className="max-h-[88vh] overflow-y-auto">
           <DrawerTitle>Filter treks</DrawerTitle>
@@ -408,15 +379,6 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
         <CompareBar />
       </div>
     </div>
-  );
-}
-
-function WhatsAppGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
-      <path d="M17.47 14.38c-.28-.14-1.64-.81-1.9-.9-.25-.1-.44-.14-.62.14-.19.28-.71.9-.87 1.08-.16.19-.32.21-.6.07-.28-.14-1.17-.43-2.23-1.37-.82-.73-1.38-1.64-1.54-1.92-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.19-.28.28-.46.1-.19.05-.35-.02-.49-.07-.14-.62-1.5-.85-2.05-.22-.53-.45-.46-.62-.47h-.53c-.19 0-.49.07-.74.35-.25.28-.98.96-.98 2.34s1 2.71 1.14 2.9c.14.19 1.97 3 4.77 4.21 1.78.77 2.28.84 3.1.71.47-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33Z" />
-      <path d="M12.04 2C6.58 2 2.15 6.43 2.15 11.89c0 1.75.46 3.45 1.33 4.95L2 22l5.3-1.39c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.89-4.43 9.89-9.89C21.94 6.43 17.5 2 12.04 2Zm0 18.07h-.01c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.14.82.84-3.06-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 4.54 0 8.24 3.7 8.24 8.24 0 4.54-3.7 8.25-8.22 8.25Z" />
-    </svg>
   );
 }
 

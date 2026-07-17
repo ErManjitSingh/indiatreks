@@ -61,7 +61,7 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
 
         <h1 className="mt-4 font-heading text-[2.15rem] font-extrabold leading-[1.05] tracking-tight !text-white">
           <span className="block !text-white">Explore India&apos;s Best</span>
-          <span className="mt-1 block bg-gradient-to-r from-[#7CB342] to-[#C5E063] bg-clip-text text-[2.35rem] !text-transparent">
+          <span className="mt-0.5 block font-brush text-[3.15rem] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
             Himalayan Treks
           </span>
         </h1>
@@ -101,7 +101,7 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
 
             <h1 className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight !text-white">
               <span className="!text-white">Explore India&apos;s Best</span>
-              <span className="mt-1 block bg-gradient-to-r from-[#7CB342] to-[#C5E063] bg-clip-text !text-transparent">
+              <span className="mt-0.5 block font-brush text-[clamp(2.75rem,7vw,4.75rem)] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
                 Himalayan Treks
               </span>
             </h1>
