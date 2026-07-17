@@ -109,7 +109,7 @@ function generateBlogMeta(input: { title?: string; excerpt?: string; category?: 
   const title = trimLen(`${name} | Trekking Guide`, 60);
   const description = trimLen(
     input.excerpt ||
-      `Read ${name} — practical tips, itineraries, and Himalayan advice from India Holiday Destinations.`,
+      `Read ${name} - practical tips, itineraries, and Himalayan advice from India Holiday Destinations.`,
     160,
   );
   return {
@@ -139,7 +139,7 @@ function generateDestinationMeta(input: { name?: string; region?: string; state?
   const description = trimLen(
     summary.length >= 80
       ? summary
-      : `Explore ${name}${place ? ` (${place})` : ""} treks — best seasons, how to reach, nearby trails, and curated packages with India Holiday Destinations.`,
+      : `Explore ${name}${place ? ` (${place})` : ""} treks - best seasons, how to reach, nearby trails, and curated packages with India Holiday Destinations.`,
     160,
   );
   return {
@@ -283,13 +283,13 @@ function generateTrekFaqs(input: {
     },
     {
       question: `When is the best time to do ${name}?`,
-      answer: `The recommended window is ${seasons}. Weather in ${dest} can change quickly — always check the latest departure notes.`,
+      answer: `The recommended window is ${seasons}. Weather in ${dest} can change quickly - always check the latest departure notes.`,
     },
     {
       question: `Is ${name} suitable for beginners?`,
       answer:
         difficulty === "easy"
-          ? `Yes — ${name} is beginner-friendly with proper guidance, though basic stamina still helps.`
+          ? `Yes - ${name} is beginner-friendly with proper guidance, though basic stamina still helps.`
           : `It can work for fit beginners with preparation. If you are new to trekking, start training 3–4 weeks in advance.`,
     },
     {
@@ -345,7 +345,7 @@ async function suggestFaqs(input: {
       },
       {
         question: `Can I book online?`,
-        answer: `Yes. Select a trek, choose a departure, and complete booking online — or send an enquiry for custom dates.`,
+        answer: `Yes. Select a trek, choose a departure, and complete booking online - or send an enquiry for custom dates.`,
       },
     ];
   }
@@ -728,7 +728,7 @@ function analyzeContentQuality(input: {
   if (words < 300) improvements.push("Expand body content to at least 300–600 words for stronger SEO.");
 
   if (h1Count === 0) improvements.push("Ensure a single clear H1 (page title).");
-  if (h1Count > 1) improvements.push("Multiple H1s detected — keep only one primary H1.");
+  if (h1Count > 1) improvements.push("Multiple H1s detected - keep only one primary H1.");
 
   const overall = clamp(
     headingScore * 0.2 +
@@ -814,7 +814,7 @@ function suggestImageSeo(input: {
   const title = titleCase(base.replace(/-/g, " "));
   const alt =
     input.alt?.trim() ||
-    trimLen(`${input.contextTitle || title}${place} — Himalayan trek photo`, 125);
+    trimLen(`${input.contextTitle || title}${place} - Himalayan trek photo`, 125);
   return {
     requiresReview: true,
     suggestions: {

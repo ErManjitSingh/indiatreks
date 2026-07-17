@@ -1,6 +1,6 @@
 /**
  * Apply AI-generated SEO to all entities missing meta/FAQs/schema.
- * Human-quality templates from aiSeo generators — writes only into empty fields
+ * Human-quality templates from aiSeo generators - writes only into empty fields
  * unless FORCE=1 (then overwrites title/description/canonical/og/twitter).
  *
  * Usage (on VPS):
@@ -82,7 +82,7 @@ async function applyTreks() {
     const seo = mergeSeo(trek.seo as never, meta.suggestions as never, {
       schemaType: "TouristTrip",
       imageAlt: trek.seo?.imageAlt || `${trek.title} Himalayan trek`,
-      imageCaption: trek.seo?.imageCaption || `${trek.title} — India Holiday Destinations`,
+      imageCaption: trek.seo?.imageCaption || `${trek.title} - India Holiday Destinations`,
       ogImage: trek.seo?.ogImage || trek.heroImages?.[0] || undefined,
       twitterImage: trek.seo?.twitterImage || trek.seo?.ogImage || trek.heroImages?.[0] || undefined,
       breadcrumb: [
@@ -223,7 +223,7 @@ async function applyDestinations() {
     const seo = mergeSeo(destination.seo as never, meta.suggestions as never, {
       schemaType: "TouristDestination",
       imageAlt: destination.seo?.imageAlt || `${destination.name} trekking destination`,
-      imageCaption: destination.seo?.imageCaption || `${destination.name} — India Holiday Destinations`,
+      imageCaption: destination.seo?.imageCaption || `${destination.name} - India Holiday Destinations`,
       ogImage: destination.seo?.ogImage || destination.coverImage || undefined,
       twitterImage: destination.seo?.twitterImage || destination.coverImage || undefined,
       breadcrumb: [
@@ -329,7 +329,7 @@ async function applyHomepageSettings() {
         title: homepage.title || "Explore India's Most Incredible Himalayan Treks",
         description:
           homepage.description ||
-          "Book premium Himalayan treks with India Holiday Destinations — expert guides, transparent pricing, and curated itineraries across Himachal and beyond.",
+          "Book premium Himalayan treks with India Holiday Destinations - expert guides, transparent pricing, and curated itineraries across Himachal and beyond.",
         keywords: homepage.keywords?.length
           ? homepage.keywords
           : ["himalayan treks", "himachal treks", "weekend treks", "india holiday destinations"],
