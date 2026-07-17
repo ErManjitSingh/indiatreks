@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
 import { TrekCard } from "@/components/home/trek-card";
+import { BlogsSection } from "@/components/home/blogs-section";
 import { budgetLabelToPriceRange } from "@/lib/trek-filters";
 import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { BLUR_DATA_URL } from "@/constants/media";
@@ -57,6 +58,7 @@ export function MobileHome() {
       <MobileDestinations />
       <MobileWhyStats />
       <MobileExpertCta />
+      <BlogsSection />
     </div>
   );
 }

@@ -28,6 +28,13 @@ const DestinationsSection = dynamic(
   },
 );
 
+const BlogsSection = dynamic(
+  () => import("@/components/home/blogs-section").then((m) => m.BlogsSection),
+  {
+    loading: () => <div className="mx-auto h-72 max-w-6xl animate-pulse rounded-2xl bg-muted" />,
+  },
+);
+
 export function DesktopHome() {
   return (
     <>
@@ -48,6 +55,11 @@ export function DesktopHome() {
         fallback={<div className="mx-auto h-72 max-w-6xl animate-pulse rounded-2xl bg-muted" />}
       >
         <DestinationsSection />
+      </Suspense>
+      <Suspense
+        fallback={<div className="mx-auto h-72 max-w-6xl animate-pulse rounded-2xl bg-muted" />}
+      >
+        <BlogsSection />
       </Suspense>
     </>
   );

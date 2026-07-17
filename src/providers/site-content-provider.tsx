@@ -92,9 +92,40 @@ function pickArray<T>(cms: readonly T[] | undefined, fallback: readonly T[]): T[
   return cms?.length ? [...cms] : [...fallback];
 }
 
+function mapBootstrapBlogs(
+  blogs: SiteBootstrap["blogs"] | undefined,
+): typeof latestBlogs | undefined {
+  if (!Array.isArray(blogs) || !blogs.length) return undefined;
+  const mapped = blogs
+    .map((raw, index) => {
+      const b = raw as Record<string, unknown>;
+      const slug = String(b.slug ?? "");
+      const title = String(b.title ?? "");
+      if (!slug || !title) return null;
+      const author =
+        typeof b.author === "object" && b.author && "name" in (b.author as object)
+          ? String((b.author as { name?: string }).name || "Editorial Team")
+          : "Editorial Team";
+      return {
+        id: String(b._id ?? slug ?? `blog-${index}`),
+        slug,
+        title,
+        excerpt: String(b.excerpt ?? ""),
+        category: String(b.category ?? "Guide"),
+        readingTimeMinutes: Number(b.readingTimeMinutes ?? 8),
+        author,
+        publishedAt: String(b.publishedAt ?? ""),
+        image: String(b.coverImage || b.image || "/images/og-default.jpg"),
+      };
+    })
+    .filter(Boolean) as typeof latestBlogs;
+  return mapped.length ? mapped : undefined;
+}
+
 function pickHomepage(bootstrap: SiteBootstrap | null): HomepageBundle {
   const homepage = (bootstrap?.homepage ?? {}) as Record<string, unknown>;
   const cmsHero = homepage.heroSearchOptions as Partial<typeof heroSearchOptions> | undefined;
+  const liveBlogs = mapBootstrapBlogs(bootstrap?.blogs);
   return {
     featuredTreks: pickArray(
       homepage.featuredTreks as typeof featuredTreks | undefined,
@@ -135,10 +166,9 @@ function pickHomepage(bootstrap: SiteBootstrap | null): HomepageBundle {
       homepage.testimonials as typeof testimonials | undefined,
       testimonials,
     ),
-    latestBlogs: pickArray(
-      homepage.latestBlogs as typeof latestBlogs | undefined,
-      latestBlogs,
-    ),
+    latestBlogs: liveBlogs?.length
+      ? liveBlogs
+      : pickArray(homepage.latestBlogs as typeof latestBlogs | undefined, latestBlogs),
     homeFaqs: pickArray(homepage.homeFaqs as typeof homeFaqs | undefined, homeFaqs),
     heroMedia: (homepage.heroMedia as typeof heroMedia) ?? heroMedia,
     trustBadges: pickArray(
