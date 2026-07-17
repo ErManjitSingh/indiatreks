@@ -6,62 +6,68 @@ import { JsonLd } from "@/components/seo";
 import { blogJsonLd, breadcrumbJsonLd, createMetadata, faqJsonLd } from "@/lib/seo";
 import { fetchBlog, fetchBlogHub, fetchBlogRelated, fetchBlogs } from "@/lib/api/blogs";
 
-export const revalidate = 3600;
+/** Root layout uses headers(), so this page must render dynamically. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface BlogPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  try {
-    const { items } = await fetchBlogs({ status: "published", limit: 100 });
-    return items.map((blog) => ({ slug: blog.slug }));
-  } catch {
-    return [];
-  }
-}
-
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const blog = await fetchBlog(slug);
-  if (!blog) {
+  try {
+    const blog = await fetchBlog(slug);
+    if (!blog) {
+      return createMetadata({
+        title: "Blog not found",
+        description: "This article could not be found.",
+        canonical: `/blogs/${slug}`,
+        noIndex: true,
+      });
+    }
+
+    const seo = (blog.seo || {}) as Record<string, string | string[] | boolean | undefined>;
     return createMetadata({
-      title: "Blog not found",
-      description: "This article could not be found.",
+      title: (seo.title as string) || blog.title,
+      description: (seo.description as string) || blog.excerpt || "",
+      canonical: (seo.canonical as string) || `/blogs/${blog.slug}`,
+      keywords: (seo.keywords as string[]) || blog.tags || [blog.title],
+      ogImage: (seo.ogImage as string) || blog.coverImage,
+      ogTitle: seo.ogTitle as string,
+      ogDescription: seo.ogDescription as string,
+      twitterTitle: seo.twitterTitle as string,
+      twitterDescription: seo.twitterDescription as string,
+      twitterImage: seo.twitterImage as string,
+      type: "article",
+      authors: blog.author?.name ? [blog.author.name] : undefined,
+      publishedTime: blog.publishedAt,
+      modifiedTime: blog.modifiedAt || blog.updatedAt,
+      noIndex: seo.index === false,
+    });
+  } catch {
+    return createMetadata({
+      title: "Blog",
+      description: "Travel blog article",
       canonical: `/blogs/${slug}`,
-      noIndex: true,
     });
   }
-
-  const seo = (blog.seo || {}) as Record<string, string | string[] | boolean | undefined>;
-  return createMetadata({
-    title: (seo.title as string) || blog.title,
-    description: (seo.description as string) || blog.excerpt || "",
-    canonical: (seo.canonical as string) || `/blogs/${blog.slug}`,
-    keywords: (seo.keywords as string[]) || blog.tags || [blog.title],
-    ogImage: (seo.ogImage as string) || blog.coverImage,
-    ogTitle: seo.ogTitle as string,
-    ogDescription: seo.ogDescription as string,
-    twitterTitle: seo.twitterTitle as string,
-    twitterDescription: seo.twitterDescription as string,
-    twitterImage: seo.twitterImage as string,
-    type: "article",
-    authors: blog.author?.name ? [blog.author.name] : undefined,
-    publishedTime: blog.publishedAt,
-    modifiedTime: blog.modifiedAt || blog.updatedAt,
-    noIndex: seo.index === false,
-  });
 }
 
 export default async function BlogDetailPage({ params }: BlogPageProps) {
   const { slug } = await params;
-  const [blog, relatedBundle, list, hub] = await Promise.all([
-    fetchBlog(slug),
+
+  const blog = await fetchBlog(slug).catch(() => null);
+  if (!blog) notFound();
+
+  const [relatedBundle, list, hub] = await Promise.all([
     fetchBlogRelated(slug).catch(() => null),
-    fetchBlogs({ status: "published", limit: 100 }),
+    fetchBlogs({ status: "published", limit: 50, sort: "latest" }).catch(() => ({
+      items: [] as Awaited<ReturnType<typeof fetchBlogs>>["items"],
+      meta: undefined,
+    })),
     fetchBlogHub().catch(() => null),
   ]);
-  if (!blog) notFound();
 
   const blogs = list.items;
   const index = blogs.findIndex((b) => b.slug === slug);
