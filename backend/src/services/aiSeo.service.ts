@@ -58,22 +58,27 @@ function generateTrekMeta(input: {
   summary?: string;
   season?: string;
 }) {
-  const name = input.title?.trim() || "Himalayan Trek";
+  const rawTitle = input.title?.trim() || "Himalayan Trek";
+  const name = rawTitle.replace(/\s+trek$/i, "").trim() || rawTitle;
+  const displayName = /trek/i.test(rawTitle) ? rawTitle : `${name} Trek`;
   const dest = input.destinationName || input.region || "Himalayas";
   const difficulty = input.difficulty || "moderate";
   const days = input.durationDays || 0;
   const altitude = input.maxAltitude || 0;
-  const slug = slugify(name);
+  const slug = slugify(rawTitle);
 
-  const title = trimLen(
-    `${name} Trek Package ${days ? `| ${days} Days` : ""} | ${titleCase(difficulty)}`.replace(/\s+\|/g, " |"),
-    60,
-  );
+  const titleParts = [displayName];
+  if (days) titleParts.push(`${days} Days`);
+  titleParts.push(titleCase(difficulty));
+  const title = trimLen(titleParts.join(" | "), 60);
+
+  const summary = (input.summary || "").trim();
   const description = trimLen(
-    input.summary ||
-      `Book the ${name} with India Holiday Destinations. ${days ? `${days}-day ` : ""}${difficulty} trek in ${dest}${
-        altitude ? ` up to ${altitude} ft` : ""
-      }. Transparent pricing, expert guides, and verified departures.`,
+    summary.length >= 80
+      ? summary
+      : `Book the ${displayName} with India Holiday Destinations. ${days ? `${days}-day ` : ""}${difficulty} trek in ${dest}${
+          altitude ? ` up to ${altitude} ft` : ""
+        }. Expert guides, clear inclusions, and verified departures.`,
     160,
   );
 
@@ -82,13 +87,13 @@ function generateTrekMeta(input: {
     description,
     canonical: `/treks/${slug}`,
     slug,
-    ogTitle: trimLen(`${name} | Himalayan Adventure`, 60),
+    ogTitle: trimLen(`${displayName} | Himalayan Adventure`, 60),
     ogDescription: description,
-    twitterTitle: trimLen(name, 60),
+    twitterTitle: trimLen(displayName, 60),
     twitterDescription: description,
-    focusKeyword: name.toLowerCase().includes("trek") ? name.toLowerCase() : `${name.toLowerCase()} trek`,
+    focusKeyword: displayName.toLowerCase(),
     keywords: [
-      name.toLowerCase(),
+      displayName.toLowerCase(),
       `${dest.toLowerCase()} trek`,
       `${difficulty} trek`,
       days ? `${days} day trek` : "",
@@ -124,10 +129,16 @@ function generateBlogMeta(input: { title?: string; excerpt?: string; category?: 
 function generateDestinationMeta(input: { name?: string; region?: string; state?: string; summary?: string }) {
   const name = input.name?.trim() || "Destination";
   const slug = slugify(name);
-  const title = trimLen(`${name} Treks & Travel Guide`, 60);
+  const place = [input.region, input.state].filter(Boolean).join(", ");
+  const title = trimLen(
+    place ? `${name} Treks & Travel Guide | ${place.split(",")[0].trim()}` : `${name} Treks & Travel Guide`,
+    60,
+  );
+  const summary = (input.summary || "").trim();
   const description = trimLen(
-    input.summary ||
-      `Explore ${name}${input.state ? `, ${input.state}` : ""} treks, best seasons, how to reach, and curated packages with India Holiday Destinations.`,
+    summary.length >= 80
+      ? summary
+      : `Explore ${name}${place ? ` in ${place}` : ""} treks — best seasons, how to reach, nearby trails, and curated packages with India Holiday Destinations.`,
     160,
   );
   return {
@@ -140,7 +151,9 @@ function generateDestinationMeta(input: { name?: string; region?: string; state?
     twitterTitle: trimLen(name, 60),
     twitterDescription: description,
     focusKeyword: `${name.toLowerCase()} treks`,
-    keywords: [name.toLowerCase(), `${name.toLowerCase()} trek`, input.region || "", input.state || ""].filter(Boolean),
+    keywords: [name.toLowerCase(), `${name.toLowerCase()} trek`, input.region || "", input.state || "", "himalayan treks"].filter(
+      Boolean,
+    ),
   };
 }
 
