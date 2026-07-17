@@ -1,10 +1,15 @@
-import { google } from "googleapis";
+import { google, type searchconsole_v1 } from "googleapis";
+import { env } from "../config/env";
 import { googleOAuthService } from "./googleOAuth.service";
 import { SearchConsoleCacheModel } from "../models/SearchConsoleCache.model";
 import { SearchConsoleModel } from "../models/SearchConsole.model";
 import { SeoSettingsModel } from "../models/SeoSettings.model";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../utils/logger";
+
+type GscSite = searchconsole_v1.Schema$WmxSite;
+
+const DEFAULT_GSC_PROPERTY = "sc-domain:treks.indiaholidaydestination.com";
 
 function dateNDaysAgo(days: number) {
   const d = new Date();
@@ -16,13 +21,105 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-async function resolveProperty() {
+function hostFromProperty(value: string) {
+  if (value.startsWith("sc-domain:")) return value.slice("sc-domain:".length).toLowerCase();
+  try {
+    return new URL(value).hostname.toLowerCase();
+  } catch {
+    return value.replace(/^https?:\/\//i, "").replace(/\/$/, "").toLowerCase();
+  }
+}
+
+function wrapGoogleError(err: unknown, fallbackCode = "GSC_API_ERROR"): never {
+  const message = err instanceof Error ? err.message : "Google Search Console request failed";
+  const lower = message.toLowerCase();
+  if (lower.includes("sufficient permission") || lower.includes("forbidden")) {
+    throw new ApiError(403, message, "GSC_PERMISSION_DENIED");
+  }
+  if (lower.includes("not found") || lower.includes("invalid site")) {
+    throw new ApiError(404, message, "GSC_PROPERTY_NOT_FOUND");
+  }
+  throw new ApiError(502, message, fallbackCode);
+}
+
+function pickSiteFromList(sites: GscSite[], preferred?: string | null) {
+  if (!sites.length) return null;
+
+  if (preferred) {
+    const exact = sites.find((site) => site.siteUrl === preferred);
+    if (exact?.siteUrl) return exact.siteUrl;
+
+    const preferredHost = hostFromProperty(preferred);
+    const byHost = sites.find((site) => site.siteUrl && hostFromProperty(site.siteUrl) === preferredHost);
+    if (byHost?.siteUrl) return byHost.siteUrl;
+  }
+
+  const siteHost = hostFromProperty(env.FRONTEND_URL || DEFAULT_GSC_PROPERTY);
+  const domainProperty = sites.find((site) => site.siteUrl === `sc-domain:${siteHost}`);
+  if (domainProperty?.siteUrl) return domainProperty.siteUrl;
+
+  const urlProperty = sites.find((site) => site.siteUrl && hostFromProperty(site.siteUrl) === siteHost);
+  if (urlProperty?.siteUrl) return urlProperty.siteUrl;
+
+  const verified = sites.find(
+    (site) =>
+      site.siteUrl &&
+      site.permissionLevel &&
+      !site.permissionLevel.toLowerCase().includes("unverified"),
+  );
+  if (verified?.siteUrl) return verified.siteUrl;
+
+  return sites[0]?.siteUrl || null;
+}
+
+async function getPreferredProperty() {
   const status = await googleOAuthService.getStatus();
   if (status.searchConsoleProperty) return status.searchConsoleProperty;
   const sc = await SearchConsoleModel.findOne({ key: "default" }).lean();
   if (sc?.propertyUrl) return sc.propertyUrl;
   const settings = await SeoSettingsModel.findOne({ key: "global" }).lean();
-  return settings?.siteUrl || "https://treks.indiaholidaydestination.com";
+  return settings?.siteUrl || DEFAULT_GSC_PROPERTY;
+}
+
+async function listSitesWithClient(client: InstanceType<typeof google.auth.OAuth2>) {
+  const webmasters = google.searchconsole({ version: "v1", auth: client });
+  try {
+    const res = await webmasters.sites.list();
+    return res.data.siteEntry || [];
+  } catch (err) {
+    wrapGoogleError(err, "GSC_SITES_LIST_FAILED");
+  }
+}
+
+async function resolvePropertyFromSites(sites: GscSite[]) {
+  const preferred = await getPreferredProperty();
+  const siteUrl = pickSiteFromList(sites, preferred);
+
+  if (!siteUrl) {
+    throw new ApiError(
+      403,
+      "No Search Console property is available for this Google account.",
+      "GSC_NO_PROPERTY",
+      { availableSites: sites.map((site) => site.siteUrl).filter(Boolean) },
+    );
+  }
+
+  if (siteUrl !== preferred) {
+    await googleOAuthService.updatePropertyLinks({ searchConsoleProperty: siteUrl });
+    await SearchConsoleModel.findOneAndUpdate(
+      { key: "default" },
+      { $set: { propertyUrl: siteUrl } },
+      { upsert: true },
+    );
+  }
+
+  return siteUrl;
+}
+
+async function resolveProperty() {
+  const { client } = await googleOAuthService.getAuthedClient();
+  const sites = await listSitesWithClient(client);
+  return resolvePropertyFromSites(sites);
 }
 
 async function getCached() {
@@ -31,46 +128,47 @@ async function getCached() {
 
 async function syncSearchAnalytics(rangeDays = 28) {
   const { client } = await googleOAuthService.getAuthedClient();
-  const siteUrl = await resolveProperty();
   const webmasters = google.searchconsole({ version: "v1", auth: client });
+  const sites = await listSitesWithClient(client);
+  const siteUrl = await resolvePropertyFromSites(sites);
   const startDate = dateNDaysAgo(rangeDays);
   const endDate = today();
 
-  const [totalsRes, pagesRes, queriesRes, queryPageRes, sitemapsRes, sitesRes] = await Promise.all([
-    webmasters.searchanalytics.query({
-      siteUrl,
-      requestBody: { startDate, endDate, dimensions: [] },
-    }),
-    webmasters.searchanalytics.query({
-      siteUrl,
-      requestBody: {
-        startDate,
-        endDate,
-        dimensions: ["page"],
-        rowLimit: 50,
-      },
-    }),
-    webmasters.searchanalytics.query({
-      siteUrl,
-      requestBody: {
-        startDate,
-        endDate,
-        dimensions: ["query"],
-        rowLimit: 50,
-      },
-    }),
-    webmasters.searchanalytics.query({
-      siteUrl,
-      requestBody: {
-        startDate,
-        endDate,
-        dimensions: ["query", "page"],
-        rowLimit: 250,
-      },
-    }),
-    webmasters.sitemaps.list({ siteUrl }).catch(() => ({ data: { sitemap: [] } })),
-    webmasters.sites.list().catch(() => ({ data: { siteEntry: [] } })),
-  ]);
+  try {
+    const [totalsRes, pagesRes, queriesRes, queryPageRes, sitemapsRes] = await Promise.all([
+      webmasters.searchanalytics.query({
+        siteUrl,
+        requestBody: { startDate, endDate, dimensions: [] },
+      }),
+      webmasters.searchanalytics.query({
+        siteUrl,
+        requestBody: {
+          startDate,
+          endDate,
+          dimensions: ["page"],
+          rowLimit: 50,
+        },
+      }),
+      webmasters.searchanalytics.query({
+        siteUrl,
+        requestBody: {
+          startDate,
+          endDate,
+          dimensions: ["query"],
+          rowLimit: 50,
+        },
+      }),
+      webmasters.searchanalytics.query({
+        siteUrl,
+        requestBody: {
+          startDate,
+          endDate,
+          dimensions: ["query", "page"],
+          rowLimit: 250,
+        },
+      }),
+      webmasters.sitemaps.list({ siteUrl }).catch(() => ({ data: { sitemap: [] } })),
+    ]);
 
   const totalRow = totalsRes.data.rows?.[0];
   const totals = {
@@ -149,7 +247,7 @@ async function syncSearchAnalytics(rangeDays = 28) {
         coverage,
         sitemaps,
         raw: {
-          connectedProperties: (sitesRes.data.siteEntry || []).map((site) => ({
+          connectedProperties: sites.map((site) => ({
             siteUrl: site.siteUrl || "",
             permissionLevel: site.permissionLevel || "",
           })),
@@ -167,21 +265,46 @@ async function syncSearchAnalytics(rangeDays = 28) {
     { upsert: true },
   );
 
+  const { GoogleAccountModel } = await import("../models/GoogleAccount.model");
+  await GoogleAccountModel.updateOne({ key: "default" }, { $unset: { lastError: 1 } });
+
   return doc;
+  } catch (err) {
+    wrapGoogleError(err, "GSC_SYNC_FAILED");
+  }
 }
 
 async function getDashboard(rangeDays = 28, forceSync = false) {
   const status = await googleOAuthService.getStatus();
   let cache = await getCached();
+  let connectedProperties: Array<Record<string, unknown>> = Array.isArray(cache?.raw?.connectedProperties)
+    ? (cache?.raw?.connectedProperties as Array<Record<string, unknown>>)
+    : [];
 
-  if (status.connected && (forceSync || !cache || cache.source === "empty")) {
+  if (status.connected) {
     try {
-      const synced = await syncSearchAnalytics(rangeDays);
-      cache = synced.toObject() as typeof cache;
+      const sites = await listSites();
+      connectedProperties = sites.map((site) => ({
+        siteUrl: site.siteUrl || "",
+        permissionLevel: site.permissionLevel || "",
+      }));
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Sync failed";
-      logger.warn("Search Console sync failed", { message });
-      await GoogleAccountModelSafeSetError(message);
+      const message = err instanceof Error ? err.message : "Failed to list Search Console properties";
+      logger.warn("Search Console property list failed", { message });
+    }
+
+    if (forceSync || !cache || cache.source === "empty") {
+      try {
+        const synced = await syncSearchAnalytics(rangeDays);
+        cache = synced.toObject() as typeof cache;
+        connectedProperties = Array.isArray(cache?.raw?.connectedProperties)
+          ? (cache?.raw?.connectedProperties as Array<Record<string, unknown>>)
+          : connectedProperties;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Sync failed";
+        logger.warn("Search Console sync failed", { message });
+        await GoogleAccountModelSafeSetError(message);
+      }
     }
   }
 
@@ -206,9 +329,8 @@ async function getDashboard(rangeDays = 28, forceSync = false) {
     topPages: cache?.topPages || [],
     topQueries: cache?.topQueries || [],
     sitemaps: cache?.sitemaps || [],
-    connectedProperties: Array.isArray(cache?.raw?.connectedProperties)
-      ? (cache?.raw?.connectedProperties as Array<Record<string, unknown>>)
-      : [],
+    connectedProperties,
+    lastError: status.lastError || null,
     submittedSitemap: (cache?.sitemaps || [])[0]?.path || null,
     coverageStatus:
       (cache?.coverage?.errors || 0) > 0
@@ -228,15 +350,23 @@ async function listSitemaps() {
   const { client } = await googleOAuthService.getAuthedClient();
   const siteUrl = await resolveProperty();
   const webmasters = google.searchconsole({ version: "v1", auth: client });
-  const res = await webmasters.sitemaps.list({ siteUrl });
-  return { siteUrl, sitemaps: res.data.sitemap || [] };
+  try {
+    const res = await webmasters.sitemaps.list({ siteUrl });
+    return { siteUrl, sitemaps: res.data.sitemap || [] };
+  } catch (err) {
+    wrapGoogleError(err, "GSC_SITEMAPS_LIST_FAILED");
+  }
 }
 
 async function submitSitemap(sitemapUrl: string) {
   const { client } = await googleOAuthService.getAuthedClient();
   const siteUrl = await resolveProperty();
   const webmasters = google.searchconsole({ version: "v1", auth: client });
-  await webmasters.sitemaps.submit({ siteUrl, feedpath: sitemapUrl });
+  try {
+    await webmasters.sitemaps.submit({ siteUrl, feedpath: sitemapUrl });
+  } catch (err) {
+    wrapGoogleError(err, "GSC_SITEMAP_SUBMIT_FAILED");
+  }
 
   await SearchConsoleModel.findOneAndUpdate(
     { key: "default" },
@@ -287,16 +417,13 @@ async function inspectUrl(inspectionUrl: string) {
       raw: result,
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "URL inspection failed";
-    throw new ApiError(502, message, "URL_INSPECTION_FAILED");
+    wrapGoogleError(err, "URL_INSPECTION_FAILED");
   }
 }
 
 async function listSites() {
   const { client } = await googleOAuthService.getAuthedClient();
-  const webmasters = google.searchconsole({ version: "v1", auth: client });
-  const res = await webmasters.sites.list();
-  return res.data.siteEntry || [];
+  return listSitesWithClient(client);
 }
 
 export const googleSearchConsoleService = {

@@ -27,7 +27,7 @@ export default function SearchConsolePage() {
   const params = useSearchParams();
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [dash, setDash] = useState<Record<string, unknown> | null>(null);
-  const [property, setProperty] = useState("");
+  const [property, setProperty] = useState("sc-domain:treks.indiaholidaydestination.com");
   const [sitemapUrl, setSitemapUrl] = useState(
     "https://treks.indiaholidaydestination.com/sitemap.xml",
   );
@@ -184,7 +184,7 @@ export default function SearchConsolePage() {
               className={adminInputClass}
               value={property}
               onChange={(e) => setProperty(e.target.value)}
-              placeholder="https://treks.indiaholidaydestination.com/"
+              placeholder="sc-domain:treks.indiaholidaydestination.com"
             />
           </AdminField>
           <Button variant="outline" disabled={busy} onClick={() => void saveProperty()}>
