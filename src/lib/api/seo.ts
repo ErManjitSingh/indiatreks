@@ -100,6 +100,11 @@ export async function adminGetSitemapConfig() {
   return res.data;
 }
 
+export async function adminUpdateSitemapConfig(body: Record<string, unknown>) {
+  const res = await apiPut<SeoDoc>("/seo/sitemap-config", body);
+  return res.data;
+}
+
 export async function adminGenerateSitemaps() {
   const res = await apiPost<{ name: string; count: number }[]>("/seo/sitemaps/generate", {});
   return res.data;

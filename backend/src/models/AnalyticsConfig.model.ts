@@ -20,6 +20,12 @@ export interface IAnalyticsConfig extends Document {
     enabled: boolean;
     projectId?: string;
   };
+  bingWebmaster: {
+    enabled: boolean;
+    apiKey?: string;
+    siteUrl?: string;
+    verified?: boolean;
+  };
   customScripts: Array<{
     name: string;
     position: "head" | "body_start" | "body_end";
@@ -49,6 +55,12 @@ const AnalyticsConfigSchema = new Schema<IAnalyticsConfig>(
     clarity: {
       enabled: { type: Boolean, default: false },
       projectId: { type: String },
+    },
+    bingWebmaster: {
+      enabled: { type: Boolean, default: false },
+      apiKey: { type: String, select: false },
+      siteUrl: { type: String },
+      verified: { type: Boolean, default: false },
     },
     customScripts: [
       {

@@ -26,6 +26,7 @@ import {
 import { toast } from "@/components/ui/toast";
 import {
   adminDeleteTrek,
+  adminGetTrekStats,
   adminListTreks,
   getErrorMessage,
   type AdminDoc,
@@ -114,20 +115,16 @@ export default function AdminTreksPage() {
 
   const loadStatsAndRegions = useCallback(async () => {
     try {
-      const all = await adminListTreks({ limit: 150 });
-      const rows = all.items;
+      const summary = await adminGetTrekStats();
       setStats({
-        total: Number(all.meta?.total ?? rows.length),
-        published: rows.filter((t) => t.status === "published").length,
-        draft: rows.filter((t) => t.status === "draft").length,
-        archived: rows.filter((t) => t.status === "archived").length,
+        total: Number(summary.total ?? 0),
+        published: Number(summary.published ?? 0),
+        draft: Number(summary.draft ?? 0),
+        archived: Number(summary.archived ?? 0),
       });
-      const unique = [
-        ...new Set(rows.map((t) => String(t.region || "").trim()).filter(Boolean)),
-      ].sort((a, b) => a.localeCompare(b));
-      setRegions(unique);
-    } catch {
-      /* ignore — table load will surface errors */
+      setRegions(Array.isArray(summary.regions) ? summary.regions : []);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to load trek stats"));
     }
   }, []);
 

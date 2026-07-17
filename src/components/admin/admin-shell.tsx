@@ -26,6 +26,7 @@ import {
   Sun,
   Zap,
   Sparkles,
+  Radar,
 } from "lucide-react";
 
 import { getStoredUser, logoutSession, ensureAuthSession, type AuthUser } from "@/lib/api/auth";
@@ -37,8 +38,9 @@ const nav = [
   { href: "/admin/treks", label: "Treks", icon: Mountain },
   { href: "/admin/destinations", label: "Destinations", icon: MapPin },
   { href: "/admin/blogs", label: "Blogs", icon: Newspaper },
-  { href: "/admin/seo", label: "SEO", icon: Search },
+  { href: "/admin/seo-center", label: "SEO Center", icon: Radar },
   { href: "/admin/seo/ai", label: "AI SEO Engine", icon: Sparkles },
+  { href: "/admin/seo", label: "SEO Settings", icon: Search },
   { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/categories", label: "Categories", icon: FolderTree },

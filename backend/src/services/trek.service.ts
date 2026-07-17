@@ -2,7 +2,7 @@ import { trekRepository, TrekListFilters } from "../repositories/TrekRepository"
 import { slugify } from "../utils/slugify";
 import { getPagination, paginateMeta } from "../utils/pagination";
 import { ApiError } from "../utils/ApiError";
-import { ITrek } from "../models/Trek.model";
+import { ITrek, TrekModel } from "../models/Trek.model";
 
 interface ListQuery extends TrekListFilters {
   page?: number;
@@ -176,6 +176,24 @@ async function restore(id: string) {
   return trek;
 }
 
+async function getStats() {
+  const base = { deletedAt: null };
+  const [total, published, draft, archived, regionRows] = await Promise.all([
+    TrekModel.countDocuments(base),
+    TrekModel.countDocuments({ ...base, status: "published" }),
+    TrekModel.countDocuments({ ...base, status: "draft" }),
+    TrekModel.countDocuments({ ...base, status: "archived" }),
+    TrekModel.distinct("region", { ...base, region: { $nin: [null, ""] } }),
+  ]);
+
+  const regions = regionRows
+    .map((r) => String(r).trim())
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+
+  return { total, published, draft, archived, regions };
+}
+
 async function getRelated(slug: string, limit = 4) {
   const trek = await trekRepository.findBySlug(slug, true);
   if (!trek) return [];
@@ -202,6 +220,7 @@ async function getRelated(slug: string, limit = 4) {
 
 export const trekService = {
   list,
+  getStats,
   getBySlug,
   getById,
   create,

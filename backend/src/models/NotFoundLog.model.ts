@@ -9,6 +9,7 @@ export interface INotFoundLog extends Document {
   hitCount: number;
   lastHitAt: Date;
   resolved: boolean;
+  ignored: boolean;
   redirectId?: Types.ObjectId;
   notes?: string;
   createdAt: Date;
@@ -24,6 +25,7 @@ const NotFoundLogSchema = new Schema<INotFoundLog>(
     hitCount: { type: Number, default: 1 },
     lastHitAt: { type: Date, default: Date.now, index: true },
     resolved: { type: Boolean, default: false, index: true },
+    ignored: { type: Boolean, default: false, index: true },
     redirectId: { type: Schema.Types.ObjectId, ref: "Redirect" },
     notes: { type: String },
   },

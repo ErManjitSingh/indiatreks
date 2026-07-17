@@ -221,6 +221,14 @@ export const analyticsConfigSchema = z.object({
       projectId: z.string().optional(),
     })
     .optional(),
+  bingWebmaster: z
+    .object({
+      enabled: z.boolean().optional(),
+      siteUrl: z.string().optional(),
+      verified: z.boolean().optional(),
+      apiKey: z.string().optional(),
+    })
+    .optional(),
   customScripts: z
     .array(
       z.object({

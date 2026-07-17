@@ -9,6 +9,12 @@ import { createTrekSchema, updateTrekSchema, listTreksQuerySchema } from "../val
 const router = Router();
 
 router.get("/", optionalAuth, publicCache(30, 120), validate(listTreksQuerySchema, "query"), trekController.listTreks);
+router.get(
+  "/stats",
+  authenticate,
+  requirePermission("treks.read"),
+  trekController.getTrekStats,
+);
 router.get("/:slug", optionalAuth, publicCache(30, 120), validate(paramsSlugSchema, "params"), trekController.getTrekBySlug);
 router.get("/:slug/related", publicCache(60, 300), validate(paramsSlugSchema, "params"), trekController.getRelatedTreks);
 

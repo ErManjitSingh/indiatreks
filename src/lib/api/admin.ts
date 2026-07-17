@@ -32,6 +32,27 @@ export async function adminListTreks(params?: Record<string, unknown>) {
   return listResource<AdminDoc>("/treks", { limit: 50, ...params });
 }
 
+export type TrekAdminStats = {
+  total: number;
+  published: number;
+  draft: number;
+  archived: number;
+  regions: string[];
+};
+
+export async function adminGetTrekStats(): Promise<TrekAdminStats> {
+  const res = await apiGet<TrekAdminStats>("/treks/stats");
+  return (
+    res.data ?? {
+      total: 0,
+      published: 0,
+      draft: 0,
+      archived: 0,
+      regions: [],
+    }
+  );
+}
+
 export async function adminGetTrek(id: string) {
   const res = await apiGet<AdminDoc>(`/treks/id/${id}`);
   return res.data;

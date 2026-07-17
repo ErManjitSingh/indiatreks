@@ -13,6 +13,11 @@ export const listTreks = asyncHandler(async (req: Request, res: Response) => {
   return sendPaginated(res, items, meta);
 });
 
+export const getTrekStats = asyncHandler(async (_req: Request, res: Response) => {
+  const stats = await trekService.getStats();
+  return sendSuccess(res, stats);
+});
+
 export const getTrekBySlug = asyncHandler(async (req: Request, res: Response) => {
   const includeUnpublished = isStaffReader(req, "treks.read");
   const trek = await trekService.getBySlug((req.params.slug as string), includeUnpublished);
