@@ -30,8 +30,7 @@ import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { useSiteContent } from "@/providers/site-content-provider";
 
-const heroImage =
-  "https://i.pinimg.com/originals/b8/85/74/b8857474f8d270e5e4720f216c7a8481.jpg";
+const heroImage = "/images/heroes/home-mobile-hero.jpg";
 const serviceChips: Array<{ title: string; icon: LucideIcon }> = [
   { title: "Expert Trek Leaders", icon: UserRound },
   { title: "Safety First", icon: ShieldCheck },
@@ -68,14 +67,14 @@ function MobileHero() {
     <section className="relative isolate min-h-[58svh] overflow-hidden bg-[#0b1220] text-white">
       <Image
         src={heroImage}
-        alt="Trekker overlooking Himalayan peaks"
+        alt="Night camping under the Milky Way in the Himalayas"
         fill
         priority
         sizes="100vw"
-        quality={65}
+        quality={75}
         placeholder="blur"
         blurDataURL={BLUR_DATA_URL}
-        className="object-cover object-[28%_center]"
+        className="object-cover object-[center_35%]"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,20,0.35)_0%,rgba(8,12,20,0.25)_40%,rgba(8,12,20,0.82)_100%)]" />
 

@@ -3,9 +3,8 @@
  * All files live under /public/images/treks/
  */
 export const trekImages = {
-  hero: "https://eegoitaly.in/cdn/shop/articles/Top-5-Hiking-Trails-in-India.jpg?v=1641639624&width=1760",
-  heroMobile:
-    "https://images.stockcake.com/public/1/e/1/1e149601-5e19-404b-b596-806d19605849/mountain-sunset-trek-stockcake.jpg",
+  hero: "/images/heroes/treks-banner.jpg",
+  heroMobile: "/images/heroes/home-mobile-hero.jpg",
   mountains1: "/images/treks/mountains-1.jpg",
   mountains2: "/images/treks/mountains-2.jpg",
   mountains3: "/images/treks/mountains-3.jpg",

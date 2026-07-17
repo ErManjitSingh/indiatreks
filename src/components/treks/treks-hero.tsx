@@ -15,8 +15,7 @@ import { Container } from "@/components/ui/container";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { siteConfig } from "@/config/site";
 
-const heroImage =
-  "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80";
+const heroImage = "/images/heroes/treks-banner.jpg";
 
 const stats = [
   { id: "treks", title: "120+", subtitle: "Trek Adventures", icon: Mountain },
@@ -40,14 +39,14 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
       <div className="absolute inset-0">
         <Image
           src={heroImage}
-          alt="Snow-capped Himalayan peaks at golden hour"
+          alt="Trekker overlooking snow-capped Himalayan peaks at sunrise"
           fill
           priority
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
           sizes="100vw"
-          quality={75}
-          className="object-cover object-[center_35%]"
+          quality={80}
+          className="object-cover object-[center_40%]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,12,0.28)_0%,rgba(8,18,12,0.35)_45%,rgba(8,18,12,0.88)_100%)]" />
       </div>
