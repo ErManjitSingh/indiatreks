@@ -9,7 +9,7 @@ interface TrekDetailPageContentProps {
 }
 
 export function TrekDetailPageContent({ trek, listings = [] }: TrekDetailPageContentProps) {
-  const relatedTreks = trek.relatedSlugs
+  const relatedTreks = (trek.relatedSlugs ?? [])
     .map((slug) => listings.find((item) => item.slug === slug))
     .filter((item): item is TrekListingItem => Boolean(item));
 
@@ -22,7 +22,7 @@ export function TrekDetailPageContent({ trek, listings = [] }: TrekDetailPageCon
           { label: trek.state, href: `/treks?state=${encodeURIComponent(trek.state)}` },
           { label: trek.title, href: `/treks/${trek.slug}` },
         ]}
-        faqs={trek.faqs.map((faq) => ({ question: faq.question, answer: faq.answer }))}
+        faqs={(trek.faqs ?? []).map((faq) => ({ question: faq.question, answer: faq.answer }))}
         tour={{
           name: trek.title,
           description: trek.summary,

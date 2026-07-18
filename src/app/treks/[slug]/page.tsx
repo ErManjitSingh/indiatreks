@@ -12,42 +12,15 @@ import {
   reviewAggregateJsonLd,
   tourJsonLd,
 } from "@/lib/seo";
-import { getAllTrekSlugs, getTrekDetail, getTrekListings } from "@/services/treks.service";
+import { getTrekDetail, getTrekListings } from "@/services/treks.service";
 
 interface TrekDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const PROGRAMMATIC_FALLBACK = [
-  "himachal",
-  "manali",
-  "dharamshala",
-  "kullu",
-  "spiti",
-  "easy",
-  "moderate",
-  "difficult",
-  "3-days",
-  "4-days",
-  "winter",
-  "summer",
-  "may",
-  "june",
-];
-
+/** Root layout uses headers(), so this page must render dynamically. */
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-export const revalidate = 3600;
-
-export async function generateStaticParams() {
-  const trekSlugs = (await getAllTrekSlugs()).map((slug) => ({ slug }));
-  const programmatic = PROGRAMMATIC_FALLBACK.map((slug) => ({ slug }));
-  const seen = new Set<string>();
-  return [...trekSlugs, ...programmatic].filter((item) => {
-    if (seen.has(item.slug)) return false;
-    seen.add(item.slug);
-    return true;
-  });
-}
 
 export async function generateMetadata({ params }: TrekDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -123,7 +96,8 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
 
   if (trek) {
     const faqs = trek.faqs ?? [];
-    const listings = await getTrekListings({ limit: 500 });
+    // Single page is enough for related cards — avoid fetchAllTreks (slow / can hang nav).
+    const listings = await getTrekListings({ limit: 100, page: 1 });
     return (
       <>
         <JsonLd
@@ -153,7 +127,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
             rating: trek.rating,
             reviewCount: trek.reviewCount,
             priceInr: trek.basePriceInr,
-            reviews: trek.reviews.map((review) => ({
+            reviews: (trek.reviews ?? []).map((review) => ({
               author: review.name,
               rating: review.rating,
               comment: review.comment,
@@ -169,7 +143,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
 
   const programmatic = await fetchProgrammaticSeoPage(slug);
   if (programmatic) {
-    const treks = await getTrekListings({ limit: 200 });
+    const treks = await getTrekListings({ limit: 100, page: 1 });
     return (
       <ProgrammaticTrekPage
         page={{
