@@ -23,8 +23,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
-import { TrekCard } from "@/components/home/trek-card";
 import { BlogsSection } from "@/components/home/blogs-section";
+import { HomeTrekCollections } from "@/components/home/home-trek-collections";
 import { budgetLabelToPriceRange } from "@/lib/trek-filters";
 import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { BLUR_DATA_URL } from "@/constants/media";
@@ -53,7 +53,7 @@ export function MobileHome() {
       <MobileHero />
       <MobileSearchCard />
       <MobileServiceRow />
-      <MobilePopularTreks />
+      <HomeTrekCollections variant="mobile" />
       <MobileDestinations />
       <MobileWhyStats />
       <MobileExpertCta />
@@ -272,31 +272,6 @@ function MobileServiceRow() {
           );
         })}
       </ul>
-    </section>
-  );
-}
-
-function MobilePopularTreks() {
-  const { featuredTreks } = useSiteContent();
-  const treks = featuredTreks.slice(0, 4);
-  return (
-    <section className="px-4 pt-7">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-heading text-base font-extrabold tracking-tight text-[#14201a] uppercase">
-          Popular Treks
-        </h2>
-        <Link href="/treks" className="inline-flex items-center gap-1 text-xs font-bold text-[#2D5A27]">
-          View All
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-        </Link>
-      </div>
-      <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {treks.map((trek) => (
-          <div key={trek.id} className="w-[78%] max-w-[300px] shrink-0">
-            <TrekCard trek={trek} />
-          </div>
-        ))}
-      </div>
     </section>
   );
 }
