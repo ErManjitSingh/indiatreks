@@ -108,7 +108,7 @@ export function AdvancedTrekSearch({
   ];
 
   return (
-    <div className="relative z-20 -mt-[5.5rem] md:-mt-16 lg:-mt-20" id="trek-search">
+    <div className="relative z-20 -mt-10 md:-mt-14 lg:-mt-16" id="trek-search">
       {/* —— Mobile search card (3×2 mockup) —— */}
       <div className="px-4 md:hidden">
         <form
@@ -179,12 +179,12 @@ export function AdvancedTrekSearch({
           </button>
         </form>
 
-        <ul className="mt-4 flex justify-between gap-1 px-0.5">
+        <ul className="mt-7 flex justify-between gap-1 px-0.5 pb-1">
           {featureRow.map((item) => {
             const Icon = item.icon;
             return (
               <li key={item.label} className="flex w-[18%] flex-col items-center text-center">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2EC] text-[#2D5A27]">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF2EC] text-[#2D5A27] shadow-sm ring-1 ring-[#e0e8de]">
                   <Icon className="h-4 w-4" aria-hidden />
                 </span>
                 <p className="mt-1.5 text-[9px] leading-tight font-medium text-[#4B5563]">

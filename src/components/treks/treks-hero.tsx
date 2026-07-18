@@ -91,7 +91,7 @@ export function TreksHero({ totalTreks, resultCount, banner }: TreksHeroProps) {
       </div>
 
       {/* —— Desktop hero —— */}
-      <Container className="relative z-[2] hidden min-h-[min(72vh,620px)] flex-col justify-center py-20 md:flex lg:pb-28">
+      <Container className="relative z-[2] hidden min-h-[min(68vh,560px)] flex-col justify-center py-20 md:flex lg:min-h-[min(72vh,600px)] lg:pb-32">
         <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(240px,0.55fr)] lg:gap-10">
           <div className="max-w-2xl">
             <p className="inline-flex items-center gap-1.5 rounded-full bg-[#3A3A3A]/85 px-3.5 py-1.5 text-[11px] font-semibold text-white backdrop-blur-sm">
