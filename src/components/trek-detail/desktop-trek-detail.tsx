@@ -60,34 +60,26 @@ export function DesktopTrekDetail({ trek, relatedTreks }: DesktopTrekDetailProps
       <Container className="pt-0">
         <TrekDetailTabs reviewCount={trek.reviewCount} />
 
-        <div className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)_320px]">
-          <div className="min-w-0 space-y-10 xl:contents">
-            <div className="min-w-0">
-              <TrekOverviewBlock trek={trek} />
-            </div>
-            <div className="min-w-0">
-              <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
-                <TrekItinerary trek={trek} />
-              </Suspense>
-            </div>
+        <div className="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0 space-y-10">
+            <TrekOverviewBlock trek={trek} />
+
+            <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
+              <TrekItinerary trek={trek} />
+              <TrekInclusionsExclusions trek={trek} />
+              <div id="essentials" className="scroll-mt-28">
+                <TrekPackingList trek={trek} />
+              </div>
+              <section id="gallery" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
+                <h2 className="mb-4 font-heading text-2xl font-bold text-[#1A1A1A]">Gallery</h2>
+                <TrekMediaGallery trek={trek} />
+              </section>
+              <TrekReviews trek={trek} />
+              <TrekFaq trek={trek} />
+            </Suspense>
           </div>
 
           <TrekDetailSidebar trek={trek} />
-        </div>
-
-        <div className="space-y-2 border-t border-[#e8ece6] pb-12 pt-2">
-          <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-muted" />}>
-            <TrekInclusionsExclusions trek={trek} />
-            <div id="essentials" className="scroll-mt-28">
-              <TrekPackingList trek={trek} />
-            </div>
-            <section id="gallery" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
-              <h2 className="mb-4 font-heading text-2xl font-bold text-[#1A1A1A]">Gallery</h2>
-              <TrekMediaGallery trek={trek} />
-            </section>
-            <TrekReviews trek={trek} />
-            <TrekFaq trek={trek} />
-          </Suspense>
         </div>
       </Container>
 

@@ -70,7 +70,7 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
   };
 
   return (
-    <section className="relative isolate min-h-[520px] overflow-hidden md:min-h-[580px] lg:min-h-[640px]">
+    <section className="relative isolate min-h-[320px] overflow-hidden md:min-h-[360px] lg:min-h-[380px]">
       <Image
         src={heroImage}
         alt={trek.title}
@@ -85,8 +85,8 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
       <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/35" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25" />
 
-      <Container className="relative z-10 flex min-h-[520px] flex-col justify-end pb-10 pt-8 md:min-h-[580px] md:pb-12 md:pt-10 lg:min-h-[640px]">
-        <div className="absolute right-4 top-6 z-20 flex gap-2 sm:right-0 sm:top-8 md:right-0">
+      <Container className="relative z-10 flex min-h-[320px] flex-col justify-end pb-7 pt-6 md:min-h-[360px] md:pb-8 md:pt-7 lg:min-h-[380px]">
+        <div className="absolute right-4 top-4 z-20 flex gap-2 sm:right-0 sm:top-5 md:right-0">
           <button
             type="button"
             onClick={share}
@@ -109,7 +109,7 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
           </button>
         </div>
 
-        <nav aria-label="Breadcrumb" className="mb-5 text-xs text-white/80 md:text-sm">
+        <nav aria-label="Breadcrumb" className="mb-3 text-xs text-white/80 md:text-sm">
           <ol className="flex flex-wrap items-center gap-1.5">
             <li>
               <Link href="/" className="hover:text-white">
@@ -143,11 +143,11 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
               Trending Trek
             </span>
 
-            <h1 className="mt-4 font-heading text-4xl font-bold tracking-tight text-white drop-shadow md:text-5xl lg:text-6xl">
+            <h1 className="mt-3 font-heading text-3xl font-bold tracking-tight text-white drop-shadow md:text-4xl lg:text-[2.75rem]">
               {trek.title}
             </h1>
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/90">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/90">
               <span className="inline-flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-[#A3E635]" aria-hidden />
                 {trek.location}
@@ -169,12 +169,12 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
               </span>
             </div>
 
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/85 md:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/85 md:text-[15px]">
               {trek.summary}
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <p className="mr-2 font-heading text-2xl font-extrabold text-white md:text-3xl">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <p className="mr-2 font-heading text-xl font-extrabold text-white md:text-2xl">
                 From {formatCurrency(trek.basePriceInr)}
                 <span className="ml-1 text-sm font-medium text-white/75">/ person</span>
               </p>
@@ -199,15 +199,15 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
             </div>
           </div>
 
-          <div className="hidden rounded-2xl border border-white/25 bg-white/95 p-5 shadow-xl backdrop-blur-md lg:block">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#2D5A27]">
+          <div className="hidden rounded-2xl border border-white/25 bg-white/95 p-4 shadow-xl backdrop-blur-md lg:block">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2D5A27]">
               Why trek with us
             </p>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-3 space-y-2.5">
               {heroFeatures.map(({ label, icon: Icon }) => (
-                <li key={label} className="flex items-center gap-3 text-sm font-semibold text-[#1A1A1A]">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F5E9] text-[#2D5A27]">
-                    <Icon className="h-4 w-4" aria-hidden />
+                <li key={label} className="flex items-center gap-2.5 text-sm font-semibold text-[#1A1A1A]">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E8F5E9] text-[#2D5A27]">
+                    <Icon className="h-3.5 w-3.5" aria-hidden />
                   </span>
                   {label}
                 </li>

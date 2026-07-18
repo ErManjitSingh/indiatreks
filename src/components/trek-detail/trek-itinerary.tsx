@@ -22,7 +22,7 @@ import { formatNumber } from "@/utils";
 
 export function TrekItinerary({ trek }: { trek: TrekDetail }) {
   return (
-    <section id="itinerary" className="scroll-mt-28">
+    <section id="itinerary" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
       <h2 className="font-heading text-2xl font-bold text-[#2D5A27]">Itinerary</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Day-by-day plan for {trek.title}
