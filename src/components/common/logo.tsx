@@ -23,7 +23,6 @@ export function Logo({ className, showTagline = false, href = "/" }: LogoProps) 
           width={40}
           height={40}
           className="object-cover"
-          priority
         />
       </span>
       <span className="flex flex-col leading-none">

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
 import type { TrekDetail } from "@/types/trek-detail";
 import type { TrekListingItem } from "@/types/trek-listing";
@@ -26,8 +27,25 @@ interface TrekDetailViewportProps {
   relatedTreks: TrekListingItem[];
 }
 
-/** SSR both viewports; CSS shows one. Faster LCP than client-only matchMedia gate. */
+/** SSR both for LCP; after hydration keep only the matching viewport. */
 export function TrekDetailViewport({ trek, relatedTreks }: TrekDetailViewportProps) {
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  if (isDesktop === true) {
+    return <DesktopTrekDetail trek={trek} relatedTreks={relatedTreks} />;
+  }
+  if (isDesktop === false) {
+    return <MobileTrekDetail trek={trek} />;
+  }
+
   return (
     <>
       <div className="md:hidden">

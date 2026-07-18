@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { BookingHubClient } from "@/app/booking/booking-hub-client";
 import { createMetadata } from "@/lib/seo";
 
-/** Root layout uses headers(), so this page must render dynamically. */
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export const metadata: Metadata = createMetadata({
   title: "Book a trek",

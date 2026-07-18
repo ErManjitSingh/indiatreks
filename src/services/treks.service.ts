@@ -2,7 +2,12 @@
  * Trek data comes from the Express API only (MongoDB).
  * No static trek catalog / itinerary fallback.
  */
-import { fetchAllTreks, fetchTrekBySlug, fetchTreks } from "@/lib/api/treks";
+import {
+  fetchAllTreks,
+  fetchRelatedTreks,
+  fetchTrekBySlug,
+  fetchTreks,
+} from "@/lib/api/treks";
 import type { Trek } from "@/types";
 import type { TrekDetail } from "@/types/trek-detail";
 import type { TrekListingItem } from "@/types/trek-listing";
@@ -74,6 +79,17 @@ export async function getTrekDetail(slug: string): Promise<TrekDetail | null> {
     return await fetchTrekBySlug(slug);
   } catch {
     return null;
+  }
+}
+
+export async function getRelatedTrekListings(
+  slug: string,
+  limit = 6,
+): Promise<TrekListingItem[]> {
+  try {
+    return await fetchRelatedTreks(slug, limit);
+  } catch {
+    return [];
   }
 }
 

@@ -10,10 +10,35 @@ type AnalyticsPublic = {
   clarity?: { enabled?: boolean; projectId?: string };
 };
 
+function useIdleGate(delayMs = 4000) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const enable = () => setReady(true);
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: delayMs });
+    } else {
+      timeoutId = setTimeout(enable, delayMs);
+    }
+
+    return () => {
+      if (idleId != null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [delayMs]);
+  return ready;
+}
+
 export function AnalyticsScripts() {
+  const idleReady = useIdleGate(4500);
   const [config, setConfig] = useState<AnalyticsPublic | null>(null);
 
   useEffect(() => {
+    if (!idleReady) return;
     let cancelled = false;
     (async () => {
       try {
@@ -28,19 +53,21 @@ export function AnalyticsScripts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [idleReady]);
 
   if (!config) return null;
 
-  const gaId = config.ga4?.enabled ? config.ga4.measurementId : undefined;
   const gtmId = config.gtm?.enabled ? config.gtm.containerId : undefined;
+  // Skip standalone GA4 when GTM already owns tags (avoids double-loading).
+  const gaId =
+    !gtmId && config.ga4?.enabled ? config.ga4.measurementId : undefined;
   const pixelId = config.metaPixel?.enabled ? config.metaPixel.pixelId : undefined;
   const clarityId = config.clarity?.enabled ? config.clarity.projectId : undefined;
 
   return (
     <>
       {gtmId ? (
-        <Script id="gtm-init" strategy="afterInteractive">{`
+        <Script id="gtm-init" strategy="lazyOnload">{`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -51,8 +78,11 @@ export function AnalyticsScripts() {
 
       {gaId ? (
         <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
-          <Script id="ga4-init" strategy="afterInteractive">{`
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            strategy="lazyOnload"
+          />
+          <Script id="ga4-init" strategy="lazyOnload">{`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
@@ -62,7 +92,7 @@ export function AnalyticsScripts() {
       ) : null}
 
       {pixelId ? (
-        <Script id="meta-pixel" strategy="afterInteractive">{`
+        <Script id="meta-pixel" strategy="lazyOnload">{`
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -77,7 +107,7 @@ export function AnalyticsScripts() {
       ) : null}
 
       {clarityId ? (
-        <Script id="ms-clarity" strategy="afterInteractive">{`
+        <Script id="ms-clarity" strategy="lazyOnload">{`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;

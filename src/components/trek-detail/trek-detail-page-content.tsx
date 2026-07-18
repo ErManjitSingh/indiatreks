@@ -9,9 +9,8 @@ interface TrekDetailPageContentProps {
 }
 
 export function TrekDetailPageContent({ trek, listings = [] }: TrekDetailPageContentProps) {
-  const relatedTreks = (trek.relatedSlugs ?? [])
-    .map((slug) => listings.find((item) => item.slug === slug))
-    .filter((item): item is TrekListingItem => Boolean(item));
+  // `listings` is expected to be related treks (from /related) or a filtered set.
+  const relatedTreks = listings.filter((item) => item.slug !== trek.slug).slice(0, 8);
 
   return (
     <>

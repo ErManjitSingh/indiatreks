@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo";
 import { blogJsonLd, breadcrumbJsonLd, createMetadata, faqJsonLd } from "@/lib/seo";
 import { fetchBlog, fetchBlogHub, fetchBlogRelated, fetchBlogs } from "@/lib/api/blogs";
 
-/** Root layout uses headers(), so this page must render dynamically. */
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+/** ISR — public blog HTML cached for 10 minutes. */
+export const revalidate = 600;
+export const dynamicParams = true;
 
 interface BlogPageProps {
   params: Promise<{ slug: string }>;

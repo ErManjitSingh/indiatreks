@@ -12,15 +12,23 @@ import {
   reviewAggregateJsonLd,
   tourJsonLd,
 } from "@/lib/seo";
-import { getTrekDetail, getTrekListings } from "@/services/treks.service";
+import { getTrekDetail, getRelatedTrekListings, getTrekListings } from "@/services/treks.service";
 
 interface TrekDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-/** Root layout uses headers(), so this page must render dynamically. */
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    const listings = await getTrekListings({ limit: 100, page: 1 });
+    return listings.map((t) => ({ slug: t.slug }));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }: TrekDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -96,8 +104,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
 
   if (trek) {
     const faqs = trek.faqs ?? [];
-    // Single page is enough for related cards — avoid fetchAllTreks (slow / can hang nav).
-    const listings = await getTrekListings({ limit: 100, page: 1 });
+    const listings = await getRelatedTrekListings(slug, 8);
     return (
       <>
         <JsonLd

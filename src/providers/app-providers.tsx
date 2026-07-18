@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import type { SiteBootstrap } from "@/lib/api/content";
@@ -23,9 +24,12 @@ interface AppProvidersProps {
 export function AppProviders({
   children,
   bootstrap = null,
-  lean = false,
+  lean,
 }: AppProvidersProps) {
-  if (lean) {
+  const pathname = usePathname();
+  const isLean = lean ?? pathname.startsWith("/admin");
+
+  if (isLean) {
     return (
       <StoreHydration>
         {children}

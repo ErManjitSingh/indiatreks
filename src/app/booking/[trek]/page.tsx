@@ -10,8 +10,7 @@ interface BookingTrekPageProps {
   params: Promise<{ trek: string }>;
 }
 
-/** Root layout uses headers(), so this page must render dynamically. */
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 export const dynamicParams = true;
 
 export async function generateMetadata({

@@ -1,4 +1,5 @@
 import { apiGet, apiPost, type ApiSuccess } from "@/lib/api/client";
+import { cachedApiGet } from "@/lib/api/cached-fetch";
 import type { TrekDetail } from "@/types/trek-detail";
 import type { TrekListingItem } from "@/types/trek-listing";
 
@@ -49,14 +50,42 @@ function mapListing(raw: Record<string, unknown>): TrekListingItem {
   };
 }
 
+async function publicGet<T>(
+  path: string,
+  params?: Record<string, unknown>,
+  tags: string[] = ["treks"],
+): Promise<ApiSuccess<T>> {
+  if (typeof window === "undefined") {
+    return cachedApiGet<T>(path, { params, revalidate: 600, tags });
+  }
+  return apiGet<T>(path, params);
+}
+
 export async function fetchTreks(
   params: TrekListParams = {},
 ): Promise<{ items: TrekListingItem[]; meta?: ApiSuccess<unknown>["meta"] }> {
-  const res = await apiGet<Record<string, unknown>[]>("/treks", params);
+  const res = await publicGet<Record<string, unknown>[]>("/treks", params);
   return {
     items: (res.data ?? []).map((row) => mapListing(row)),
     meta: res.meta,
   };
+}
+
+/** Related treks for a slug — small payload vs fetching full catalog. */
+export async function fetchRelatedTreks(
+  slug: string,
+  limit = 6,
+): Promise<TrekListingItem[]> {
+  try {
+    const res = await publicGet<Record<string, unknown>[]>(
+      `/treks/${slug}/related`,
+      { limit },
+      ["treks", `trek-${slug}`],
+    );
+    return (res.data ?? []).map((row) => mapListing(row));
+  } catch {
+    return [];
+  }
 }
 
 /** Paginate through API (max 100/page) until all published treks are loaded. */
@@ -82,7 +111,11 @@ export async function fetchAllTreks(
 
 export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> {
   try {
-    const res = await apiGet<Record<string, unknown>>(`/treks/${slug}`);
+    const res = await publicGet<Record<string, unknown>>(
+      `/treks/${slug}`,
+      undefined,
+      ["treks", `trek-${slug}`],
+    );
     if (!res.data) return null;
     const raw = res.data;
     return {

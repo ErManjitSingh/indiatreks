@@ -96,7 +96,8 @@ export function SiteShell({
   const isTreksListing = pathname === "/treks";
   const isTrekDetail = /^\/treks\/.+/.test(pathname);
   const hideGlobalStickyBooking = isHome || isTreksListing || isTrekDetail;
-  const idleReady = useIdleReady(2500);
+  const idleReady = useIdleReady(2000);
+  const chromeReady = useIdleReady(3500);
 
   return (
     <>
@@ -131,21 +132,6 @@ export function SiteShell({
       <div className="hidden md:block">
         <Footer />
       </div>
-      <div className="hidden md:block">
-        <FloatingWhatsApp
-          label={
-            isHome
-              ? "Chat with Trek Expert — We’re online!"
-              : "Chat on WhatsApp - Get Instant Help"
-          }
-        />
-      </div>
-      {showStickyBooking && !hideGlobalStickyBooking ? (
-        <div className="hidden md:block">
-          <StickyBookingButton />
-        </div>
-      ) : null}
-      <BookingDrawer />
       {!isTreksListing && !isTrekDetail ? <MobileBottomNav /> : null}
       {idleReady ? (
         <>
@@ -156,6 +142,25 @@ export function SiteShell({
             <BackToTop />
           </div>
           <ConversionLayer />
+        </>
+      ) : null}
+      {chromeReady ? (
+        <>
+          <div className="hidden md:block">
+            <FloatingWhatsApp
+              label={
+                isHome
+                  ? "Chat with Trek Expert — We’re online!"
+                  : "Chat on WhatsApp - Get Instant Help"
+              }
+            />
+          </div>
+          {showStickyBooking && !hideGlobalStickyBooking ? (
+            <div className="hidden md:block">
+              <StickyBookingButton />
+            </div>
+          ) : null}
+          <BookingDrawer />
         </>
       ) : null}
     </>

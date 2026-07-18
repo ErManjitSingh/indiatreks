@@ -1,8 +1,4 @@
-import { headers } from "next/headers";
-
-import { SiteShell } from "@/components/layout";
-import { Seo } from "@/components/seo";
-import { AnalyticsScripts } from "@/components/seo/analytics-scripts";
+import { ConditionalSiteChrome } from "@/components/layout/conditional-site-chrome";
 import { fontBody, fontBrush, fontDisplay, fontHeading } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import { fetchBootstrap } from "@/lib/api/content";
@@ -31,15 +27,15 @@ export const viewport = {
   maximumScale: 5,
 };
 
+/** Cached bootstrap — no headers() so pages stay static/ISR-eligible. */
+export const revalidate = 600;
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = (await headers()).get("x-pathname") ?? "";
-  const isAdmin = pathname.startsWith("/admin");
-  // Admin does not need homepage bootstrap payload (saves ~50KB+ per request).
-  const bootstrap = isAdmin ? null : await fetchBootstrap();
+  const bootstrap = await fetchBootstrap();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -47,16 +43,8 @@ export default async function RootLayout({
         className={`${fontHeading.variable} ${fontBody.variable} ${fontDisplay.variable} ${fontBrush.variable} font-body antialiased`}
         suppressHydrationWarning
       >
-        <AppProviders bootstrap={bootstrap} lean={isAdmin}>
-          {isAdmin ? (
-            children
-          ) : (
-            <>
-              <Seo />
-              <AnalyticsScripts />
-              <SiteShell>{children}</SiteShell>
-            </>
-          )}
+        <AppProviders bootstrap={bootstrap}>
+          <ConditionalSiteChrome>{children}</ConditionalSiteChrome>
         </AppProviders>
       </body>
     </html>

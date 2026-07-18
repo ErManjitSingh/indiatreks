@@ -100,7 +100,7 @@ function MobileHero() {
         alt="Night camping under the Milky Way in the Himalayas"
         fill
         priority
-        unoptimized
+        quality={70}
         sizes="100vw"
         className="object-cover object-[center_30%]"
       />

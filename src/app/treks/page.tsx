@@ -25,6 +25,6 @@ export const metadata: Metadata = createMetadata({
 });
 
 export default async function TreksPage() {
-  const treks = await getTrekListings({ limit: 200 });
+  const treks = await getTrekListings({ limit: 100, page: 1 });
   return <TreksPageContent treks={treks} />;
 }

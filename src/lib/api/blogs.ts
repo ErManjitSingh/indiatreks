@@ -1,4 +1,16 @@
-import { apiGet, apiPost } from "@/lib/api/client";
+import { apiGet, apiPost, type ApiSuccess } from "@/lib/api/client";
+import { cachedApiGet } from "@/lib/api/cached-fetch";
+
+async function publicGet<T>(
+  path: string,
+  params?: Record<string, unknown>,
+  tags: string[] = ["blogs"],
+): Promise<ApiSuccess<T>> {
+  if (typeof window === "undefined") {
+    return cachedApiGet<T>(path, { params, revalidate: 600, tags });
+  }
+  return apiGet<T>(path, params);
+}
 
 export type BlogCard = {
   slug: string;
@@ -29,17 +41,17 @@ export type BlogDetail = BlogCard & {
 };
 
 export async function fetchBlogs(params?: Record<string, unknown>) {
-  const res = await apiGet<BlogCard[]>("/blogs", params);
+  const res = await publicGet<BlogCard[]>("/blogs", params);
   return { items: res.data ?? [], meta: res.meta };
 }
 
 export async function fetchBlog(slug: string) {
-  const res = await apiGet<BlogDetail>(`/blogs/${slug}`);
+  const res = await publicGet<BlogDetail>(`/blogs/${slug}`, undefined, ["blogs", `blog-${slug}`]);
   return res.data ?? null;
 }
 
 export async function fetchBlogHub() {
-  const res = await apiGet<{
+  const res = await publicGet<{
     latest: BlogCard[];
     popular: BlogCard[];
     trending: BlogCard[];
@@ -50,11 +62,11 @@ export async function fetchBlogHub() {
 }
 
 export async function fetchBlogRelated(slug: string) {
-  const res = await apiGet<{
+  const res = await publicGet<{
     blogs: BlogCard[];
     treks: Array<{ slug: string; title?: string; summary?: string }>;
     destinations: Array<{ slug: string; name?: string; summary?: string }>;
-  }>(`/blogs/${slug}/related`);
+  }>(`/blogs/${slug}/related`, undefined, ["blogs", `blog-${slug}`]);
   return res.data;
 }
 
