@@ -4,6 +4,7 @@ import {
   CheckSquare,
   ClipboardList,
   HelpCircle,
+  Images,
   Info,
   MessageSquareQuote,
   Route,
@@ -18,9 +19,10 @@ const tabs = [
   { id: "itinerary", label: "Itinerary", icon: Route },
   { id: "inclusions", label: "Inclusions", icon: CheckSquare },
   { id: "exclusions", label: "Exclusions", icon: XSquare },
-  { id: "essentials", label: "Trek Essentials", icon: ClipboardList },
-  { id: "faqs", label: "FAQs", icon: HelpCircle },
+  { id: "essentials", label: "Things to Carry", icon: ClipboardList },
+  { id: "gallery", label: "Gallery", icon: Images },
   { id: "reviews", label: "Reviews", icon: MessageSquareQuote, countKey: true },
+  { id: "faqs", label: "FAQs", icon: HelpCircle },
 ] as const;
 
 export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
@@ -51,9 +53,9 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
   return (
     <nav
       aria-label="Trek sections"
-      className="sticky top-14 z-30 -mx-4 mb-6 border-y border-[#e8ece6] bg-white/95 px-4 backdrop-blur-md md:top-[4.25rem] md:mx-0 md:rounded-xl md:border md:px-2"
+      className="sticky top-14 z-30 border-b border-[#e8ece6] bg-white/95 backdrop-blur-md md:top-[4.25rem]"
     >
-      <ul className="flex gap-1 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul className="flex gap-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = active === tab.id;
@@ -62,14 +64,14 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
               <a
                 href={`#${tab.id}`}
                 className={cn(
-                  "inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-semibold transition",
+                  "inline-flex items-center gap-1.5 whitespace-nowrap border-b-[3px] px-4 py-3.5 text-sm font-semibold transition",
                   isActive
                     ? "border-[#2D5A27] text-[#2D5A27]"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
                 onClick={() => setActive(tab.id)}
               >
-                <Icon className="h-3.5 w-3.5" aria-hidden />
+                <Icon className="hidden h-3.5 w-3.5 sm:inline" aria-hidden />
                 {tab.label}
                 {"countKey" in tab && tab.countKey ? (
                   <span className="text-xs font-medium text-muted-foreground">

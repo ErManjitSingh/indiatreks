@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  Droplets,
+  Mountain,
+  Route,
+  Tent,
+  Trees,
+  UtensilsCrossed,
+} from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -14,81 +22,73 @@ import { formatNumber } from "@/utils";
 
 export function TrekItinerary({ trek }: { trek: TrekDetail }) {
   return (
-    <section id="itinerary" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
-      <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2D5A27]">
-          Day-wise Itinerary
-        </p>
-        <h2 className="mt-1 font-heading text-2xl font-bold text-[#1A1A1A]">
-          Your journey, day by day
-        </h2>
-      </div>
-      <div className="relative border-l border-primary/25 pl-6 md:pl-8">
+    <section id="itinerary" className="scroll-mt-28">
+      <h2 className="font-heading text-2xl font-bold text-[#2D5A27]">Itinerary</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Day-by-day plan for {trek.title}
+      </p>
+
+      <div className="relative mt-6 border-l-2 border-[#d7e0d4] pl-6">
         <Accordion
           type="multiple"
-          defaultValue={[`day-${trek.itinerary[0]?.day}`]}
-          className="space-y-4"
+          defaultValue={trek.itinerary.slice(0, 2).map((d) => `day-${d.day}`)}
+          className="space-y-5"
         >
           {trek.itinerary.map((day) => (
             <AccordionItem
               key={day.day}
               value={`day-${day.day}`}
-              className="relative rounded-2xl border border-border bg-card px-4 shadow-sm md:px-6"
+              className="relative border-0 bg-transparent"
             >
-              <span className="absolute -left-[2.05rem] top-5 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground md:-left-[2.35rem]">
-                {day.day}
+              <span className="absolute -left-[2.05rem] top-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#2D5A27] text-[11px] font-bold text-white shadow-sm">
+                D{day.day}
               </span>
-              <AccordionTrigger className="py-5 text-left hover:no-underline">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+              <AccordionTrigger className="rounded-xl border border-[#e8ece6] bg-white px-4 py-4 text-left hover:no-underline data-[state=open]:rounded-b-none data-[state=open]:border-b-0">
+                <div className="min-w-0 pr-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2D5A27]">
                     Day {day.day}
                   </p>
-                  <h3 className="mt-1 font-heading text-lg font-bold md:text-xl">{day.title}</h3>
-                  {day.startLocation && day.endLocation ? (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {day.startLocation} → {day.endLocation}
-                    </p>
-                  ) : null}
+                  <h3 className="mt-1 font-heading text-base font-bold text-[#1A1A1A] md:text-lg">
+                    {day.startLocation && day.endLocation
+                      ? `${day.startLocation} to ${day.endLocation}`
+                      : day.title}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-muted-foreground">
+                    {day.distanceKm ? <span>{day.distanceKm} Km</span> : null}
+                    {day.walkingHours ? <span>{day.walkingHours}</span> : null}
+                    {day.altitudeFt ? (
+                      <span>
+                        {formatNumber(day.altitudeFt)} Ft /{" "}
+                        {Math.round(day.altitudeFt / 3.281).toLocaleString("en-IN")} M
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </AccordionTrigger>
-              <AccordionContent>
-                <DayMetaGrid day={day} />
-                <p className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-muted-foreground">
+              <AccordionContent className="rounded-b-xl border border-t-0 border-[#e8ece6] bg-white px-4 pb-4 pt-0">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-[#444]">
                   {day.description}
                 </p>
+                <DayFactRow day={day} />
                 {day.highlights?.length ? (
-                  <div className="mt-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                      Highlights
-                    </p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
-                      {day.highlights.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-                {day.tips?.length ? (
-                  <div className="mt-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                      Important Tips
-                    </p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
-                      {day.tips.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#333]">
+                    {day.highlights.slice(0, 4).map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 ) : null}
                 {day.images.length ? (
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {day.images.map((src) => (
-                      <div key={src} className="relative aspect-[16/10] overflow-hidden rounded-2xl">
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {day.images.slice(0, 2).map((src) => (
+                      <div
+                        key={src}
+                        className="relative aspect-[16/10] overflow-hidden rounded-xl"
+                      >
                         <Image
                           src={src}
                           alt={`${day.title} gallery`}
                           fill
-                          sizes="280px"
+                          sizes="200px"
                           loading="lazy"
                           placeholder="blur"
                           blurDataURL={BLUR_DATA_URL}
@@ -103,43 +103,61 @@ export function TrekItinerary({ trek }: { trek: TrekDetail }) {
           ))}
         </Accordion>
       </div>
+
+      <div className="mt-5 rounded-xl border border-dashed border-[#c5d4c2] bg-[#F7FBF6] px-4 py-3 text-xs leading-relaxed text-[#2D5A27]">
+        Itineraries are flexible and can be customized for private groups, fitness levels, and
+        seasonal conditions. Your trek leader confirms the exact plan each morning.
+      </div>
     </section>
   );
 }
 
-function DayMetaGrid({ day }: { day: TrekItineraryDay }) {
-  const cells: Array<{ label: string; value: string }> = [];
-  if (day.startLocation) cells.push({ label: "Start", value: day.startLocation });
-  if (day.endLocation) cells.push({ label: "End", value: day.endLocation });
-  if (day.distanceKm) cells.push({ label: "Distance", value: `${day.distanceKm} km` });
-  if (day.walkingHours) cells.push({ label: "Trek Time", value: day.walkingHours });
-  if (day.altitudeFt) {
-    cells.push({ label: "Altitude", value: `${formatNumber(day.altitudeFt)} ft` });
+function DayFactRow({ day }: { day: TrekItineraryDay }) {
+  const facts = [
+    {
+      label: "Meals",
+      value: day.meals.join(", ") || "As per plan",
+      icon: UtensilsCrossed,
+    },
+    {
+      label: "Stay",
+      value: day.accommodation || "Camp / Homestay",
+      icon: Tent,
+    },
+    {
+      label: "Trail",
+      value: day.trailType || "Himalayan trail",
+      icon: day.trailType?.toLowerCase().includes("forest") ? Trees : Route,
+    },
+    {
+      label: "Water Source",
+      value: "Available",
+      icon: Droplets,
+    },
+  ];
+
+  if (day.difficulty) {
+    facts.push({
+      label: "Difficulty",
+      value: day.difficulty,
+      icon: Mountain,
+    });
   }
-  if (day.elevationGainLoss) {
-    cells.push({ label: "Elevation Gain/Loss", value: day.elevationGainLoss });
-  }
-  if (day.difficulty) cells.push({ label: "Difficulty", value: day.difficulty });
-  if (day.trailType) cells.push({ label: "Trail Type", value: day.trailType });
-  cells.push({ label: "Meals", value: day.meals.join(", ") || "—" });
-  cells.push({ label: "Overnight Stay", value: day.accommodation || "—" });
 
   return (
-    <div className="grid gap-3 pb-2 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {cells.map((cell) => (
-        <Meta key={cell.label} label={cell.label} value={cell.value} />
+    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {facts.slice(0, 4).map(({ label, value, icon: Icon }) => (
+        <div
+          key={label}
+          className="rounded-lg border border-[#eef2ee] bg-[#F7F8F6] px-2.5 py-2"
+        >
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <Icon className="h-3.5 w-3.5 text-[#2D5A27]" aria-hidden />
+            {label}
+          </div>
+          <p className="mt-1 text-xs font-semibold leading-snug text-[#1A1A1A]">{value}</p>
+        </div>
       ))}
-    </div>
-  );
-}
-
-function Meta({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl bg-muted/60 px-3 py-2">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 font-medium text-foreground">{value}</p>
     </div>
   );
 }
