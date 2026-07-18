@@ -43,7 +43,7 @@ export function createMetadata({
     metadataBase: new URL(siteConfig.url),
     alternates: {
       canonical: url,
-      languages: alternatesLanguages ?? { "en-IN": url },
+      languages: alternatesLanguages ?? { "en-IN": url, "x-default": url },
     },
     openGraph: {
       title: resolvedOgTitle,
@@ -82,10 +82,13 @@ export function createMetadata({
     },
     icons: {
       icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/favicon.png", type: "image/png", sizes: "32x32" },
         { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
         { url: "/icons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       ],
-      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+      shortcut: "/favicon.ico",
     },
     manifest: "/manifest.webmanifest",
     other: {
@@ -98,19 +101,63 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${siteConfig.url}/#organization`,
     name: siteConfig.name,
     url: siteConfig.url,
-    logo: absoluteUrl("/icons/logo.png"),
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/icons/logo.png"),
+    },
     description: siteConfig.description,
     email: siteConfig.email,
     telephone: siteConfig.phone,
-    sameAs: Object.values(siteConfig.social),
+    sameAs: Object.values(siteConfig.social).filter(Boolean),
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address.line1,
       addressLocality: siteConfig.address.city,
       addressCountry: siteConfig.address.country,
     },
+  };
+}
+
+export function travelAgencyJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TravelAgency",
+    "@id": `${siteConfig.url}/#localbusiness`,
+    name: siteConfig.name,
+    url: siteConfig.url,
+    image: absoluteUrl(siteConfig.ogImage),
+    logo: absoluteUrl("/icons/logo.png"),
+    description: siteConfig.description,
+    email: siteConfig.email,
+    telephone: siteConfig.phone,
+    priceRange: "₹₹",
+    currenciesAccepted: "INR",
+    paymentAccepted: "Cash, UPI, Credit Card, Debit Card",
+    areaServed: {
+      "@type": "Country",
+      name: "India",
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: [siteConfig.address.line1, siteConfig.address.line2]
+        .filter(Boolean)
+        .join(", "),
+      addressLocality: siteConfig.address.city,
+      addressCountry: siteConfig.address.country,
+    },
+    sameAs: Object.values(siteConfig.social).filter(Boolean),
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        telephone: siteConfig.phone,
+        contactType: "customer service",
+        availableLanguage: ["English", "Hindi"],
+        areaServed: "IN",
+      },
+    ],
   };
 }
 
@@ -164,6 +211,7 @@ export function tourJsonLd(input: {
   priceInr: number;
   durationDays: number;
   destinationName: string;
+  itinerary?: Array<{ day: number; title: string; description?: string }>;
 }) {
   return {
     "@context": "https://schema.org",
@@ -176,6 +224,17 @@ export function tourJsonLd(input: {
     itinerary: {
       "@type": "ItemList",
       name: `${input.name} itinerary`,
+      numberOfItems: input.itinerary?.length || input.durationDays,
+      ...(input.itinerary?.length
+        ? {
+            itemListElement: input.itinerary.map((day, index) => ({
+              "@type": "ListItem",
+              position: day.day || index + 1,
+              name: day.title,
+              description: day.description,
+            })),
+          }
+        : {}),
     },
     offers: {
       "@type": "Offer",

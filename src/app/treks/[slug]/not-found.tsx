@@ -1,9 +1,18 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createMetadata({
+  title: "Trek not found",
+  description: "This trek could not be found. Browse all Himalayan treks on India Holiday Destinations.",
+  canonical: "/treks",
+  noIndex: true,
+});
 
 export default function TrekNotFound() {
   return (

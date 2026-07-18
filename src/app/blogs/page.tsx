@@ -15,19 +15,48 @@ export const revalidate = 3600;
 
 const BLOGS_PER_PAGE = 9;
 
-export const metadata: Metadata = createMetadata({
-  title: "Travel Blog & Himalayan Guide",
-  description:
-    "Travel stories, trekking guides, tips and inspiration from the Himalayas. Read destination guides, trek explainers, and practical trip planning advice.",
-  canonical: "/blogs",
-  keywords: [
-    "travel blog",
-    "himalayan guide",
-    "trekking guides",
-    "dharamshala travel",
-    "India Holiday Destinations",
-  ],
-});
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string; tag?: string; sort?: string; page?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
+  const category = params.category;
+  const q = params.q;
+
+  const titleParts = [
+    q ? `Search: ${q}` : null,
+    category || null,
+    "Travel Blog & Himalayan Guide",
+    page > 1 ? `Page ${page}` : null,
+  ].filter(Boolean);
+
+  const canonical =
+    page > 1
+      ? `/blogs?page=${page}${category ? `&category=${encodeURIComponent(category)}` : ""}${q ? `&q=${encodeURIComponent(q)}` : ""}`
+      : category
+        ? `/blogs?category=${encodeURIComponent(category)}`
+        : "/blogs";
+
+  return createMetadata({
+    title: titleParts.join(" | "),
+    description: q
+      ? `Search results for “${q}” on the India Holiday Destinations travel blog.`
+      : category
+        ? `${category} articles and Himalayan travel guides from India Holiday Destinations.`
+        : "Travel stories, trekking guides, tips and inspiration from the Himalayas. Read destination guides, trek explainers, and practical trip planning advice.",
+    canonical,
+    keywords: [
+      "travel blog",
+      "himalayan guide",
+      "trekking guides",
+      category,
+      "India Holiday Destinations",
+    ].filter(Boolean) as string[],
+    noIndex: page > 1 || Boolean(q),
+  });
+}
 
 function buildHref(base: Record<string, string | undefined>, patch: Record<string, string | undefined>) {
   const next = { ...base, ...patch };

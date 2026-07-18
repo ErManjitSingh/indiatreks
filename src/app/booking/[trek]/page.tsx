@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { BookingTrekClient } from "@/app/booking/[trek]/booking-trek-client";
-import { bookingJsonLd, createMetadata } from "@/lib/seo";
+import { createMetadata } from "@/lib/seo";
 import { getTrekDetail, getListing } from "@/services/treks.service";
 
 interface BookingTrekPageProps {
@@ -59,41 +59,20 @@ export default async function BookingTrekPage({ params }: BookingTrekPageProps) 
       status: "open" as const,
     }));
 
-  const rawImage = detail?.gallery?.[0] ?? listing?.images?.[0];
-  const image =
-    typeof rawImage === "string"
-      ? rawImage
-      : rawImage && typeof rawImage === "object" && "src" in rawImage
-        ? rawImage.src
-        : "/images/og-default.jpg";
-  const schema = bookingJsonLd({
-    name: title,
-    description: detail?.summary ?? listing?.summary ?? title,
-    image,
-    url: `/booking/${slug}`,
-    priceInr: basePriceInr,
-  });
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-xl px-4 py-12">
+          <div className="h-64 animate-pulse rounded-2xl bg-muted" />
+        </div>
+      }
+    >
+      <BookingTrekClient
+        trekSlug={slug}
+        trekTitle={title}
+        basePriceInr={basePriceInr}
+        departures={departures}
       />
-      <Suspense
-        fallback={
-          <div className="mx-auto max-w-xl px-4 py-12">
-            <div className="h-64 animate-pulse rounded-2xl bg-muted" />
-          </div>
-        }
-      >
-        <BookingTrekClient
-          trekSlug={slug}
-          trekTitle={title}
-          basePriceInr={basePriceInr}
-          departures={departures}
-        />
-      </Suspense>
-    </>
+    </Suspense>
   );
 }

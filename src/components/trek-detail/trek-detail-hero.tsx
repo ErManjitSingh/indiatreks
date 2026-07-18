@@ -155,14 +155,14 @@ export function TrekDetailHero({ trek }: { trek: TrekDetail }) {
               Premium Himalayan Adventure
             </p>
 
-            <h1 className="mt-4 font-heading text-[clamp(1.85rem,6vw,3.75rem)] font-extrabold leading-[1.02] tracking-[-0.03em] uppercase md:mt-5">
+            <p className="mt-4 font-heading text-[clamp(1.85rem,6vw,3.75rem)] font-extrabold leading-[1.02] tracking-[-0.03em] uppercase md:mt-5">
               <span className="block text-white/90 normal-case tracking-normal">
                 {trek.location || trek.region || trek.state}
               </span>
               <span className="mt-0.5 block font-brush text-[clamp(2.35rem,8vw,4.75rem)] font-bold normal-case leading-[0.92] tracking-normal text-[#B8E04A]">
                 {trek.title}
               </span>
-            </h1>
+            </p>
 
             <p className="mt-3 max-w-md text-[13px] leading-relaxed text-white/85 md:mt-4 md:text-sm lg:text-[15px]">
               {trek.summary}

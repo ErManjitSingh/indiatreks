@@ -99,12 +99,12 @@ export function TreksHero({ totalTreks, resultCount, banner }: TreksHeroProps) {
               4.9 Rated by 15,000+ Trekkers
             </p>
 
-            <h1 className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight !text-white">
+            <p className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight !text-white">
               <span className="!text-white">{banner.lead}</span>
               <span className="mt-0.5 block font-brush text-[clamp(2.5rem,6.5vw,4.75rem)] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
                 {banner.accent}
               </span>
-            </h1>
+            </p>
 
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/85">
               {banner.description} Showing{" "}

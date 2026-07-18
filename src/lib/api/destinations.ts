@@ -1,4 +1,5 @@
-import { apiGet } from "@/lib/api/client";
+import { apiGet, type ApiSuccess } from "@/lib/api/client";
+import { cachedApiGet } from "@/lib/api/cached-fetch";
 
 export type ApiDestination = {
   _id?: string;
@@ -18,12 +19,19 @@ export type ApiDestination = {
   seo?: Record<string, unknown>;
 };
 
+async function publicGet<T>(path: string, params?: Record<string, unknown>): Promise<ApiSuccess<T>> {
+  if (typeof window === "undefined") {
+    return cachedApiGet<T>(path, { params, revalidate: 600, tags: ["destinations"] });
+  }
+  return apiGet<T>(path, params);
+}
+
 export async function fetchDestinations() {
-  const res = await apiGet<ApiDestination[]>("/destinations", { limit: 50 });
+  const res = await publicGet<ApiDestination[]>("/destinations", { limit: 50 });
   return res.data ?? [];
 }
 
 export async function fetchDestinationBySlug(slug: string) {
-  const res = await apiGet<ApiDestination>(`/destinations/${slug}`);
+  const res = await publicGet<ApiDestination>(`/destinations/${slug}`);
   return res.data;
 }

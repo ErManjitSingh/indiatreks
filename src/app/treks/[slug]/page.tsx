@@ -12,6 +12,7 @@ import {
   reviewAggregateJsonLd,
   tourJsonLd,
 } from "@/lib/seo";
+import { siteConfig } from "@/config/site";
 import { getTrekDetail, getRelatedTrekListings, getTrekListings } from "@/services/treks.service";
 
 interface TrekDetailPageProps {
@@ -34,38 +35,37 @@ export async function generateMetadata({ params }: TrekDetailPageProps): Promise
   const { slug } = await params;
   const trek = await getTrekDetail(slug);
   if (trek) {
-    const seo = trek.cms as
-      | {
-          seoTitle?: string;
-          metaDescription?: string;
-          focusKeyword?: string;
-          ogTitle?: string;
-          ogDescription?: string;
-          twitterTitle?: string;
-          twitterDescription?: string;
-        }
-      | undefined;
+    const seo = trek.cms;
+    const canonical =
+      seo?.canonicalUrl && seo.canonicalUrl.startsWith("http")
+        ? seo.canonicalUrl.replace(siteConfig.url.replace(/\/$/, ""), "") || `/treks/${trek.slug}`
+        : seo?.canonicalUrl || `/treks/${trek.slug}`;
 
     return createMetadata({
-      title: seo?.seoTitle ?? trek.cms?.seoTitle ?? `${trek.title} | Himalayan Trek`,
-      description: seo?.metaDescription ?? trek.cms?.metaDescription ?? trek.summary,
-      canonical: `/treks/${trek.slug}`,
-      keywords: [
-        trek.title,
-        trek.location,
-        trek.region,
-        `${trek.title} package`,
-        `${trek.title} itinerary`,
-        "Dharamshala trek",
-        "Dhauladhar trek",
-        "Himalayan trek",
-        "India Holiday Destinations",
-      ],
-      ogImage: trek.heroImages[0],
+      title: seo?.seoTitle || `${trek.title} | Himalayan Trek`,
+      description: seo?.metaDescription || trek.summary,
+      canonical,
+      keywords: seo?.keywords?.length
+        ? seo.keywords
+        : [
+            trek.title,
+            seo?.focusKeyword,
+            trek.location,
+            trek.region,
+            `${trek.title} package`,
+            `${trek.title} itinerary`,
+            "Himalayan trek",
+            "India Holiday Destinations",
+          ].filter(Boolean) as string[],
+      ogImage: seo?.ogImage || trek.heroImages[0],
       ogTitle: seo?.ogTitle,
       ogDescription: seo?.ogDescription,
       twitterTitle: seo?.twitterTitle,
       twitterDescription: seo?.twitterDescription,
+      twitterImage: seo?.twitterImage,
+      twitterCard: seo?.twitterCard,
+      noIndex: seo?.noIndex === true,
+      noFollow: seo?.noFollow === true,
     });
   }
 
@@ -123,6 +123,11 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
             priceInr: trek.basePriceInr,
             durationDays: trek.durationDays,
             destinationName: trek.location || trek.quickInfo?.destination || trek.region,
+            itinerary: (trek.itinerary ?? []).map((day) => ({
+              day: day.day,
+              title: day.title,
+              description: day.description,
+            })),
           })}
         />
         <JsonLd

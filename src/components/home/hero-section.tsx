@@ -47,12 +47,12 @@ export function HeroSection() {
               Premium Himalayan Adventures
             </p>
 
-            <h1 className="mt-4 font-heading text-[clamp(1.85rem,7vw,4.25rem)] font-extrabold leading-[1.02] tracking-[-0.03em] uppercase md:mt-5">
+            <p className="mt-4 font-heading text-[clamp(1.85rem,7vw,4.25rem)] font-extrabold leading-[1.02] tracking-[-0.03em] uppercase md:mt-5">
               <span className="text-white">Explore India&apos;s</span>
               <span className="mt-0.5 block font-brush text-[clamp(2.4rem,9vw,5.5rem)] font-bold normal-case leading-[0.92] tracking-normal text-[#B8E04A]">
                 Wild Side
               </span>
-            </h1>
+            </p>
 
             <p className="mt-3 max-w-md text-[13px] leading-relaxed text-white/85 md:mt-4 md:text-sm lg:text-[15px]">
               Curated Himalayan treks with expert local guides &amp; unforgettable mountain

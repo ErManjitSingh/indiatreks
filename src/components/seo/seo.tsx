@@ -6,6 +6,7 @@ import {
   faqJsonLd,
   organizationJsonLd,
   tourJsonLd,
+  travelAgencyJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
 import type { BreadcrumbItem } from "@/types";
@@ -28,6 +29,7 @@ interface SeoProps {
   breadcrumbs?: BreadcrumbItem[];
   includeOrganization?: boolean;
   includeWebsite?: boolean;
+  includeTravelAgency?: boolean;
   faqs?: Array<{ question: string; answer: string }>;
   tour?: Parameters<typeof tourJsonLd>[0];
   blog?: Parameters<typeof blogJsonLd>[0];
@@ -38,6 +40,7 @@ export function Seo({
   breadcrumbs,
   includeOrganization = true,
   includeWebsite = true,
+  includeTravelAgency = true,
   faqs,
   tour,
   blog,
@@ -46,6 +49,7 @@ export function Seo({
     <>
       {includeOrganization ? <JsonLd data={organizationJsonLd()} /> : null}
       {includeWebsite ? <JsonLd data={websiteJsonLd()} /> : null}
+      {includeTravelAgency ? <JsonLd data={travelAgencyJsonLd()} /> : null}
       {breadcrumbs?.length ? <JsonLd data={breadcrumbJsonLd(breadcrumbs)} /> : null}
       {faqs?.length ? <JsonLd data={faqJsonLd(faqs)} /> : null}
       {tour ? <JsonLd data={tourJsonLd(tour)} /> : null}

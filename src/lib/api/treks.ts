@@ -181,11 +181,34 @@ export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> 
       downloads: (raw.downloads as TrekDetail["downloads"]) ?? [],
       relatedSlugs: (raw.relatedSlugs as string[]) ?? [],
       cms: raw.seo
-        ? {
-            seoTitle: (raw.seo as { title?: string }).title,
-            metaDescription: (raw.seo as { description?: string }).description,
-            canonicalUrl: (raw.seo as { canonical?: string }).canonical,
-          }
+        ? (() => {
+            const seo = raw.seo as Record<string, unknown>;
+            const card = seo.twitterCard;
+            return {
+              seoTitle: (seo.title as string | undefined) ?? (seo.metaTitle as string | undefined),
+              metaDescription:
+                (seo.description as string | undefined) ??
+                (seo.metaDescription as string | undefined),
+              canonicalUrl: seo.canonical as string | undefined,
+              focusKeyword: seo.focusKeyword as string | undefined,
+              keywords: Array.isArray(seo.keywords) ? (seo.keywords as string[]) : undefined,
+              ogTitle: seo.ogTitle as string | undefined,
+              ogDescription: seo.ogDescription as string | undefined,
+              ogImage: seo.ogImage as string | undefined,
+              twitterTitle: seo.twitterTitle as string | undefined,
+              twitterDescription: seo.twitterDescription as string | undefined,
+              twitterImage: seo.twitterImage as string | undefined,
+              twitterCard:
+                card === "summary" ||
+                card === "summary_large_image" ||
+                card === "app" ||
+                card === "player"
+                  ? card
+                  : undefined,
+              noIndex: seo.index === false,
+              noFollow: seo.follow === false,
+            };
+          })()
         : undefined,
     };
   } catch {

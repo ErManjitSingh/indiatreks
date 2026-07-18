@@ -79,6 +79,18 @@ export interface TrekQuickInfo {
 export interface TrekCmsExtras {
   seoTitle?: string;
   metaDescription?: string;
+  canonicalUrl?: string;
+  focusKeyword?: string;
+  keywords?: string[];
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player";
+  noIndex?: boolean;
+  noFollow?: boolean;
   country?: string;
   coordinates?: { lat: number; lng: number; label?: string };
   flora?: string;
@@ -112,7 +124,6 @@ export interface TrekCmsExtras {
   relatedBlogs?: Array<{ title: string; href: string }>;
   videoPlaceholder?: string;
   externalReferences?: Array<{ label: string; href: string }>;
-  canonicalUrl?: string;
 }
 
 export interface TrekDetail {
