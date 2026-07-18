@@ -166,7 +166,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-3 pb-3">
         {nav.map((item) => {
           const active = item.exact
             ? pathname === item.href
@@ -180,14 +180,20 @@ export function AdminShell({ children }: { children: ReactNode }) {
               href={item.href}
               title={item.label}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
-                collapsed && "justify-center px-2",
+                "flex origin-left items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out will-change-transform",
+                collapsed && "origin-center justify-center px-2",
                 active
-                  ? "bg-[#22C55E] text-white shadow-sm shadow-[#22C55E]/25"
-                  : "text-[#4B5563] hover:bg-[#F3F4F6]",
+                  ? "scale-[1.04] bg-[#22C55E] text-white shadow-md shadow-[#22C55E]/30"
+                  : "scale-100 text-[#4B5563] hover:scale-[1.04] hover:bg-[#F3F4F6] hover:text-[#111827] hover:shadow-sm",
               )}
             >
-              <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
+              <Icon
+                className={cn(
+                  "h-[18px] w-[18px] shrink-0 transition-transform duration-200",
+                  active && "scale-110",
+                )}
+                aria-hidden
+              />
               {!collapsed ? <span>{item.label}</span> : null}
             </Link>
           );
@@ -198,8 +204,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
           rel="noopener noreferrer"
           title="API Docs"
           className={cn(
-            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4B5563] transition hover:bg-[#F3F4F6]",
-            collapsed && "justify-center px-2",
+            "flex origin-left items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4B5563] transition-all duration-200 ease-out hover:scale-[1.04] hover:bg-[#F3F4F6] hover:text-[#111827] hover:shadow-sm",
+            collapsed && "origin-center justify-center px-2",
           )}
         >
           <FileText className="h-[18px] w-[18px] shrink-0" aria-hidden />
@@ -212,8 +218,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
           type="button"
           onClick={onLogout}
           className={cn(
-            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4B5563] transition hover:bg-[#FEF2F2] hover:text-[#DC2626]",
-            collapsed && "justify-center px-2",
+            "flex w-full origin-left items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4B5563] transition-all duration-200 ease-out hover:scale-[1.04] hover:bg-[#FEF2F2] hover:text-[#DC2626] hover:shadow-sm",
+            collapsed && "origin-center justify-center px-2",
           )}
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" aria-hidden />
