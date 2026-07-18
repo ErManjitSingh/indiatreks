@@ -4,18 +4,15 @@ import { Suspense } from "react";
 
 import { BookingTrekClient } from "@/app/booking/[trek]/booking-trek-client";
 import { bookingJsonLd, createMetadata } from "@/lib/seo";
-import { getAllTrekSlugs, getTrekDetail, getListing } from "@/services/treks.service";
+import { getTrekDetail, getListing } from "@/services/treks.service";
 
 interface BookingTrekPageProps {
   params: Promise<{ trek: string }>;
 }
 
+/** Root layout uses headers(), so this page must render dynamically. */
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  const slugs = await getAllTrekSlugs();
-  return slugs.map((trek) => ({ trek }));
-}
 
 export async function generateMetadata({
   params,

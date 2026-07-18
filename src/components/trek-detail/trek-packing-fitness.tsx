@@ -15,7 +15,9 @@ export function TrekPackingList({ trek }: { trek: TrekDetail }) {
       <h2 className="mt-1 font-heading text-2xl font-bold text-[#1A1A1A]">Packing checklist</h2>
       <Accordion
         type="multiple"
-        defaultValue={trek.packingList.map((g) => g.category)}
+        defaultValue={
+          trek.packingList[0]?.category ? [trek.packingList[0].category] : []
+        }
         className="mt-4 rounded-2xl border border-border bg-card px-4 shadow-sm md:px-6"
       >
         {trek.packingList.map((group) => (

@@ -9,6 +9,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 import {
   Accordion,
@@ -66,9 +67,7 @@ export function TrekItinerary({ trek }: { trek: TrekDetail }) {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="rounded-b-xl border border-t-0 border-[#e8ece6] bg-white px-4 pb-4 pt-0">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-[#444]">
-                  {day.description}
-                </p>
+                <DayDescription text={day.description} />
                 <DayFactRow day={day} />
                 {day.highlights?.length ? (
                   <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#333]">
@@ -109,6 +108,32 @@ export function TrekItinerary({ trek }: { trek: TrekDetail }) {
         seasonal conditions. Your trek leader confirms the exact plan each morning.
       </div>
     </section>
+  );
+}
+
+function DayDescription({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const needsMore = text.trim().length > 180;
+
+  return (
+    <div>
+      <p
+        className={`whitespace-pre-line text-sm leading-relaxed text-[#444] ${
+          expanded || !needsMore ? "" : "line-clamp-3"
+        }`}
+      >
+        {text}
+      </p>
+      {needsMore ? (
+        <button
+          type="button"
+          className="mt-1.5 text-sm font-semibold text-[#2D5A27] hover:underline"
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "Read less" : "Read more"}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
