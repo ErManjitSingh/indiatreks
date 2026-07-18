@@ -101,19 +101,43 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
       label: "Difficulty",
       value: trek.difficulty.charAt(0).toUpperCase() + trek.difficulty.slice(1),
       icon: Gauge,
+      card: "bg-[#fff3e8] ring-[#f5d5b8]",
+      iconWrap: "bg-[#F97316] text-white",
     },
     {
       label: "Duration",
       value: formatTrekDuration(trek.durationDays, trek.durationNights),
       icon: CalendarDays,
+      card: "bg-[#e8f3ff] ring-[#c5def8]",
+      iconWrap: "bg-[#3B82F6] text-white",
     },
-    { label: "Best Season", value: trek.quickInfo.bestTime, icon: Snowflake },
-    { label: "Distance", value: trek.quickInfo.distance || `${trek.distanceKm} Km`, icon: Users },
-    { label: "Max Altitude", value: formatAltitude(trek.maxAltitude), icon: Mountain },
+    {
+      label: "Best Season",
+      value: trek.quickInfo.bestTime,
+      icon: Snowflake,
+      card: "bg-[#e7f7f2] ring-[#bfe8da]",
+      iconWrap: "bg-[#0D9488] text-white",
+    },
+    {
+      label: "Distance",
+      value: trek.quickInfo.distance || `${trek.distanceKm} Km`,
+      icon: Users,
+      card: "bg-[#eef8e4] ring-[#d4ebbc]",
+      iconWrap: "bg-[#8BC34A] text-white",
+    },
+    {
+      label: "Max Altitude",
+      value: formatAltitude(trek.maxAltitude),
+      icon: Mountain,
+      card: "bg-[#f3eefc] ring-[#ddd0f5]",
+      iconWrap: "bg-[#7C3AED] text-white",
+    },
     {
       label: "Group Size",
       value: trek.quickInfo.groupSize || "Join a Group",
       icon: Users,
+      card: "bg-[#fdecef] ring-[#f5c9d2]",
+      iconWrap: "bg-[#E11D48] text-white",
     },
   ];
 
@@ -247,15 +271,27 @@ export function MobileTrekDetail({ trek }: { trek: TrekDetail }) {
 
         <p className="mt-3 text-sm leading-relaxed text-[#555]">{trek.summary}</p>
 
-        <ul className="mt-4 flex gap-2.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {specs.map(({ label, value, icon: Icon }) => (
+        <ul className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {specs.map(({ label, value, icon: Icon, card, iconWrap }) => (
             <li
               key={label}
-              className="min-w-[6.5rem] shrink-0 rounded-xl border border-[#e8ece6] bg-white px-3 py-3 text-center"
+              className={cn(
+                "min-w-[5.75rem] shrink-0 rounded-xl px-2 py-2 text-center ring-1",
+                card,
+              )}
             >
-              <Icon className="mx-auto h-4 w-4 text-[#2D5A27]" aria-hidden />
-              <p className="mt-1.5 text-[10px] font-medium text-muted-foreground">{label}</p>
-              <p className="mt-0.5 text-xs font-bold capitalize text-[#1A1A1A]">{value}</p>
+              <span
+                className={cn(
+                  "mx-auto inline-flex h-6 w-6 items-center justify-center rounded-full shadow-sm",
+                  iconWrap,
+                )}
+              >
+                <Icon className="h-3 w-3" strokeWidth={2} aria-hidden />
+              </span>
+              <p className="mt-1 text-[9px] font-semibold text-[#5a665c]">{label}</p>
+              <p className="mt-0.5 text-[10px] font-bold capitalize leading-snug text-[#14201a]">
+                {value}
+              </p>
             </li>
           ))}
         </ul>
