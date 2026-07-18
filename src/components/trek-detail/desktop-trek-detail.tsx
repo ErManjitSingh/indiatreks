@@ -67,13 +67,17 @@ export function DesktopTrekDetail({ trek, relatedTreks }: DesktopTrekDetailProps
             <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" />}>
               <TrekItinerary trek={trek} />
               <TrekInclusionsExclusions trek={trek} />
-              <div id="essentials" className="scroll-mt-28">
-                <TrekPackingList trek={trek} />
-              </div>
-              <section id="gallery" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
-                <h2 className="mb-4 font-heading text-2xl font-bold text-[#1A1A1A]">Gallery</h2>
-                <TrekMediaGallery trek={trek} />
-              </section>
+            <div id="essentials" className="scroll-mt-28">
+              <TrekPackingList trek={trek} />
+            </div>
+            <section
+              id="gallery"
+              data-trek-section="gallery"
+              className="scroll-mt-28 border-t border-[#e8ece6] pt-8"
+            >
+              <h2 className="mb-4 font-heading text-2xl font-bold text-[#1A1A1A]">Gallery</h2>
+              <TrekMediaGallery trek={trek} />
+            </section>
               <TrekReviews trek={trek} />
               <TrekFaq trek={trek} />
             </Suspense>

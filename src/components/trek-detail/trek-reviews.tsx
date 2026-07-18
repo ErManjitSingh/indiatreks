@@ -16,7 +16,7 @@ export function TrekReviews({ trek }: { trek: TrekDetail }) {
   const [helpful, setHelpful] = useState<Record<string, number>>({});
 
   return (
-    <section id="reviews" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
+    <section id="reviews" data-trek-section="reviews" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2D5A27]">

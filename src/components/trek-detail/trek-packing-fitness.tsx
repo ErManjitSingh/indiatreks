@@ -8,7 +8,7 @@ import type { TrekDetail } from "@/types/trek-detail";
 
 export function TrekPackingList({ trek }: { trek: TrekDetail }) {
   return (
-    <section className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
+    <section data-trek-section="essentials" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2D5A27]">
         Things to Carry
       </p>

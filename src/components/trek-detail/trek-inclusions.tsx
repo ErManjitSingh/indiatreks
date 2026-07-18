@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export function TrekInclusionsExclusions({ trek }: { trek: TrekDetail }) {
   return (
     <div className="space-y-8 border-t border-[#e8ece6] pt-8">
-      <section id="inclusions" className="scroll-mt-28">
+      <section id="inclusions" data-trek-section="inclusions" className="scroll-mt-28">
         <Checklist
           title="Inclusions"
           tone="success"
@@ -14,7 +14,7 @@ export function TrekInclusionsExclusions({ trek }: { trek: TrekDetail }) {
           icon={<Check className="h-4 w-4" aria-hidden />}
         />
       </section>
-      <section id="exclusions" className="scroll-mt-28">
+      <section id="exclusions" data-trek-section="exclusions" className="scroll-mt-28">
         <Checklist
           title="Exclusions"
           tone="destructive"

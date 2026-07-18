@@ -16,7 +16,7 @@ export function TrekOverviewBlock({ trek }: { trek: TrekDetail }) {
   const highlights = trek.highlights.slice(0, 6);
 
   return (
-    <section id="overview" className="scroll-mt-28">
+    <section id="overview" data-trek-section="overview" className="scroll-mt-28">
       <h2 className="font-heading text-2xl font-bold text-[#1A1A1A]">About {trek.title}</h2>
       <p className="mt-3 text-sm leading-7 text-[#444] md:text-[15px] md:leading-8">
         {shown}

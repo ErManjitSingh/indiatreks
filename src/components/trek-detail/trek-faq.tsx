@@ -10,7 +10,7 @@ import type { TrekDetail } from "@/types/trek-detail";
 
 export function TrekFaq({ trek }: { trek: TrekDetail }) {
   return (
-    <section id="faqs" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
+    <section id="faqs" data-trek-section="faqs" className="scroll-mt-28 border-t border-[#e8ece6] pt-8">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2D5A27]">FAQ</p>
       <h2 className="mt-1 font-heading text-2xl font-bold text-[#1A1A1A]">
         Frequently asked questions

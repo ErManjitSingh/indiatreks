@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-const tabs: Array<{
+export const TREK_SECTION_TABS: Array<{
   id: string;
   label: string;
   icon: LucideIcon;
@@ -82,14 +82,38 @@ const tabs: Array<{
   },
 ];
 
-export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
+function isElementVisible(el: Element): boolean {
+  const style = window.getComputedStyle(el);
+  if (style.display === "none" || style.visibility === "hidden") return false;
+  let node: HTMLElement | null = el as HTMLElement;
+  while (node) {
+    const parentStyle = window.getComputedStyle(node);
+    if (parentStyle.display === "none") return false;
+    node = node.parentElement;
+  }
+  return true;
+}
+
+export function getVisibleTrekSection(id: string): HTMLElement | null {
+  const nodes = Array.from(
+    document.querySelectorAll(`[data-trek-section="${id}"], #${CSS.escape(id)}`),
+  ) as HTMLElement[];
+  return nodes.find(isElementVisible) ?? null;
+}
+
+export function TrekDetailTabs({
+  reviewCount,
+  stickyClassName,
+}: {
+  reviewCount: number;
+  stickyClassName?: string;
+}) {
   const [active, setActive] = useState("overview");
 
   useEffect(() => {
-    const ids = tabs.map((tab) => tab.id);
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
+    const elements = TREK_SECTION_TABS.map((tab) => getVisibleTrekSection(tab.id)).filter(
+      Boolean,
+    ) as HTMLElement[];
 
     if (!elements.length) return;
 
@@ -98,7 +122,9 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActive(visible.target.id);
+        const id =
+          (visible?.target as HTMLElement).dataset.trekSection || visible?.target.id;
+        if (id) setActive(id);
       },
       { rootMargin: "-25% 0px -55% 0px", threshold: [0.15, 0.4] },
     );
@@ -109,7 +135,7 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
 
   const scrollToSection = (id: string) => {
     setActive(id);
-    const el = document.getElementById(id);
+    const el = getVisibleTrekSection(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 110;
     window.scrollTo({ top, behavior: "smooth" });
@@ -118,10 +144,13 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
   return (
     <nav
       aria-label="Trek sections"
-      className="sticky top-14 z-30 -mx-4 border-b border-[#e8ece6] bg-white/95 px-4 py-3 backdrop-blur-md md:top-[4.25rem] md:mx-0 md:rounded-b-xl md:px-0"
+      className={cn(
+        "sticky z-30 border-b border-[#e8ece6] bg-white/95 py-3 backdrop-blur-md",
+        stickyClassName ?? "top-14 -mx-4 px-4 md:top-[4.25rem] md:mx-0 md:rounded-b-xl md:px-0",
+      )}
     >
       <ul className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {tabs.map((tab) => {
+        {TREK_SECTION_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = active === tab.id;
           return (
@@ -137,7 +166,12 @@ export function TrekDetailTabs({ reviewCount }: { reviewCount: number }) {
                 <Icon className="h-3.5 w-3.5" aria-hidden />
                 {tab.label}
                 {tab.countKey ? (
-                  <span className={cn("text-xs font-medium", isActive ? "text-white/85" : "opacity-80")}>
+                  <span
+                    className={cn(
+                      "text-xs font-medium",
+                      isActive ? "text-white/85" : "opacity-80",
+                    )}
+                  >
                     ({reviewCount})
                   </span>
                 ) : null}
