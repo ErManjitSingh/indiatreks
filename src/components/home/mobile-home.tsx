@@ -31,12 +31,42 @@ import { BLUR_DATA_URL } from "@/constants/media";
 import { useSiteContent } from "@/providers/site-content-provider";
 
 const heroImage = "/images/heroes/home-mobile-hero.jpg";
-const serviceChips: Array<{ title: string; icon: LucideIcon }> = [
-  { title: "Expert Trek Leaders", icon: UserRound },
-  { title: "Safety First", icon: ShieldCheck },
-  { title: "Small Group", icon: Users },
-  { title: "Medical Support", icon: BriefcaseMedical },
-  { title: "Best Price", icon: BadgeCheck },
+const serviceChips: Array<{
+  title: string;
+  icon: LucideIcon;
+  card: string;
+  iconWrap: string;
+}> = [
+  {
+    title: "Expert Leaders",
+    icon: UserRound,
+    card: "bg-[#eef8e4] ring-[#d4ebbc]",
+    iconWrap: "bg-[#8BC34A] text-white",
+  },
+  {
+    title: "Safety First",
+    icon: ShieldCheck,
+    card: "bg-[#fff3e8] ring-[#f5d5b8]",
+    iconWrap: "bg-[#F97316] text-white",
+  },
+  {
+    title: "Small Group",
+    icon: Users,
+    card: "bg-[#e8f3ff] ring-[#c5def8]",
+    iconWrap: "bg-[#3B82F6] text-white",
+  },
+  {
+    title: "Medical Support",
+    icon: BriefcaseMedical,
+    card: "bg-[#fdecef] ring-[#f5c9d2]",
+    iconWrap: "bg-[#E11D48] text-white",
+  },
+  {
+    title: "Best Price",
+    icon: BadgeCheck,
+    card: "bg-[#e7f7f2] ring-[#bfe8da]",
+    iconWrap: "bg-[#0D9488] text-white",
+  },
 ];
 
 const whyStats = [
@@ -253,19 +283,21 @@ function MiniField({
 
 function MobileServiceRow() {
   return (
-    <section className="px-4 pt-5" aria-label="Service highlights">
-      <ul className="flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="px-4 pt-4" aria-label="Service highlights">
+      <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {serviceChips.map((item) => {
           const Icon = item.icon;
           return (
             <li
               key={item.title}
-              className="flex w-[104px] shrink-0 flex-col items-center gap-2 rounded-2xl bg-white px-2 py-3 text-center shadow-[0_4px_14px_rgba(15,23,42,0.05)] ring-1 ring-[#e8ece6]"
+              className={`flex w-[88px] shrink-0 flex-col items-center gap-1.5 rounded-xl px-1.5 py-2 text-center ring-1 ${item.card}`}
             >
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#eef5e6] text-[#2D5A27]">
-                <Icon className="h-4 w-4" strokeWidth={1.7} aria-hidden />
+              <span
+                className={`inline-flex h-7 w-7 items-center justify-center rounded-full shadow-sm ${item.iconWrap}`}
+              >
+                <Icon className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
               </span>
-              <span className="text-[10px] leading-tight font-bold text-[#14201a]">
+              <span className="text-[9px] leading-tight font-bold text-[#14201a]">
                 {item.title}
               </span>
             </li>
