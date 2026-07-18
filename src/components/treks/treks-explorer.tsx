@@ -32,6 +32,7 @@ import {
   filtersFromSearchParams,
   filtersToSearchParams,
 } from "@/lib/trek-filters";
+import { getTreksBannerCopy } from "@/lib/treks-banner";
 import { useCompareStore, useUiStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type {
@@ -97,6 +98,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
 
   const activeFilterCount = countActiveFilters(filters);
   const results = useMemo(() => filterTreks(treks, filters), [filters, treks]);
+  const banner = useMemo(() => getTreksBannerCopy(filters), [filters]);
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageStart = (safePage - 1) * PAGE_SIZE;
@@ -164,7 +166,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
 
   return (
     <div className="relative bg-[#F8F8F8] pb-24 md:bg-[#F7F8F6] md:pb-0">
-      <TreksHero totalTreks={treks.length} />
+      <TreksHero totalTreks={treks.length} resultCount={results.length} banner={banner} />
 
       <AdvancedTrekSearch
         filters={filters}
@@ -187,7 +189,9 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
           >
             <span className="text-lg leading-none">←</span>
           </Link>
-          <h2 className="font-heading text-[15px] font-bold text-[#122016]">All Himalayan Treks</h2>
+          <h2 className="min-w-0 truncate px-1 text-center font-heading text-[15px] font-bold text-[#122016]">
+            {banner.shortLabel}
+          </h2>
           <div className="flex items-center gap-0.5">
             <a
               href="#trek-search"
@@ -210,10 +214,12 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
 
       <Container id="trek-results" className="scroll-mt-24 py-4 md:py-8">
         <div className="mb-3 flex items-center justify-between md:hidden">
-          <h2 className="font-heading text-[15px] font-bold text-[#122016]">Top Picks For You</h2>
-          <a href="#trek-results" className="text-[12px] font-semibold text-[#2D5A27]">
-            View All &gt;
-          </a>
+          <h2 className="font-heading text-[15px] font-bold text-[#122016]">
+            {banner.shortLabel}
+          </h2>
+          <span className="text-[12px] font-semibold text-[#2D5A27]">
+            {results.length} trek{results.length === 1 ? "" : "s"}
+          </span>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">

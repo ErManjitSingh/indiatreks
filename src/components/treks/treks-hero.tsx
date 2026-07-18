@@ -13,6 +13,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/config/site";
+import type { TreksBannerCopy } from "@/lib/treks-banner";
 
 const heroImage = "/images/heroes/treks-banner.jpg";
 
@@ -25,20 +26,23 @@ const stats = [
 
 interface TreksHeroProps {
   totalTreks: number;
+  resultCount: number;
+  banner: TreksBannerCopy;
 }
 
-export function TreksHero({ totalTreks }: TreksHeroProps) {
+export function TreksHero({ totalTreks, resultCount, banner }: TreksHeroProps) {
   const whatsapp = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(
-    "Hi! I need help choosing a Himalayan trek.",
+    `Hi! I need help with ${banner.shortLabel}.`,
   )}`;
-  const count = Math.max(totalTreks, 120);
+  const catalogCount = Math.max(totalTreks, 1);
+  const shown = Math.max(resultCount, 0);
 
   return (
     <section className="relative isolate overflow-hidden bg-[#0b1220] text-white">
       <div className="absolute inset-0">
         <Image
           src={heroImage}
-          alt="Trekker overlooking snow-capped Himalayan peaks at sunrise"
+          alt={`${banner.accent} — Himalayan trekking adventures`}
           fill
           priority
           unoptimized
@@ -48,7 +52,7 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,12,0.28)_0%,rgba(8,18,12,0.35)_45%,rgba(8,18,12,0.88)_100%)]" />
       </div>
 
-      {/* —— Mobile hero (mockup) —— */}
+      {/* —— Mobile hero —— */}
       <div className="relative z-[2] flex min-h-[52svh] flex-col justify-end px-4 pb-28 pt-16 md:hidden">
         <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#3A3A3A]/85 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-sm">
           <Star className="h-3 w-3 fill-amber-300 text-amber-300" aria-hidden />
@@ -56,14 +60,14 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
         </p>
 
         <h1 className="mt-4 font-heading text-[2.15rem] font-extrabold leading-[1.05] tracking-tight !text-white">
-          <span className="block !text-white">Explore India&apos;s Best</span>
-          <span className="mt-0.5 block font-brush text-[3.15rem] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
-            Himalayan Treks
+          <span className="block !text-white">{banner.lead}</span>
+          <span className="mt-0.5 block font-brush text-[clamp(2.4rem,12vw,3.15rem)] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
+            {banner.accent}
           </span>
         </h1>
 
-        <p className="mt-3 max-w-[20rem] text-[13px] leading-relaxed text-white/90">
-          {count}+ handpicked trekking adventures across India
+        <p className="mt-3 max-w-[22rem] text-[13px] leading-relaxed text-white/90">
+          {shown} trek{shown === 1 ? "" : "s"} matching this view · {catalogCount}+ in our catalog
         </p>
 
         <div className="mt-5 flex items-center gap-2.5">
@@ -96,15 +100,16 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
             </p>
 
             <h1 className="mt-5 font-heading text-[clamp(1.9rem,5.5vw,3.4rem)] font-extrabold leading-[1.08] tracking-tight !text-white">
-              <span className="!text-white">Explore India&apos;s Best</span>
-              <span className="mt-0.5 block font-brush text-[clamp(2.75rem,7vw,4.75rem)] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
-                Himalayan Treks
+              <span className="!text-white">{banner.lead}</span>
+              <span className="mt-0.5 block font-brush text-[clamp(2.5rem,6.5vw,4.75rem)] font-bold leading-[0.92] tracking-normal text-[#B8E04A]">
+                {banner.accent}
               </span>
             </h1>
 
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/85">
-              Discover {count}+ handpicked Himalayan adventures — from easy weekend escapes to
-              high-altitude expeditions with expert local guides.
+              {banner.description} Showing{" "}
+              <span className="font-semibold text-white">{shown}</span> matching trek
+              {shown === 1 ? "" : "s"}.
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -131,11 +136,12 @@ export function TreksHero({ totalTreks }: TreksHeroProps) {
             <ul className="grid grid-cols-2 gap-4">
               {stats.map((stat) => {
                 const Icon = stat.icon;
+                const title = stat.id === "treks" ? `${Math.max(catalogCount, 120)}+` : stat.title;
                 return (
                   <li key={stat.id} className="rounded-xl bg-white/5 px-3 py-3.5">
                     <Icon className="mb-2 h-5 w-5 text-[#B8E04A]" aria-hidden />
                     <p className="font-heading text-xl font-extrabold leading-none text-white">
-                      {stat.title}
+                      {title}
                     </p>
                     <p className="mt-1.5 text-[11px] font-medium text-white/75">{stat.subtitle}</p>
                   </li>
