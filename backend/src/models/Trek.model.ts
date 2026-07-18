@@ -43,12 +43,19 @@ export interface IQuickInfo {
 export interface IItineraryDay {
   day: number;
   title: string;
+  startLocation?: string;
+  endLocation?: string;
   distanceKm?: number;
   altitudeFt?: number;
+  elevationGainLoss?: string;
   walkingHours?: string;
+  difficulty?: string;
+  trailType?: string;
   meals: string[];
   accommodation: string;
   description: string;
+  highlights?: string[];
+  tips?: string[];
   images: string[];
 }
 
@@ -190,12 +197,19 @@ const ItineraryDaySchema = new Schema<IItineraryDay>(
   {
     day: { type: Number, required: true },
     title: { type: String, required: true },
+    startLocation: { type: String },
+    endLocation: { type: String },
     distanceKm: { type: Number },
     altitudeFt: { type: Number },
+    elevationGainLoss: { type: String },
     walkingHours: { type: String },
+    difficulty: { type: String },
+    trailType: { type: String },
     meals: { type: [String], default: [] },
     accommodation: { type: String, default: "" },
     description: { type: String, default: "" },
+    highlights: { type: [String], default: undefined },
+    tips: { type: [String], default: undefined },
     images: { type: [String], default: [] },
   },
   { _id: false },

@@ -19,8 +19,7 @@ import { TrustBadges } from "@/components/booking/trust-badges";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { toast } from "@/components/ui/toast";
-import { getTrekBySlug } from "@/data/treks";
-import { getTrekDetailBySlug } from "@/data/trek-details";
+import { fetchTrekBySlug } from "@/lib/api/treks";
 import { calculateBookingPrice, createBookingId } from "@/lib/booking/pricing";
 import {
   useBookingDraftStore,
@@ -51,6 +50,7 @@ export function CheckoutClient() {
   const addBooking = useBookingsStore((s) => s.addBooking);
   const [hydrated, setHydrated] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [unitPrice, setUnitPrice] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -64,15 +64,28 @@ export function CheckoutClient() {
     };
   }, []);
 
-  const unitPrice = useMemo(() => {
-    if (!draft) return 0;
-    const detail = getTrekDetailBySlug(draft.trekSlug);
-    const listing = getTrekBySlug(draft.trekSlug);
-    const dep = detail?.departures.find(
-      (d) => d.id === draft.departureId || d.date === draft.departureDate,
-    );
-    return dep?.priceInr ?? detail?.basePriceInr ?? listing?.basePriceInr ?? 0;
-  }, [draft]);
+  useEffect(() => {
+    if (!hydrated || !draft?.trekSlug) {
+      setUnitPrice(0);
+      return;
+    }
+    let active = true;
+    void (async () => {
+      try {
+        const detail = await fetchTrekBySlug(draft.trekSlug);
+        if (!active) return;
+        const dep = detail?.departures.find(
+          (d) => d.id === draft.departureId || d.date === draft.departureDate,
+        );
+        setUnitPrice(dep?.priceInr ?? detail?.basePriceInr ?? 0);
+      } catch {
+        if (active) setUnitPrice(0);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [hydrated, draft]);
 
   const pricing = useMemo(() => {
     if (!draft) {

@@ -13,12 +13,22 @@ export interface TrekWeatherMonth {
 export interface TrekItineraryDay {
   day: number;
   title: string;
+  startLocation?: string;
+  endLocation?: string;
   distanceKm?: number;
   altitudeFt?: number;
+  /** e.g. "+1,800 ft / -400 ft" */
+  elevationGainLoss?: string;
   walkingHours?: string;
+  /** Day-level grade, e.g. "Moderate" */
+  difficulty?: string;
+  /** e.g. "oak forest, river crossings, alpine meadow" */
+  trailType?: string;
   meals: string[];
   accommodation: string;
   description: string;
+  highlights?: string[];
+  tips?: string[];
   images: string[];
 }
 

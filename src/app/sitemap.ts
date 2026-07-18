@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
-import { getAllTrekDetailSlugs } from "@/data/trek-details";
+import { getAllTrekSlugs } from "@/services/treks.service";
 
 const PROGRAMMATIC_SLUGS = [
   "himachal",
@@ -33,7 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ];
 
-  const trekPages = getAllTrekDetailSlugs().map((slug) => ({
+  const trekSlugs = await getAllTrekSlugs();
+  const trekPages = trekSlugs.map((slug) => ({
     url: `${base}/treks/${slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

@@ -323,42 +323,26 @@ function suitableFor(difficulty) {
 }
 
 function buildItinerary(title, days, destination) {
+  // Placeholder only — real itineraries live in scripts/data/itineraries/*.json
+  // and are applied via scripts/apply-unique-itineraries.mjs. Do not use this
+  // for published content.
   const shortName = title.replace(/\s*Trek$/i, "");
   return Array.from({ length: days }, (_, i) => {
     const day = i + 1;
-    if (day === 1) {
-      return {
-        day,
-        title: `Arrival & trek start near ${destination}`,
-        distanceKm: days === 1 ? 8 : 6,
-        altitudeFt: undefined,
-        walkingHours: days === 1 ? "4-6 hrs" : "3-5 hrs",
-        meals: days === 1 ? ["Lunch"] : ["Lunch", "Dinner"],
-        accommodation: days === 1 ? "Day return" : "Camp / Homestay",
-        description: `Briefing, gear check and begin the ${shortName} trail from the ${destination} trailhead. Steady ascent with scenic Himalayan views.`,
-        images: [],
-      };
-    }
-    if (day === days) {
-      return {
-        day,
-        title: days === 1 ? `${shortName} summit / viewpoint` : "Descent & departure",
-        distanceKm: 8,
-        walkingHours: "4-6 hrs",
-        meals: ["Breakfast", "Lunch"],
-        accommodation: "Hotel / Homestay",
-        description: `Complete the remaining stretch of ${shortName}, soak in summit or lake views, then descend to the roadhead and depart.`,
-        images: [],
-      };
-    }
     return {
       day,
-      title: `${shortName} — Day ${day}`,
-      distanceKm: 7 + (day % 3),
-      walkingHours: "5-7 hrs",
-      meals: ["Breakfast", "Lunch", "Dinner"],
-      accommodation: "Camp / Homestay",
-      description: `Continue along the ${shortName} route with gradual altitude gain, ridge or valley walking, and overnight near the next camp.`,
+      title: `${shortName} — Day ${day} (draft)`,
+      startLocation: destination,
+      endLocation: destination,
+      distanceKm: 6,
+      walkingHours: "4-6 hrs",
+      difficulty: "Moderate",
+      trailType: "Himalayan trail",
+      meals: day === 1 ? ["Lunch", "Dinner"] : day === days ? ["Breakfast", "Lunch"] : ["Breakfast", "Lunch", "Dinner"],
+      accommodation: days === 1 ? "Day return" : day === days ? "Hotel / Homestay" : "Camp / Homestay",
+      description: `PLACEHOLDER: Replace with a unique, trail-accurate itinerary for ${shortName} day ${day} near ${destination}.`,
+      highlights: [],
+      tips: [],
       images: [],
     };
   });

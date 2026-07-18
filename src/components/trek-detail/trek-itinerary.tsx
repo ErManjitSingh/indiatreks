@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BLUR_DATA_URL } from "@/constants/media";
-import type { TrekDetail } from "@/types/trek-detail";
+import type { TrekDetail, TrekItineraryDay } from "@/types/trek-detail";
 import { formatNumber } from "@/utils";
 
 export function TrekItinerary({ trek }: { trek: TrekDetail }) {
@@ -44,21 +44,42 @@ export function TrekItinerary({ trek }: { trek: TrekDetail }) {
                     Day {day.day}
                   </p>
                   <h3 className="mt-1 font-heading text-lg font-bold md:text-xl">{day.title}</h3>
+                  {day.startLocation && day.endLocation ? (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {day.startLocation} → {day.endLocation}
+                    </p>
+                  ) : null}
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="grid gap-3 pb-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                  {day.distanceKm ? <Meta label="Distance" value={`${day.distanceKm} km`} /> : null}
-                  {day.altitudeFt ? (
-                    <Meta label="Altitude" value={`${formatNumber(day.altitudeFt)} ft`} />
-                  ) : null}
-                  {day.walkingHours ? <Meta label="Walking Hours" value={day.walkingHours} /> : null}
-                  <Meta label="Meals" value={day.meals.join(", ")} />
-                  <Meta label="Stay" value={day.accommodation} />
-                </div>
-                <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
+                <DayMetaGrid day={day} />
+                <p className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-muted-foreground">
                   {day.description}
                 </p>
+                {day.highlights?.length ? (
+                  <div className="mt-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      Highlights
+                    </p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
+                      {day.highlights.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {day.tips?.length ? (
+                  <div className="mt-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      Important Tips
+                    </p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
+                      {day.tips.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
                 {day.images.length ? (
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     {day.images.map((src) => (
@@ -83,6 +104,32 @@ export function TrekItinerary({ trek }: { trek: TrekDetail }) {
         </Accordion>
       </div>
     </section>
+  );
+}
+
+function DayMetaGrid({ day }: { day: TrekItineraryDay }) {
+  const cells: Array<{ label: string; value: string }> = [];
+  if (day.startLocation) cells.push({ label: "Start", value: day.startLocation });
+  if (day.endLocation) cells.push({ label: "End", value: day.endLocation });
+  if (day.distanceKm) cells.push({ label: "Distance", value: `${day.distanceKm} km` });
+  if (day.walkingHours) cells.push({ label: "Trek Time", value: day.walkingHours });
+  if (day.altitudeFt) {
+    cells.push({ label: "Altitude", value: `${formatNumber(day.altitudeFt)} ft` });
+  }
+  if (day.elevationGainLoss) {
+    cells.push({ label: "Elevation Gain/Loss", value: day.elevationGainLoss });
+  }
+  if (day.difficulty) cells.push({ label: "Difficulty", value: day.difficulty });
+  if (day.trailType) cells.push({ label: "Trail Type", value: day.trailType });
+  cells.push({ label: "Meals", value: day.meals.join(", ") || "—" });
+  cells.push({ label: "Overnight Stay", value: day.accommodation || "—" });
+
+  return (
+    <div className="grid gap-3 pb-2 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {cells.map((cell) => (
+        <Meta key={cell.label} label={cell.label} value={cell.value} />
+      ))}
+    </div>
   );
 }
 

@@ -8,23 +8,42 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { SectionHeader } from "@/components/ui/section-header";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { allTreks } from "@/data/treks";
+import { fetchAllTreks } from "@/lib/api/treks";
 import { useRecentlyViewedStore } from "@/lib/store";
+import type { TrekListingItem } from "@/types/trek-listing";
 import { formatCurrency } from "@/utils";
 
 export function RecentlyViewedTreks() {
   const trekIds = useRecentlyViewedStore((state) => state.trekIds);
   const [hydrated, setHydrated] = useState(false);
+  const [treks, setTreks] = useState<TrekListingItem[]>([]);
 
   useEffect(() => setHydrated(true), []);
 
-  if (!hydrated || trekIds.length === 0) return null;
+  useEffect(() => {
+    if (!hydrated || trekIds.length === 0) return;
+    let active = true;
+    void (async () => {
+      try {
+        const catalog = await fetchAllTreks();
+        if (!active) return;
+        const matched = trekIds
+          .map(
+            (id) =>
+              catalog.find((trek) => trek.id === id || trek.slug === id) ?? null,
+          )
+          .filter((trek): trek is TrekListingItem => Boolean(trek));
+        setTreks(matched);
+      } catch {
+        if (active) setTreks([]);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [hydrated, trekIds]);
 
-  const treks = trekIds
-    .map((id) => allTreks.find((trek) => trek.id === id))
-    .filter((trek): trek is NonNullable<typeof trek> => Boolean(trek));
-
-  if (!treks.length) return null;
+  if (!hydrated || trekIds.length === 0 || !treks.length) return null;
 
   return (
     <Section spacing="sm" className="bg-muted/20">
@@ -39,7 +58,7 @@ export function RecentlyViewedTreks() {
             >
               <div className="relative aspect-[16/10]">
                 <Image
-                  src={trek.images[0]}
+                  src={trek.images[0] || "/images/og-default.jpg"}
                   alt={trek.title}
                   fill
                   sizes="256px"

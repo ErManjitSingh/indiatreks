@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/seo";
 import { ProgrammaticTrekPage } from "@/components/seo/programmatic-trek-page";
 import { TrekDetailPageContent } from "@/components/trek-detail";
-import { getAllTrekDetailSlugs } from "@/data/trek-details";
 import { fetchProgrammaticSeoPage } from "@/lib/api/seo";
 import {
   breadcrumbJsonLd,
@@ -13,7 +12,7 @@ import {
   reviewAggregateJsonLd,
   tourJsonLd,
 } from "@/lib/seo";
-import { getTrekDetail, getTrekListings } from "@/services/treks.service";
+import { getAllTrekSlugs, getTrekDetail, getTrekListings } from "@/services/treks.service";
 
 interface TrekDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -36,8 +35,11 @@ const PROGRAMMATIC_FALLBACK = [
   "june",
 ];
 
-export function generateStaticParams() {
-  const trekSlugs = getAllTrekDetailSlugs().map((slug) => ({ slug }));
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const trekSlugs = (await getAllTrekSlugs()).map((slug) => ({ slug }));
   const programmatic = PROGRAMMATIC_FALLBACK.map((slug) => ({ slug }));
   const seen = new Set<string>();
   return [...trekSlugs, ...programmatic].filter((item) => {
@@ -46,8 +48,6 @@ export function generateStaticParams() {
     return true;
   });
 }
-
-export const revalidate = 3600;
 
 export async function generateMetadata({ params }: TrekDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -123,6 +123,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
 
   if (trek) {
     const faqs = trek.faqs ?? [];
+    const listings = await getTrekListings({ limit: 500 });
     return (
       <>
         <JsonLd
@@ -161,7 +162,7 @@ export default async function TrekDetailPage({ params }: TrekDetailPageProps) {
           })}
         />
         {faqs.length ? <JsonLd data={faqJsonLd(faqs)} /> : null}
-        <TrekDetailPageContent trek={trek} />
+        <TrekDetailPageContent trek={trek} listings={listings} />
       </>
     );
   }

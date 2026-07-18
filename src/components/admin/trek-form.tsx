@@ -48,12 +48,19 @@ import { cn } from "@/lib/utils";
 type ItineraryDayForm = {
   day: number;
   title: string;
+  startLocation: string;
+  endLocation: string;
   distanceKm: string;
   altitudeFt: string;
+  elevationGainLoss: string;
   walkingHours: string;
+  difficulty: string;
+  trailType: string;
   meals: string;
   accommodation: string;
   description: string;
+  highlights: string;
+  tips: string;
   images: string[];
 };
 
@@ -112,12 +119,19 @@ function emptyDay(day: number): ItineraryDayForm {
   return {
     day,
     title: "",
+    startLocation: "",
+    endLocation: "",
     distanceKm: "",
     altitudeFt: "",
+    elevationGainLoss: "",
     walkingHours: "",
+    difficulty: "",
+    trailType: "",
     meals: "",
     accommodation: "",
     description: "",
+    highlights: "",
+    tips: "",
     images: [],
   };
 }
@@ -129,12 +143,21 @@ function parseItinerary(raw: unknown): ItineraryDayForm[] {
     return {
       day: Number(row.day) || index + 1,
       title: String(row.title ?? ""),
+      startLocation: String(row.startLocation ?? ""),
+      endLocation: String(row.endLocation ?? ""),
       distanceKm: row.distanceKm != null && row.distanceKm !== "" ? String(row.distanceKm) : "",
       altitudeFt: row.altitudeFt != null && row.altitudeFt !== "" ? String(row.altitudeFt) : "",
+      elevationGainLoss: String(row.elevationGainLoss ?? ""),
       walkingHours: String(row.walkingHours ?? ""),
+      difficulty: String(row.difficulty ?? ""),
+      trailType: String(row.trailType ?? ""),
       meals: Array.isArray(row.meals) ? row.meals.map(String).join(", ") : String(row.meals ?? ""),
       accommodation: String(row.accommodation ?? ""),
       description: String(row.description ?? ""),
+      highlights: Array.isArray(row.highlights)
+        ? row.highlights.map(String).join("\n")
+        : String(row.highlights ?? ""),
+      tips: Array.isArray(row.tips) ? row.tips.map(String).join("\n") : String(row.tips ?? ""),
       images: Array.isArray(row.images) ? row.images.map(String).filter(Boolean) : [],
     };
   });
@@ -179,15 +202,28 @@ function toPayload(form: TrekFormState) {
     .map((day, index) => ({
       day: Number(day.day) || index + 1,
       title: day.title.trim(),
+      startLocation: day.startLocation.trim() || undefined,
+      endLocation: day.endLocation.trim() || undefined,
       distanceKm: day.distanceKm ? Number(day.distanceKm) : undefined,
       altitudeFt: day.altitudeFt ? Number(day.altitudeFt) : undefined,
-      walkingHours: day.walkingHours.trim(),
+      elevationGainLoss: day.elevationGainLoss.trim() || undefined,
+      walkingHours: day.walkingHours.trim() || undefined,
+      difficulty: day.difficulty.trim() || undefined,
+      trailType: day.trailType.trim() || undefined,
       meals: day.meals
         .split(",")
         .map((m) => m.trim())
         .filter(Boolean),
       accommodation: day.accommodation.trim(),
       description: day.description.trim(),
+      highlights: day.highlights
+        .split("\n")
+        .map((h) => h.trim())
+        .filter(Boolean),
+      tips: day.tips
+        .split("\n")
+        .map((t) => t.trim())
+        .filter(Boolean),
       images: day.images.filter(Boolean),
     }));
 
@@ -804,7 +840,7 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
                         className={inputClass}
                         value={day.title}
                         onChange={(e) => updateDay(index, { title: e.target.value })}
-                        placeholder="e.g. Arrival at base camp"
+                        placeholder="e.g. Jobra to Chikka"
                       />
                     </FieldShell>
                     <FieldShell label="Walking hours">
@@ -813,6 +849,22 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
                         value={day.walkingHours}
                         onChange={(e) => updateDay(index, { walkingHours: e.target.value })}
                         placeholder="e.g. 5-6 hrs"
+                      />
+                    </FieldShell>
+                    <FieldShell label="Start location">
+                      <input
+                        className={inputClass}
+                        value={day.startLocation}
+                        onChange={(e) => updateDay(index, { startLocation: e.target.value })}
+                        placeholder="e.g. Jobra"
+                      />
+                    </FieldShell>
+                    <FieldShell label="End location">
+                      <input
+                        className={inputClass}
+                        value={day.endLocation}
+                        onChange={(e) => updateDay(index, { endLocation: e.target.value })}
+                        placeholder="e.g. Chikka"
                       />
                     </FieldShell>
                     <FieldShell label="Distance (km)">
@@ -831,6 +883,30 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
                         min={0}
                         value={day.altitudeFt}
                         onChange={(e) => updateDay(index, { altitudeFt: e.target.value })}
+                      />
+                    </FieldShell>
+                    <FieldShell label="Elevation gain/loss">
+                      <input
+                        className={inputClass}
+                        value={day.elevationGainLoss}
+                        onChange={(e) => updateDay(index, { elevationGainLoss: e.target.value })}
+                        placeholder="e.g. +1,800 ft / -200 ft"
+                      />
+                    </FieldShell>
+                    <FieldShell label="Day difficulty">
+                      <input
+                        className={inputClass}
+                        value={day.difficulty}
+                        onChange={(e) => updateDay(index, { difficulty: e.target.value })}
+                        placeholder="e.g. Moderate"
+                      />
+                    </FieldShell>
+                    <FieldShell label="Trail type">
+                      <input
+                        className={inputClass}
+                        value={day.trailType}
+                        onChange={(e) => updateDay(index, { trailType: e.target.value })}
+                        placeholder="e.g. pine forest, river, meadow"
                       />
                     </FieldShell>
                     <FieldShell label="Meals (comma separated)">
@@ -854,10 +930,29 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
                   <div className="mt-3">
                     <FieldShell label="Description">
                       <textarea
-                        className={cn(textareaClass, "min-h-[100px]")}
+                        className={cn(textareaClass, "min-h-[160px]")}
                         value={day.description}
                         onChange={(e) => updateDay(index, { description: e.target.value })}
-                        placeholder="What happens on this day..."
+                        placeholder="Trail-specific narrative: terrain, landmarks, water sources, weather, safety..."
+                      />
+                    </FieldShell>
+                  </div>
+
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <FieldShell label="Highlights (one per line)">
+                      <textarea
+                        className={cn(textareaClass, "min-h-[90px]")}
+                        value={day.highlights}
+                        onChange={(e) => updateDay(index, { highlights: e.target.value })}
+                        placeholder="Viewpoint&#10;River crossing&#10;Sunset at camp"
+                      />
+                    </FieldShell>
+                    <FieldShell label="Important tips (one per line)">
+                      <textarea
+                        className={cn(textareaClass, "min-h-[90px]")}
+                        value={day.tips}
+                        onChange={(e) => updateDay(index, { tips: e.target.value })}
+                        placeholder="Carry 2L water&#10;Steep final climb"
                       />
                     </FieldShell>
                   </div>

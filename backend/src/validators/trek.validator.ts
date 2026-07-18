@@ -42,12 +42,19 @@ const quickInfoSchema = z.object({
 const itineraryDaySchema = z.object({
   day: z.number().int().min(1),
   title: z.string().min(1),
+  startLocation: z.string().optional(),
+  endLocation: z.string().optional(),
   distanceKm: z.number().optional(),
   altitudeFt: z.number().optional(),
+  elevationGainLoss: z.string().optional(),
   walkingHours: z.string().optional(),
+  difficulty: z.string().optional(),
+  trailType: z.string().optional(),
   meals: z.array(z.string()).default([]),
   accommodation: z.string().default(""),
   description: z.string().default(""),
+  highlights: z.array(z.string()).optional(),
+  tips: z.array(z.string()).optional(),
   images: z.array(z.string()).default([]),
 });
 

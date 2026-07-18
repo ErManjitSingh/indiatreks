@@ -1,16 +1,17 @@
 import { TrekDetailViewport } from "@/components/trek-detail/trek-detail-viewport";
 import { Seo } from "@/components/seo";
-import { allTreks } from "@/data/treks";
 import type { TrekDetail } from "@/types/trek-detail";
+import type { TrekListingItem } from "@/types/trek-listing";
 
 interface TrekDetailPageContentProps {
   trek: TrekDetail;
+  listings?: TrekListingItem[];
 }
 
-export function TrekDetailPageContent({ trek }: TrekDetailPageContentProps) {
+export function TrekDetailPageContent({ trek, listings = [] }: TrekDetailPageContentProps) {
   const relatedTreks = trek.relatedSlugs
-    .map((slug) => allTreks.find((item) => item.slug === slug))
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+    .map((slug) => listings.find((item) => item.slug === slug))
+    .filter((item): item is TrekListingItem => Boolean(item));
 
   return (
     <>

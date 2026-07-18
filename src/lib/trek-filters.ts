@@ -1,7 +1,6 @@
 import {
   TREK_ALTITUDE_BOUNDS,
   TREK_PRICE_BOUNDS,
-  allTreks,
 } from "@/data/treks";
 import type {
   TrekFiltersState,
@@ -404,5 +403,3 @@ export function getDiscountPercent(price: number, original?: number): number | n
   if (!original || original <= price) return null;
   return Math.round(((original - price) / original) * 100);
 }
-
-export { allTreks };

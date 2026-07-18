@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,20 +10,39 @@ import { BookNowButton } from "@/components/booking/book-now-button";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { BLUR_DATA_URL } from "@/constants/media";
-import { getPopularTreks } from "@/data/treks";
+import { fetchAllTreks } from "@/lib/api/treks";
+import type { TrekListingItem } from "@/types/trek-listing";
 import { formatCurrency } from "@/utils";
 
 function BookingHubContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const trekQuery = searchParams.get("trek");
-  const popular = getPopularTreks(8);
+  const [popular, setPopular] = useState<TrekListingItem[]>([]);
 
   useEffect(() => {
     if (trekQuery) {
       router.replace(`/booking/${trekQuery}`);
     }
   }, [router, trekQuery]);
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const items = await fetchAllTreks();
+        if (!active) return;
+        setPopular(
+          [...items].sort((a, b) => b.popularity - a.popularity).slice(0, 8),
+        );
+      } catch {
+        if (active) setPopular([]);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   if (trekQuery) {
     return (
@@ -61,7 +80,7 @@ function BookingHubContent() {
             >
               <Link href={`/treks/${trek.slug}`} className="relative block aspect-[4/3]">
                 <Image
-                  src={trek.images[0]}
+                  src={trek.images[0] || "/images/og-default.jpg"}
                   alt={trek.title}
                   fill
                   sizes="(max-width: 640px) 100vw, 25vw"

@@ -1,15 +1,43 @@
 /**
- * Data layer ready for CMS / API wiring.
- * Prefer REST backend when NEXT_PUBLIC_API_URL is configured.
+ * Trek data comes from the Express API only (MongoDB).
+ * No static trek catalog / itinerary fallback.
  */
 import { fetchAllTreks, fetchTrekBySlug, fetchTreks } from "@/lib/api/treks";
-import { allTreks, getTrekBySlug as getStaticListing } from "@/data/treks";
-import { getTrekDetailBySlug as getStaticDetail } from "@/data/trek-details";
 import type { Trek } from "@/types";
 import type { TrekDetail } from "@/types/trek-detail";
 import type { TrekListingItem } from "@/types/trek-listing";
 
-const useApi = Boolean(process.env.NEXT_PUBLIC_API_URL || process.env.API_URL);
+function listingFromDetail(detail: TrekDetail): TrekListingItem {
+  return {
+    id: detail.id,
+    slug: detail.slug,
+    title: detail.title,
+    summary: detail.summary,
+    destinationName: detail.quickInfo?.destination || detail.region,
+    state: detail.state,
+    region: detail.region,
+    difficulty: detail.difficulty,
+    bestSeasons: detail.bestSeasons,
+    durationDays: detail.durationDays,
+    durationNights: detail.durationNights,
+    maxAltitude: detail.maxAltitude,
+    groupSizeMin: 1,
+    groupSizeMax: 20,
+    basePriceInr: detail.basePriceInr,
+    originalPriceInr: detail.originalPriceInr,
+    rating: detail.rating,
+    reviewCount: detail.reviewCount,
+    images: detail.heroImages,
+    seatsLeft: detail.seatsLeft,
+    badges: [],
+    trekTypes: [],
+    suitableFor: [],
+    months: [],
+    departures: detail.departures.map((d) => d.date),
+    createdAt: new Date().toISOString(),
+    popularity: detail.reviewCount,
+  };
+}
 
 export async function getFeaturedTreks(): Promise<Trek[]> {
   return [];
@@ -30,38 +58,40 @@ export async function getTrekListings(params?: {
   page?: number;
   limit?: number;
 }): Promise<TrekListingItem[]> {
-  if (useApi) {
-    try {
-      const items = await fetchAllTreks(params);
-      if (items.length) return items;
-    } catch {
-      // fall through to static
+  try {
+    if (params?.page || (params?.limit && params.limit <= 100)) {
+      const { items } = await fetchTreks(params);
+      return items;
     }
+    return await fetchAllTreks(params);
+  } catch {
+    return [];
   }
-  return allTreks;
 }
 
 export async function getTrekDetail(slug: string): Promise<TrekDetail | null> {
-  if (useApi) {
-    try {
-      const fromApi = await fetchTrekBySlug(slug);
-      if (fromApi) return fromApi;
-    } catch {
-      // fall through
-    }
+  try {
+    return await fetchTrekBySlug(slug);
+  } catch {
+    return null;
   }
-  return getStaticDetail(slug) ?? null;
 }
 
 export async function getListing(slug: string): Promise<TrekListingItem | undefined> {
-  if (useApi) {
-    try {
-      const { items } = await fetchTreks({ q: slug, limit: 5 });
-      const match = items.find((t) => t.slug === slug);
-      if (match) return match;
-    } catch {
-      // fall through
-    }
+  try {
+    const detail = await fetchTrekBySlug(slug);
+    return detail ? listingFromDetail(detail) : undefined;
+  } catch {
+    return undefined;
   }
-  return getStaticListing(slug);
+}
+
+export async function getAllTrekSlugs(): Promise<string[]> {
+  const treks = await getTrekListings({ limit: 500 });
+  return treks.map((t) => t.slug);
+}
+
+export async function getPopularTrekListings(limit = 8): Promise<TrekListingItem[]> {
+  const treks = await getTrekListings({ limit: 100 });
+  return [...treks].sort((a, b) => b.popularity - a.popularity).slice(0, limit);
 }
