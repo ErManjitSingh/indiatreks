@@ -34,6 +34,7 @@ import {
   type EnterpriseSeoForm,
 } from "@/components/admin/admin-seo-fields";
 import { AiSeoAssistPanel } from "@/components/admin/ai-seo-assist-panel";
+import { revalidateTrekContent } from "@/app/actions/revalidate-treks";
 import {
   adminCreateTrek,
   adminUpdateTrek,
@@ -43,6 +44,7 @@ import {
   linesToArray,
   type AdminDoc,
 } from "@/lib/api/admin";
+import { resolveMediaUrl } from "@/lib/resolve-media-url";
 import { cn } from "@/lib/utils";
 
 type ItineraryDayForm = {
@@ -158,7 +160,9 @@ function parseItinerary(raw: unknown): ItineraryDayForm[] {
         ? row.highlights.map(String).join("\n")
         : String(row.highlights ?? ""),
       tips: Array.isArray(row.tips) ? row.tips.map(String).join("\n") : String(row.tips ?? ""),
-      images: Array.isArray(row.images) ? row.images.map(String).filter(Boolean) : [],
+      images: Array.isArray(row.images)
+        ? row.images.map((src) => resolveMediaUrl(String(src))).filter(Boolean)
+        : [],
     };
   });
 }
@@ -184,7 +188,7 @@ function fromDoc(doc?: AdminDoc | null): TrekFormState {
     seatsLeft: String(doc?.seatsLeft ?? "0"),
     status: String(doc?.status ?? "draft"),
     heroImages: Array.isArray(doc?.heroImages)
-      ? doc!.heroImages.map(String).filter(Boolean)
+      ? doc!.heroImages.map((src) => resolveMediaUrl(String(src))).filter(Boolean)
       : linesToArray(arrayToLines(doc?.heroImages)),
     highlights: arrayToLines(doc?.highlights),
     inclusions: arrayToLines(doc?.inclusions),
@@ -384,7 +388,7 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
     const urls: string[] = [];
     for (const file of list) {
       const media = await adminUploadMedia(file, folder, form.title || file.name);
-      const url = String(media?.url ?? "");
+      const url = resolveMediaUrl(String(media?.url ?? ""));
       if (url) urls.push(url);
     }
     return urls;
@@ -453,10 +457,12 @@ export function TrekForm({ initial }: { initial?: AdminDoc | null }) {
       const payload = toPayload(form);
       if (isEdit) {
         await adminUpdateTrek(String(initial!._id), payload);
+        await revalidateTrekContent(form.slug || undefined);
         toast.success("Trek updated");
         router.refresh();
       } else {
         const created = await adminCreateTrek(payload);
+        await revalidateTrekContent(form.slug || String(created.slug ?? ""));
         toast.success("Trek created");
         router.replace(`/admin/treks/${created._id}/edit`);
         return;

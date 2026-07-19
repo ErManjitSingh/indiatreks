@@ -95,9 +95,12 @@ async function uploadToLocal(
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, filename), buffer);
 
+  // Absolute URL so Next.js `next/image` treats uploads as remote (relative
+  // `/api/uploads/...` is resolved against `public/` and never reaches Express).
+  const publicBase = (env.FRONTEND_URL || env.APP_URL).replace(/\/$/, "");
   return {
     public_id: `local/${folder}/${filename}`,
-    secure_url: `/api/uploads/${folder}/${filename}`,
+    secure_url: `${publicBase}/api/uploads/${folder}/${filename}`,
     format: ext,
     width: 0,
     height: 0,

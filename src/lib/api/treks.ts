@@ -1,5 +1,6 @@
 import { apiGet, apiPost, type ApiSuccess } from "@/lib/api/client";
 import { cachedApiGet } from "@/lib/api/cached-fetch";
+import { resolveMediaUrl, resolveMediaUrls } from "@/lib/resolve-media-url";
 import type { TrekDetail } from "@/types/trek-detail";
 import type { TrekListingItem } from "@/types/trek-listing";
 
@@ -34,7 +35,9 @@ function mapListing(raw: Record<string, unknown>): TrekListingItem {
     originalPriceInr: raw.originalPriceInr ? Number(raw.originalPriceInr) : undefined,
     rating: Number(raw.rating ?? 0),
     reviewCount: Number(raw.reviewCount ?? 0),
-    images: (raw.heroImages as string[]) ?? (raw.images as string[]) ?? [],
+    images: resolveMediaUrls(
+      (raw.heroImages as string[]) ?? (raw.images as string[]) ?? [],
+    ),
     seatsLeft: Number(raw.seatsLeft ?? 0),
     badges: (raw.badges as TrekListingItem["badges"]) ?? [],
     trekTypes: (raw.trekTypes as TrekListingItem["trekTypes"]) ?? [],
@@ -139,8 +142,11 @@ export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> 
       originalPriceInr: raw.originalPriceInr ? Number(raw.originalPriceInr) : undefined,
       taxNote: String(raw.taxNote ?? "Prices inclusive of applicable GST"),
       seatsLeft: Number(raw.seatsLeft ?? 0),
-      heroImages: (raw.heroImages as string[]) ?? [],
-      gallery: (raw.gallery as TrekDetail["gallery"]) ?? [],
+      heroImages: resolveMediaUrls((raw.heroImages as string[]) ?? []),
+      gallery: ((raw.gallery as TrekDetail["gallery"]) ?? []).map((item) => ({
+        ...item,
+        src: resolveMediaUrl(item.src),
+      })),
       quickInfo: (raw.quickInfo as TrekDetail["quickInfo"]) ?? {
         destination: String(raw.destinationName ?? ""),
         duration: `${raw.durationDays ?? 1}D / ${raw.durationNights ?? 0}N`,
@@ -159,7 +165,10 @@ export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> 
         transport: "",
       },
       highlights: (raw.highlights as string[]) ?? [],
-      itinerary: (raw.itinerary as TrekDetail["itinerary"]) ?? [],
+      itinerary: ((raw.itinerary as TrekDetail["itinerary"]) ?? []).map((day) => ({
+        ...day,
+        images: resolveMediaUrls(day.images),
+      })),
       inclusions: (raw.inclusions as string[]) ?? [],
       exclusions: (raw.exclusions as string[]) ?? [],
       packingList: (raw.packingList as TrekDetail["packingList"]) ?? [],
@@ -194,10 +203,10 @@ export async function fetchTrekBySlug(slug: string): Promise<TrekDetail | null> 
               keywords: Array.isArray(seo.keywords) ? (seo.keywords as string[]) : undefined,
               ogTitle: seo.ogTitle as string | undefined,
               ogDescription: seo.ogDescription as string | undefined,
-              ogImage: seo.ogImage as string | undefined,
+              ogImage: resolveMediaUrl(seo.ogImage as string | undefined) || undefined,
               twitterTitle: seo.twitterTitle as string | undefined,
               twitterDescription: seo.twitterDescription as string | undefined,
-              twitterImage: seo.twitterImage as string | undefined,
+              twitterImage: resolveMediaUrl(seo.twitterImage as string | undefined) || undefined,
               twitterCard:
                 card === "summary" ||
                 card === "summary_large_image" ||

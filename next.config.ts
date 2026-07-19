@@ -23,6 +23,38 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "treks.indiaholidaydestination.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.treks.indiaholidaydestination.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3010",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "4000",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "4000",
+      },
+      {
+        protocol: "https",
         hostname: "eegoitaly.in",
       },
       {
@@ -56,9 +88,19 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    // Always proxy to the local Express process — never the public site URL
+    // (that would loop when API_URL points at the same hostname).
+    const apiOrigin = (process.env.API_PROXY_ORIGIN || "http://127.0.0.1:4000").replace(
+      /\/$/,
+      "",
+    );
+
     return [
       { source: "/blog", destination: "/blogs" },
       { source: "/blog/:slug", destination: "/blogs/:slug" },
+      // Local uploads live on Express; needed for next/image + local/dev without nginx.
+      { source: "/api/uploads/:path*", destination: `${apiOrigin}/api/uploads/:path*` },
+      { source: "/api/:path*", destination: `${apiOrigin}/api/:path*` },
     ];
   },
   async headers() {
