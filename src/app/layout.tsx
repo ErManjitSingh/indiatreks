@@ -89,13 +89,23 @@ export default async function RootLayout({
     fetchPublicAnalyticsConfig(),
   ]);
   const analytics =
-    (analyticsConfig as { gtm?: { enabled?: boolean; containerId?: string } } | null) ??
-    (seo?.analytics as { gtm?: { enabled?: boolean; containerId?: string } } | undefined) ??
+    (analyticsConfig as {
+      gtm?: { enabled?: boolean; containerId?: string };
+      ga4?: { enabled?: boolean; measurementId?: string };
+    } | null) ??
+    (seo?.analytics as {
+      gtm?: { enabled?: boolean; containerId?: string };
+      ga4?: { enabled?: boolean; measurementId?: string };
+    } | undefined) ??
     {};
   const gtmContainerId =
     analytics.gtm?.enabled && analytics.gtm?.containerId
       ? String(analytics.gtm.containerId)
       : process.env.NEXT_PUBLIC_GTM_ID || null;
+  const ga4MeasurementId =
+    analytics.ga4?.enabled && analytics.ga4?.measurementId
+      ? String(analytics.ga4.measurementId)
+      : process.env.NEXT_PUBLIC_GA4_ID || null;
 
   return (
     <html lang="en-IN" suppressHydrationWarning>
@@ -104,7 +114,10 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders bootstrap={bootstrap}>
-          <ConditionalSiteChrome gtmContainerId={gtmContainerId}>
+          <ConditionalSiteChrome
+            gtmContainerId={gtmContainerId}
+            ga4MeasurementId={ga4MeasurementId}
+          >
             {children}
           </ConditionalSiteChrome>
         </AppProviders>

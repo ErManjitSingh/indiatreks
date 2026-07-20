@@ -4,8 +4,6 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 
 type AnalyticsPublic = {
-  ga4?: { enabled?: boolean; measurementId?: string };
-  gtm?: { enabled?: boolean; containerId?: string };
   metaPixel?: { enabled?: boolean; pixelId?: string };
   clarity?: { enabled?: boolean; projectId?: string };
 };
@@ -34,8 +32,8 @@ function useIdleGate(delayMs = 4000) {
 }
 
 /**
- * Deferred marketing pixels (GA4 standalone, Meta, Clarity).
- * GTM is handled separately by GoogleTagManager for correct early install.
+ * Deferred marketing pixels (Meta, Clarity).
+ * GTM + GA4 are handled by dedicated early-load components.
  */
 export function AnalyticsScripts() {
   const idleReady = useIdleGate(4500);
@@ -61,32 +59,13 @@ export function AnalyticsScripts() {
 
   if (!config) return null;
 
-  const gtmEnabled = Boolean(config.gtm?.enabled && config.gtm?.containerId);
-  // Skip standalone GA4 when GTM already owns tags (avoids double-loading).
-  const gaId =
-    !gtmEnabled && config.ga4?.enabled ? config.ga4.measurementId : undefined;
   const pixelId = config.metaPixel?.enabled ? config.metaPixel.pixelId : undefined;
   const clarityId = config.clarity?.enabled ? config.clarity.projectId : undefined;
 
-  if (!gaId && !pixelId && !clarityId) return null;
+  if (!pixelId && !clarityId) return null;
 
   return (
     <>
-      {gaId ? (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            strategy="lazyOnload"
-          />
-          <Script id="ga4-init" strategy="lazyOnload">{`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gaId}');
-          `}</Script>
-        </>
-      ) : null}
-
       {pixelId ? (
         <Script id="meta-pixel" strategy="lazyOnload">{`
           !function(f,b,e,v,n,t,s)

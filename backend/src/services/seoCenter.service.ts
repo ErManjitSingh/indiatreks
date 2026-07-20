@@ -77,7 +77,20 @@ async function updateIntegrations(input: Record<string, unknown>) {
     }));
 
   if (input.ga4 && typeof input.ga4 === "object") {
-    Object.assign(doc.ga4, input.ga4);
+    const ga4 = input.ga4 as Record<string, unknown>;
+    doc.ga4 = doc.ga4 || { enabled: false };
+    if (ga4.enabled != null) doc.ga4.enabled = Boolean(ga4.enabled);
+    if (ga4.measurementId != null) {
+      const id = String(ga4.measurementId)
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+      doc.ga4.measurementId = /^G-[A-Z0-9]+$/.test(id) ? id : "";
+      if (!doc.ga4.measurementId) doc.ga4.enabled = false;
+    }
+    if (ga4.propertyId != null) {
+      doc.ga4.propertyId = String(ga4.propertyId).trim().replace(/^properties\//, "");
+    }
   }
   if (input.gtm && typeof input.gtm === "object") {
     const gtm = input.gtm as Record<string, unknown>;

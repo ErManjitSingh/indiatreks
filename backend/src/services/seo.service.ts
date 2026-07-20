@@ -175,6 +175,20 @@ async function updateAnalyticsConfig(data: Partial<IAnalyticsConfig>) {
       containerId: valid ? id : "",
     };
   }
+  if (data.ga4) {
+    const id = String(data.ga4.measurementId || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, "");
+    const valid = /^G-[A-Z0-9]+$/.test(id);
+    payload.ga4 = {
+      enabled: Boolean(data.ga4.enabled) && valid,
+      measurementId: valid ? id : "",
+      propertyId: String(data.ga4.propertyId || "")
+        .trim()
+        .replace(/^properties\//, ""),
+    };
+  }
   return AnalyticsConfigModel.findOneAndUpdate({ key: "default" }, payload, {
     new: true,
     upsert: true,
