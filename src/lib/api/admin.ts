@@ -263,18 +263,68 @@ export async function adminGetSettings(group?: string) {
   return res.data ?? {};
 }
 
+export type AdminDashboardActivity = {
+  type: "trek" | "blog" | "destination" | "media" | "faq" | string;
+  title: string;
+  href?: string;
+  at: string;
+  relativeTime: string;
+};
+
+export type AdminDashboardTopTrek = {
+  rank: number;
+  title: string;
+  place?: string;
+  slug?: string;
+  metricLabel?: string;
+  metricValue?: number;
+  metricDisplay?: string;
+  image?: string;
+};
+
 export type AdminDashboardStats = {
   treks?: { total?: number; published?: number };
   content?: {
     destinations?: number;
     faqs?: number;
     blogs?: number;
+    blogsPublished?: number;
     categories?: number;
+    media?: number;
+    settings?: number;
+    testimonials?: number;
+    blogViews?: number;
   };
   bookings?: { total?: number; confirmed?: number; pending?: number };
   users?: { total?: number };
-  enquiries?: { new?: number };
+  enquiries?: { new?: number; total?: number };
   revenue?: { total?: number; thisMonth?: number; lastMonth?: number };
+  topTreks?: AdminDashboardTopTrek[];
+  topBlogs?: Array<{
+    rank: number;
+    title: string;
+    slug?: string;
+    views?: number;
+    category?: string;
+    image?: string;
+  }>;
+  recentActivity?: AdminDashboardActivity[];
+  series?: {
+    content?: Array<{ date: string; count: number }>;
+    blogs?: Array<{ date: string; count: number }>;
+    treks?: Array<{ date: string; count: number }>;
+  };
+  analytics?: {
+    connected?: boolean;
+    source?: string;
+    rangeDays?: number;
+    visitors?: number;
+    pageViews?: number;
+    enquiries?: number;
+    bounceRate?: number | null;
+    blogViews?: number;
+    series?: Array<{ date: string; count: number }>;
+  };
 };
 
 export async function adminGetDashboardStats(): Promise<AdminDashboardStats> {
