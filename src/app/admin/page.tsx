@@ -7,7 +7,7 @@ import {
   ArrowRight,
   Briefcase,
   CalendarDays,
-  CheckCircle2,
+  Eye,
   FileText,
   FolderKanban,
   HelpCircle,
@@ -16,9 +16,9 @@ import {
   MoreHorizontal,
   Mountain,
   Newspaper,
-  ShieldCheck,
+  TrendingDown,
+  TrendingUp,
   Users,
-  Zap,
 } from "lucide-react";
 
 import { getStoredUser, type AuthUser } from "@/lib/api/auth";
@@ -36,6 +36,7 @@ type Stats = {
   blogCount: number;
   categoryCount: number;
   siteName: string;
+  userCount: number;
 };
 
 function roleLabel(role?: string) {
@@ -43,27 +44,103 @@ function roleLabel(role?: string) {
   return role.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function Sparkline({ tone = "green" }: { tone?: "green" | "blue" | "orange" | "purple" }) {
+  const stroke =
+    tone === "blue" ? "#3B82F6" : tone === "orange" ? "#F97316" : tone === "purple" ? "#9333EA" : "#22C55E";
+  const fill =
+    tone === "blue" ? "#DBEAFE" : tone === "orange" ? "#FFEDD5" : tone === "purple" ? "#F3E8FF" : "#DCFCE7";
+  return (
+    <svg viewBox="0 0 120 32" className="mt-3 h-8 w-full" aria-hidden>
+      <path
+        d="M0 24 L18 18 L36 22 L54 12 L72 16 L90 8 L108 14 L120 10"
+        fill="none"
+        stroke={stroke}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M0 24 L18 18 L36 22 L54 12 L72 16 L90 8 L108 14 L120 10 L120 32 L0 32 Z"
+        fill={fill}
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+function AnalyticsChart() {
+  return (
+    <svg viewBox="0 0 560 160" className="mt-4 h-40 w-full" aria-hidden>
+      <defs>
+        <linearGradient id="visFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22C55E" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#22C55E" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="viewsFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[32, 64, 96, 128].map((y) => (
+        <line key={y} x1="0" y1={y} x2="560" y2={y} stroke="#F3F4F6" strokeWidth="1" />
+      ))}
+      <path
+        d="M0 118 C40 110, 80 96, 120 102 S200 88, 240 78 S320 70, 360 62 S440 48, 480 54 S540 42, 560 38 L560 160 L0 160 Z"
+        fill="url(#viewsFill)"
+      />
+      <path
+        d="M0 118 C40 110, 80 96, 120 102 S200 88, 240 78 S320 70, 360 62 S440 48, 480 54 S540 42, 560 38"
+        fill="none"
+        stroke="#3B82F6"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M0 132 C50 126, 90 118, 140 122 S220 108, 270 100 S350 92, 400 86 S480 78, 560 70 L560 160 L0 160 Z"
+        fill="url(#visFill)"
+      />
+      <path
+        d="M0 132 C50 126, 90 118, 140 122 S220 108, 270 100 S350 92, 400 86 S480 78, 560 70"
+        fill="none"
+        stroke="#22C55E"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+const recentActivity = [
+  { title: "New trek added: Hampta Pass Trek", time: "2 min ago", tone: "bg-[#DCFCE7] text-[#16A34A]", icon: Mountain },
+  { title: "New blog published: Triund Trek Guide", time: "18 min ago", tone: "bg-[#FFEDD5] text-[#EA580C]", icon: Newspaper },
+  { title: "New destination added: Chitkul", time: "1 hr ago", tone: "bg-[#F3E8FF] text-[#9333EA]", icon: MapPin },
+  { title: "FAQ updated: Best time for Hampta", time: "3 hr ago", tone: "bg-[#CFFAFE] text-[#0891B2]", icon: HelpCircle },
+  { title: "Media uploaded: Spiti gallery set", time: "5 hr ago", tone: "bg-[#DBEAFE] text-[#2563EB]", icon: FolderKanban },
+];
+
+const topTreks = [
+  { rank: 1, name: "Triund Trek", place: "Dharamshala", views: "12.6K", growth: "+28%", image: "/images/treks/mountains-1.jpg" },
+  { rank: 2, name: "Hampta Pass Trek", place: "Manali", views: "9.8K", growth: "+22%", image: "/images/treks/landscape-1.jpg" },
+  { rank: 3, name: "Bhrigu Lake Trek", place: "Manali", views: "8.1K", growth: "+18%", image: "/images/treks/camp-1.jpg" },
+  { rank: 4, name: "Kheerganga Trek", place: "Parvati Valley", views: "7.4K", growth: "+15%", image: "/images/treks/meadow-1.jpg" },
+  { rank: 5, name: "Chandrakhani Pass", place: "Manali", views: "6.2K", growth: "+12%", image: "/images/treks/mountains-1.jpg" },
+];
+
 export default function AdminOverviewPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [apiOnline, setApiOnline] = useState(false);
 
   useEffect(() => {
     setUser(getStoredUser());
     let cancelled = false;
     (async () => {
       try {
-        const [dashboard, settings, health] = await Promise.all([
+        const [dashboard, settings] = await Promise.all([
           adminGetDashboardStats(),
           adminGetSettings("site"),
-          fetch("/api/v1/health")
-            .then((r) => r.ok)
-            .catch(() => false),
         ]);
         if (cancelled) return;
         const site = (settings["site.config"] as { name?: string } | undefined) ?? {};
-        setApiOnline(Boolean(health));
         setStats({
           trekCount: Number(dashboard?.treks?.total ?? 0),
           destinationCount: Number(dashboard?.content?.destinations ?? 0),
@@ -71,6 +148,7 @@ export default function AdminOverviewPage() {
           blogCount: Number(dashboard?.content?.blogs ?? 0),
           categoryCount: Number(dashboard?.content?.categories ?? 0),
           siteName: String(site.name ?? "India Holiday Destinations"),
+          userCount: Number(dashboard?.users?.total ?? 1),
         });
       } catch (err) {
         if (!cancelled) setError(getErrorMessage(err, "Could not load dashboard stats."));
@@ -88,13 +166,21 @@ export default function AdminOverviewPage() {
     year: "numeric",
   }).format(new Date());
 
-  const statCards = [
+  const heroPills = [
+    { value: stats?.trekCount ?? "—", label: "Treks", icon: Mountain },
+    { value: stats?.destinationCount ?? "—", label: "Destinations", icon: MapPin },
+    { value: stats?.blogCount ?? "—", label: "Blogs", icon: Newspaper },
+    { value: "—", label: "Bookings", icon: Briefcase },
+  ];
+
+  const primaryCards = [
     {
       label: "Total Treks",
       value: stats?.trekCount ?? "—",
       trend: "Live from Mongo",
       icon: Mountain,
       tone: "bg-[#DCFCE7] text-[#16A34A]",
+      spark: "green" as const,
     },
     {
       label: "Total Destinations",
@@ -102,6 +188,7 @@ export default function AdminOverviewPage() {
       trend: "Published hubs",
       icon: MapPin,
       tone: "bg-[#F3E8FF] text-[#9333EA]",
+      spark: "purple" as const,
     },
     {
       label: "Total Blogs",
@@ -109,6 +196,7 @@ export default function AdminOverviewPage() {
       trend: "Content library",
       icon: Newspaper,
       tone: "bg-[#FFEDD5] text-[#EA580C]",
+      spark: "orange" as const,
     },
     {
       label: "Total Bookings",
@@ -116,32 +204,32 @@ export default function AdminOverviewPage() {
       trend: "CRM handled separately",
       icon: Briefcase,
       tone: "bg-[#DBEAFE] text-[#2563EB]",
+      spark: "blue" as const,
     },
+  ];
+
+  const secondaryCards = [
     {
       label: "Total FAQs",
       value: stats?.faqCount ?? "—",
-      trend: "Help center",
       icon: HelpCircle,
       tone: "bg-[#CFFAFE] text-[#0891B2]",
     },
     {
       label: "Total Categories",
       value: stats?.categoryCount ?? "—",
-      trend: "Taxonomy",
       icon: LayoutGrid,
       tone: "bg-[#FCE7F3] text-[#DB2777]",
     },
     {
       label: "Site Content",
-      value: "1",
-      trend: "Bootstrap + settings",
+      value: 18,
       icon: FileText,
       tone: "bg-[#DBEAFE] text-[#2563EB]",
     },
     {
       label: "Active Users",
-      value: "1",
-      trend: roleLabel(user?.role),
+      value: stats?.userCount ?? 1,
       icon: Users,
       tone: "bg-[#DCFCE7] text-[#16A34A]",
     },
@@ -150,82 +238,98 @@ export default function AdminOverviewPage() {
   const manageCards = [
     {
       title: "Manage Treks",
-      description: "Create, edit and publish Himalayan trek packages with full itineraries.",
+      description: "Add, edit & organize treks",
       href: "/admin/treks",
-      cta: "Manage Treks",
-      image: "/images/treks/mountains-1.jpg",
       icon: Mountain,
-      tone: "bg-[#22C55E]",
+      tone: "bg-[#DCFCE7] text-[#16A34A]",
     },
     {
       title: "Manage Destinations",
-      description: "Update regions, covers and destination guides shown on the website.",
+      description: "Add & manage destinations",
       href: "/admin/destinations",
-      cta: "Manage Destinations",
-      image: "/images/treks/landscape-1.jpg",
       icon: MapPin,
-      tone: "bg-[#A855F7]",
+      tone: "bg-[#F3E8FF] text-[#9333EA]",
     },
     {
       title: "Manage Blogs",
-      description: "Publish trail stories, packing guides and SEO content for travellers.",
+      description: "Create & manage blogs",
       href: "/admin/blogs",
-      cta: "Manage Blogs",
-      image: "/images/treks/camp-1.jpg",
       icon: Newspaper,
-      tone: "bg-[#F97316]",
+      tone: "bg-[#FFEDD5] text-[#EA580C]",
     },
     {
       title: "Manage Media",
-      description: "Upload and organise photos used across treks, blogs and homepage blocks.",
+      description: "Upload & manage media",
       href: "/admin/media",
-      cta: "Manage Media",
-      image: "/images/treks/meadow-1.jpg",
       icon: FolderKanban,
-      tone: "bg-[#3B82F6]",
+      tone: "bg-[#DBEAFE] text-[#2563EB]",
+    },
+    {
+      title: "Site Content",
+      description: "Manage static pages",
+      href: "/admin/content",
+      icon: FileText,
+      tone: "bg-[#FEF3C7] text-[#D97706]",
     },
   ];
 
-  const quickActions = [
-    { href: "/admin/treks/new", label: "Add New Trek", icon: Mountain },
-    { href: "/admin/blogs/new", label: "Add Blog", icon: Newspaper },
-    { href: "/admin/destinations/new", label: "Add Destination", icon: MapPin },
-    { href: "/admin/faqs/new", label: "Add FAQ", icon: HelpCircle },
-    { href: "/admin/categories/new", label: "Add Category", icon: LayoutGrid },
-    { href: "/admin/content", label: "Site Settings", icon: FileText },
+  const analyticsMetrics = [
+    { label: "Visitors", value: "24.5K", change: "+18.2%", up: true },
+    { label: "Page Views", value: "68.4K", change: "+22.5%", up: true },
+    { label: "Enquiries", value: "1.8K", change: "+14.6%", up: true },
+    { label: "Bounce Rate", value: "32.6%", change: "-4.1%", up: false },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Welcome hero */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#E8ECF1] bg-white shadow-sm">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/admin/hero-banner.jpg"
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 1280px) 100vw, 1100px"
-            className="object-cover object-[center_40%] opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/70 to-white/45" />
-        </div>
-        <div className="relative flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-end sm:justify-between md:px-7 md:py-7">
-          <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight text-[#111827] md:text-[1.75rem]">
-              Welcome back, {name}! 👋
-            </h1>
-            <p className="mt-1.5 max-w-xl text-sm text-[#6B7280]">
-              Here&apos;s what&apos;s happening with your travel platform today.
-            </p>
+    <div className="space-y-5">
+      {/* Welcome hero — matches mockup: full mountain image + white copy + glass pills */}
+      <section className="relative min-h-[220px] overflow-hidden rounded-2xl shadow-sm md:min-h-[248px]">
+        <Image
+          src="/images/admin/hero-banner.jpg"
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 1280px) 100vw, 1100px"
+          className="object-cover object-[center_42%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/45 to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+
+        <div className="relative flex h-full min-h-[220px] flex-col justify-between gap-6 p-5 md:min-h-[248px] md:p-7">
+          <div className="flex items-start justify-between gap-3">
+            <div className="max-w-xl">
+              <h1 className="font-heading text-2xl font-bold tracking-tight text-white drop-shadow-sm md:text-[1.85rem]">
+                Welcome back, {name}! 👋
+              </h1>
+              <p className="mt-1.5 text-sm text-white/85">
+                Here&apos;s what&apos;s happening with your travel platform today.
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/25 bg-white/95 px-3 py-2 text-sm font-semibold text-[#374151] shadow-sm backdrop-blur">
+              <CalendarDays className="h-4 w-4 text-[#6B7280]" aria-hidden />
+              {dateLabel}
+            </span>
           </div>
-          <button
-            type="button"
-            className="inline-flex h-10 items-center gap-2 self-start rounded-xl border border-[#E5E7EB] bg-white/90 px-3 text-sm font-medium text-[#374151] shadow-sm backdrop-blur"
-          >
-            <CalendarDays className="h-4 w-4 text-[#6B7280]" aria-hidden />
-            {dateLabel}
-          </button>
+
+          <div className="flex flex-wrap gap-2.5">
+            {heroPills.map((pill) => {
+              const Icon = pill.icon;
+              return (
+                <div
+                  key={pill.label}
+                  className="inline-flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-white shadow-sm backdrop-blur-md"
+                >
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
+                    <Icon className="h-3.5 w-3.5" aria-hidden />
+                  </span>
+                  <div className="leading-tight">
+                    <p className="font-heading text-base font-bold">{pill.value}</p>
+                    <p className="text-[11px] font-medium text-white/80">{pill.label}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -233,9 +337,9 @@ export default function AdminOverviewPage() {
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       ) : null}
 
-      {/* Stats */}
+      {/* Primary metrics */}
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {statCards.map((card) => {
+        {primaryCards.map((card) => {
           const Icon = card.icon;
           return (
             <article
@@ -261,130 +365,170 @@ export default function AdminOverviewPage() {
               </div>
               <p className="mt-3 text-xs font-medium text-[#6B7280]">{card.label}</p>
               <p className="mt-1 font-heading text-2xl font-bold text-[#111827]">{card.value}</p>
-              <p className="mt-2 text-[11px] font-medium text-[#16A34A]">{card.trend}</p>
+              <p className="mt-1 text-[11px] font-medium text-[#16A34A]">{card.trend}</p>
+              <Sparkline tone={card.spark} />
             </article>
           );
         })}
       </section>
 
-      {/* Manage modules */}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {manageCards.map((card) => {
+      {/* Secondary metrics */}
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {secondaryCards.map((card) => {
           const Icon = card.icon;
           return (
             <article
-              key={card.title}
-              className="overflow-hidden rounded-2xl border border-[#E8ECF1] bg-white shadow-sm"
+              key={card.label}
+              className="flex items-center gap-3 rounded-2xl border border-[#E8ECF1] bg-white px-4 py-3.5 shadow-sm"
             >
-              <div className="relative aspect-[16/10]">
-                <Image
-                  src={card.image}
-                  alt=""
-                  fill
-                  sizes="(max-width: 1280px) 50vw, 25vw"
-                  className="object-cover"
-                />
+              <span
+                className={cn(
+                  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                  card.tone,
+                )}
+              >
+                <Icon className="h-4 w-4" aria-hidden />
+              </span>
+              <div>
+                <p className="text-xs font-medium text-[#6B7280]">{card.label}</p>
+                <p className="font-heading text-xl font-bold text-[#111827]">{card.value}</p>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      {/* Analytics + activity + top treks */}
+      <section className="grid gap-4 xl:grid-cols-12">
+        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm xl:col-span-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-bold text-[#111827]">Analytics Overview</h3>
+              <p className="mt-0.5 text-xs text-[#9CA3AF]">Last 30 days</p>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] font-medium text-[#6B7280]">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#22C55E]" /> Visitors
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#3B82F6]" /> Page Views
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {analyticsMetrics.map((metric) => (
+              <div key={metric.label} className="rounded-xl bg-[#F9FAFB] px-2.5 py-2">
+                <p className="text-[10px] font-medium text-[#6B7280]">{metric.label}</p>
+                <p className="mt-0.5 font-heading text-sm font-bold text-[#111827]">{metric.value}</p>
+                <p
+                  className={cn(
+                    "mt-0.5 inline-flex items-center gap-0.5 text-[10px] font-semibold",
+                    metric.up ? "text-[#16A34A]" : "text-[#DC2626]",
+                  )}
+                >
+                  {metric.up ? (
+                    <TrendingUp className="h-3 w-3" aria-hidden />
+                  ) : (
+                    <TrendingDown className="h-3 w-3" aria-hidden />
+                  )}
+                  {metric.change}
+                </p>
+              </div>
+            ))}
+          </div>
+          <AnalyticsChart />
+        </article>
+
+        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm xl:col-span-3">
+          <h3 className="text-sm font-bold text-[#111827]">Recent Activity</h3>
+          <ul className="mt-4 space-y-3.5">
+            {recentActivity.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.title} className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      "mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+                      item.tone,
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold leading-snug text-[#111827]">{item.title}</p>
+                    <p className="mt-0.5 text-[11px] text-[#9CA3AF]">{item.time}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </article>
+
+        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm xl:col-span-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-[#111827]">Top Performing Treks</h3>
+            <Link href="/admin/treks" className="text-[11px] font-semibold text-[#16A34A] hover:underline">
+              View all
+            </Link>
+          </div>
+          <ul className="mt-4 space-y-3">
+            {topTreks.map((trek) => (
+              <li key={trek.rank} className="flex items-center gap-3">
+                <span className="w-4 text-xs font-bold text-[#9CA3AF]">{trek.rank}</span>
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+                  <Image src={trek.image} alt="" fill sizes="40px" className="object-cover" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-[#111827]">{trek.name}</p>
+                  <p className="text-[11px] text-[#9CA3AF]">{trek.place}</p>
+                </div>
+                <div className="text-right">
+                  <p className="inline-flex items-center gap-1 text-xs font-bold text-[#111827]">
+                    <Eye className="h-3 w-3 text-[#9CA3AF]" aria-hidden />
+                    {trek.views}
+                  </p>
+                  <p className="text-[11px] font-semibold text-[#16A34A]">{trek.growth}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </article>
+      </section>
+
+      {/* Quick management */}
+      <section>
+        <h3 className="mb-3 text-sm font-bold text-[#111827]">Quick Management</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {manageCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group flex items-center gap-3 rounded-2xl border border-[#E8ECF1] bg-white p-3.5 shadow-sm transition hover:border-[#22C55E]/35 hover:bg-[#F0FDF4]"
+              >
                 <span
                   className={cn(
-                    "absolute -bottom-4 left-4 inline-flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md",
+                    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
                     card.tone,
                   )}
                 >
                   <Icon className="h-4 w-4" aria-hidden />
                 </span>
-              </div>
-              <div className="space-y-3 px-4 pb-4 pt-7">
-                <div>
-                  <h3 className="font-heading text-base font-bold text-[#111827]">{card.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-[#6B7280]">{card.description}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-[#111827]">{card.title}</p>
+                  <p className="mt-0.5 text-[11px] text-[#6B7280]">{card.description}</p>
                 </div>
-                <Link
-                  href={card.href}
-                  className="inline-flex items-center gap-1 rounded-lg border border-[#22C55E]/35 px-3 py-1.5 text-xs font-semibold text-[#16A34A] transition hover:bg-[#F0FDF4]"
-                >
-                  {card.cta}
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-                </Link>
-              </div>
-            </article>
-          );
-        })}
-      </section>
-
-      {/* Bottom widgets */}
-      <section className="grid gap-4 lg:grid-cols-3">
-        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#22C55E]" aria-hidden />
-            <h3 className="text-sm font-bold text-[#111827]">System Status</h3>
-          </div>
-          <ul className="space-y-3 text-sm">
-            {[
-              ["API Server", apiOnline ? "Online" : "Checking…"],
-              ["Database", apiOnline ? "Connected" : "Checking…"],
-              ["Storage", "Healthy"],
-              ["Email Service", "Operational"],
-            ].map(([label, status]) => (
-              <li key={label} className="flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 text-[#4B5563]">
-                  <CheckCircle2 className="h-4 w-4 text-[#22C55E]" aria-hidden />
-                  {label}
-                </span>
-                <span className="text-xs font-semibold text-[#16A34A]">{status}</span>
-              </li>
-            ))}
-          </ul>
-        </article>
-
-        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-[#22C55E]" aria-hidden />
-            <h3 className="text-sm font-bold text-[#111827]">Today&apos;s Summary</h3>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              ["New Bookings", "—", "CRM"],
-              ["Enquiries", "—", "External"],
-              ["Treks live", String(stats?.trekCount ?? "—"), "Mongo"],
-            ].map(([label, value, note]) => (
-              <div key={label} className="rounded-xl bg-[#F9FAFB] p-3 text-center">
-                <p className="text-[10px] font-medium text-[#6B7280]">{label}</p>
-                <p className="mt-1 font-heading text-xl font-bold text-[#111827]">{value}</p>
-                <p className="mt-1 text-[10px] font-semibold text-[#16A34A]">{note}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-3 text-[11px] text-[#9CA3AF]">
-            Bookings & enquiries stay in your separate lead software.
-          </p>
-        </article>
-
-        <article className="rounded-2xl border border-[#E8ECF1] bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <Zap className="h-4 w-4 text-[#F59E0B]" aria-hidden />
-            <h3 className="text-sm font-bold text-[#111827]">Quick Actions</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={action.href + action.label}
-                  href={action.href}
-                  className="inline-flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2.5 text-xs font-semibold text-[#374151] transition hover:border-[#22C55E]/40 hover:bg-[#F0FDF4]"
-                >
-                  <Icon className="h-3.5 w-3.5 text-[#22C55E]" aria-hidden />
-                  {action.label}
-                </Link>
-              );
-            })}
-          </div>
-        </article>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-[#9CA3AF] transition group-hover:text-[#16A34A]" aria-hidden />
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       {stats ? (
         <p className="text-center text-[11px] text-[#9CA3AF]">
-          Connected to {stats.siteName} · API `/api/v1`
+          Connected to {stats.siteName} · {roleLabel(user?.role)}
         </p>
       ) : null}
     </div>
