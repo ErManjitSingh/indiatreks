@@ -18,6 +18,8 @@
     "blogs:generate:shimla": "tsx src/scripts/generate-shimla-blogs.ts",
     "blogs:generate:shimla:publish": "tsx src/scripts/generate-shimla-blogs.ts",
     "blogs:generate:dharamshala": "tsx src/scripts/generate-travel-blogs.ts",
+    "blogs:generate:himachal-pending": "tsx src/scripts/generate-himachal-pending-blogs.ts",
+    "blogs:generate:himachal-pending:publish": "PUBLISH=1 tsx src/scripts/generate-himachal-pending-blogs.ts",
     "seed:shimla": "tsx src/scripts/seed-shimla.ts",
     "lint": "tsc --noEmit",
     "test": "vitest run",

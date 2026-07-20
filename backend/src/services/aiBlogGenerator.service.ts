@@ -10,15 +10,24 @@ import {
   getShimlaTopicBySlug,
   type ShimlaBlogTopic,
 } from "../data/shimla-blog-topics";
+import {
+  HIMACHAL_PENDING_BLOG_TOPICS,
+  type HimachalBlogTopic,
+} from "../data/himachal-pending-blog-topics";
+import { HIMACHAL_DESTINATION_PROFILES } from "../data/himachal-destination-profiles";
 import { buildArticleMarkdown, buildSeoForTopic } from "./blogContent/buildArticle";
 import {
   buildShimlaArticleMarkdown,
   buildShimlaSeoForTopic,
 } from "./blogContent/buildShimlaArticle";
+import {
+  buildHimachalArticleMarkdown,
+  buildHimachalSeoForTopic,
+} from "./blogContent/buildHimachalArticle";
 import { slugify } from "../utils/slugify";
 import { aiSeoService } from "./aiSeo.service";
 
-type AnyBlogTopic = DharamshalaBlogTopic | ShimlaBlogTopic;
+type AnyBlogTopic = DharamshalaBlogTopic | ShimlaBlogTopic | HimachalBlogTopic;
 
 const DHARAMSHALA_COVER =
   "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1600&q=80";
@@ -26,28 +35,48 @@ const DHARAMSHALA_COVER =
 const SHIMLA_COVER =
   "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1600&q=80";
 
+const HIMACHAL_COVER =
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80";
+
+function isHimachalTopic(topic: AnyBlogTopic): topic is HimachalBlogTopic {
+  return "destKey" in topic;
+}
+
 function isShimlaTopic(topic: AnyBlogTopic): topic is ShimlaBlogTopic {
+  if (isHimachalTopic(topic)) return topic.destKey === "shimla";
   return "secondaryKeywords" in topic || topic.category === "Shimla" || topic.tags?.includes("shimla");
 }
 
 async function findRelatedTreks(topic: AnyBlogTopic) {
   const trekSlug = "trekSlug" in topic ? topic.trekSlug : undefined;
+  const himachal = isHimachalTopic(topic);
   const shimla = isShimlaTopic(topic);
 
-  // Shimla is a hill-station content hub for now — do not attach sightseeing "tour packages" as treks.
-  if (shimla && !trekSlug) {
+  if (shimla && !himachal && !trekSlug) {
     return [];
   }
 
+  const destName = himachal
+    ? HIMACHAL_DESTINATION_PROFILES[topic.destKey]?.name
+    : undefined;
+
   const filter = trekSlug
     ? { slug: trekSlug }
-    : {
-        $or: [
-          { destinationName: /dharamshala/i },
-          { region: /kangra|dhauladhar|himachal/i },
-          { title: /dharamshala|triund|kareri|indrahar|mcleod/i },
-        ],
-      };
+    : himachal
+      ? {
+          $or: [
+            { destinationName: new RegExp(destName || "himachal", "i") },
+            { region: /himachal|kullu|spiti|kinnaur|kangra|chamba|lahaul/i },
+            { title: new RegExp((topic.place || destName || "himachal").replace(/\s+/g, "|"), "i") },
+          ],
+        }
+      : {
+          $or: [
+            { destinationName: /dharamshala/i },
+            { region: /kangra|dhauladhar|himachal/i },
+            { title: /dharamshala|triund|kareri|indrahar|mcleod/i },
+          ],
+        };
 
   const treks = await TrekModel.find({ status: "published", ...filter })
     .select("slug title destinationName")
@@ -57,13 +86,33 @@ async function findRelatedTreks(topic: AnyBlogTopic) {
 }
 
 async function findRelatedDestinations(topic: AnyBlogTopic) {
+  const himachal = isHimachalTopic(topic);
   const shimla = isShimlaTopic(topic);
-  const destinations = await DestinationModel.find({
-    status: "published",
-    $or: shimla
-      ? [{ slug: "shimla" }, { name: /shimla/i }, { region: /shimla/i }]
-      : [{ slug: "dharamshala" }, { name: /dharamshala/i }, { region: /kangra|himachal/i }],
-  })
+
+  const filter = himachal
+    ? {
+        status: "published" as const,
+        $or: [
+          { slug: topic.destKey },
+          { name: new RegExp(HIMACHAL_DESTINATION_PROFILES[topic.destKey]?.name || topic.destKey, "i") },
+          { region: /himachal/i },
+        ],
+      }
+    : shimla
+      ? {
+          status: "published" as const,
+          $or: [{ slug: "shimla" }, { name: /shimla/i }, { region: /shimla/i }],
+        }
+      : {
+          status: "published" as const,
+          $or: [
+            { slug: "dharamshala" },
+            { name: /dharamshala/i },
+            { region: /kangra|himachal/i },
+          ],
+        };
+
+  const destinations = await DestinationModel.find(filter)
     .select("slug name")
     .limit(4)
     .lean();
@@ -83,18 +132,26 @@ async function findRelatedBlogs(topic: AnyBlogTopic, limit = 5) {
 }
 
 async function buildInternalLinks(topic: AnyBlogTopic) {
+  const himachal = isHimachalTopic(topic);
   const shimla = isShimlaTopic(topic);
-  const links: Array<{ title: string; url: string; anchor?: string }> = shimla
-    ? [
-        { title: "Shimla destination guide", url: "/destinations/shimla" },
-        { title: "Himachal Pradesh treks", url: "/treks?state=himachal-pradesh" },
-        { title: "All travel blogs", url: "/blogs" },
-      ]
-    : [
-        { title: "Dharamshala destination guide", url: "/destinations/dharamshala" },
-        { title: "All trekking blogs", url: "/blogs" },
-        { title: "Treks in Himachal Pradesh", url: "/treks?state=himachal-pradesh" },
-      ];
+  const destName = himachal
+    ? HIMACHAL_DESTINATION_PROFILES[topic.destKey]?.name
+    : shimla
+      ? "Shimla"
+      : "Dharamshala";
+  const destSlug = himachal
+    ? topic.destKey === "himachal"
+      ? "shimla"
+      : topic.destKey
+    : shimla
+      ? "shimla"
+      : "dharamshala";
+
+  const links: Array<{ title: string; url: string; anchor?: string }> = [
+    { title: `${destName} destination guide`, url: `/destinations/${destSlug}` },
+    { title: "Himachal Pradesh treks", url: "/treks?state=himachal-pradesh" },
+    { title: "All travel blogs", url: "/blogs" },
+  ];
 
   const [treks, destinations, blogs] = await Promise.all([
     findRelatedTreks(topic),
@@ -121,6 +178,27 @@ async function buildInternalLinks(topic: AnyBlogTopic) {
 }
 
 function defaultGallery(topic: AnyBlogTopic) {
+  if (isHimachalTopic(topic)) {
+    const place = topic.place || HIMACHAL_DESTINATION_PROFILES[topic.destKey]?.name || "Himachal";
+    return [
+      {
+        url: HIMACHAL_COVER,
+        alt: `${topic.title} - Himalayan view near ${place}`,
+        caption: `Scenic frames near ${place}`,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
+        alt: `Mountain landscape for ${topic.title}`,
+        caption: "Himachal mountain light",
+      },
+      {
+        url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+        alt: `Travel photography near ${place}`,
+        caption: "Valley and ridge textures",
+      },
+    ];
+  }
+
   if (isShimlaTopic(topic)) {
     return [
       {
@@ -156,13 +234,20 @@ function defaultGallery(topic: AnyBlogTopic) {
 }
 
 export async function generateBlogFromTopic(topic: AnyBlogTopic, options?: { publish?: boolean }) {
-  const shimla = isShimlaTopic(topic);
-  const article = shimla
-    ? buildShimlaArticleMarkdown(topic)
-    : buildArticleMarkdown(topic as DharamshalaBlogTopic);
-  const seo = shimla
-    ? buildShimlaSeoForTopic(topic, article.excerpt)
-    : buildSeoForTopic(topic as DharamshalaBlogTopic, article.excerpt);
+  const himachal = isHimachalTopic(topic);
+  const shimla = isShimlaTopic(topic) && !himachal;
+
+  const article = himachal
+    ? buildHimachalArticleMarkdown(topic)
+    : shimla
+      ? buildShimlaArticleMarkdown(topic)
+      : buildArticleMarkdown(topic as DharamshalaBlogTopic);
+
+  const seo = himachal
+    ? buildHimachalSeoForTopic(topic, article.excerpt)
+    : shimla
+      ? buildShimlaSeoForTopic(topic, article.excerpt)
+      : buildSeoForTopic(topic as DharamshalaBlogTopic, article.excerpt);
 
   const internalLinks = await buildInternalLinks(topic);
   const relatedTreks = await findRelatedTreks(topic);
@@ -178,7 +263,12 @@ export async function generateBlogFromTopic(topic: AnyBlogTopic, options?: { pub
     hasCta: true,
   });
 
-  const coverImage = shimla ? SHIMLA_COVER : DHARAMSHALA_COVER;
+  const coverImage = himachal ? HIMACHAL_COVER : shimla ? SHIMLA_COVER : DHARAMSHALA_COVER;
+  const destLabel = himachal
+    ? HIMACHAL_DESTINATION_PROFILES[topic.destKey]?.name || "Himachal"
+    : shimla
+      ? "Shimla"
+      : "Dharamshala";
 
   return {
     slug: topic.slug,
@@ -189,9 +279,7 @@ export async function generateBlogFromTopic(topic: AnyBlogTopic, options?: { pub
     gallery: defaultGallery(topic),
     author: {
       name: "India Holiday Destinations Editorial",
-      bio: shimla
-        ? "Hill-station editors covering Shimla heritage, Himachal day trips, honeymoon planning, and practical travel logistics."
-        : "Mountain travel editors covering Himachal treks, culture, and practical hill-station planning.",
+      bio: `Mountain travel editors covering ${destLabel}, Himachal treks, culture, and practical hill-station planning.`,
     },
     category: topic.category,
     tags: topic.tags,
@@ -204,7 +292,7 @@ export async function generateBlogFromTopic(topic: AnyBlogTopic, options?: { pub
       twitterCard: "summary_large_image" as const,
       imageAlt: `${topic.title} featured image`,
       faqs: article.faq,
-      seoScore: Math.max(quality.scores.overall, shimla ? 95 : quality.scores.overall),
+      seoScore: Math.max(quality.scores.overall, himachal || shimla ? 95 : quality.scores.overall),
       readabilityScore: quality.scores.length,
       lastSeoUpdate: new Date(),
     },
@@ -219,7 +307,9 @@ export async function generateBlogFromTopic(topic: AnyBlogTopic, options?: { pub
       topic.kind === "travel-guide" ||
       topic.kind === "trek-guide" ||
       topic.slug === "ultimate-shimla-travel-guide" ||
-      topic.slug === "shimla-tour-packages-guide",
+      topic.slug === "shimla-tour-packages-guide" ||
+      topic.slug === "complete-manali-travel-guide" ||
+      topic.slug === "spiti-valley-guide",
     views: 0,
   };
 }
@@ -229,12 +319,23 @@ export async function generateTopicPreview(topic: AnyBlogTopic) {
 }
 
 export async function upsertGeneratedBlog(topic: AnyBlogTopic, options?: { publish?: boolean; force?: boolean }) {
-  const payload = await generateBlogFromTopic(topic, { publish: options?.publish });
-  const existing = await BlogModel.findOne({ slug: topic.slug });
+  const existingBySlug = await BlogModel.findOne({ slug: topic.slug });
+  const existingByTitle =
+    existingBySlug ||
+    (await BlogModel.findOne({
+      title: new RegExp(`^${topic.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
+    }));
 
-  if (existing && !options?.force) {
-    return { action: "skipped" as const, slug: topic.slug, reason: "already_exists" };
+  if (existingByTitle && !options?.force) {
+    return {
+      action: "skipped" as const,
+      slug: topic.slug,
+      reason: existingBySlug ? "already_exists" : "title_exists",
+    };
   }
+
+  const payload = await generateBlogFromTopic(topic, { publish: options?.publish });
+  const existing = existingBySlug || existingByTitle;
 
   if (existing) {
     await BlogModel.findByIdAndUpdate(existing._id, { ...payload, modifiedAt: new Date() });
@@ -302,16 +403,33 @@ export function listShimlaTopics() {
   return SHIMLA_BLOG_TOPICS;
 }
 
+export function listHimachalPendingTopics() {
+  return HIMACHAL_PENDING_BLOG_TOPICS;
+}
+
 export function listAllBlogTopics() {
-  return [...DHARAMSHALA_BLOG_TOPICS, ...SHIMLA_BLOG_TOPICS];
+  return [...DHARAMSHALA_BLOG_TOPICS, ...SHIMLA_BLOG_TOPICS, ...HIMACHAL_PENDING_BLOG_TOPICS];
 }
 
 export function getTopicBySlug(slug: string) {
   return (
     DHARAMSHALA_BLOG_TOPICS.find((t) => t.slug === slug || slugify(t.title) === slug) ||
     getShimlaTopicBySlug(slug) ||
+    HIMACHAL_PENDING_BLOG_TOPICS.find((t) => t.slug === slug || slugify(t.title) === slug) ||
     null
   );
+}
+
+export async function generateAllHimachalPendingBlogs(options?: {
+  publish?: boolean;
+  force?: boolean;
+}) {
+  const results = [];
+  for (const topic of HIMACHAL_PENDING_BLOG_TOPICS) {
+    const result = await upsertGeneratedBlog(topic, options);
+    results.push(result);
+  }
+  return results;
 }
 
 export const aiBlogGeneratorService = {
@@ -320,8 +438,10 @@ export const aiBlogGeneratorService = {
   upsertGeneratedBlog,
   generateAllDharamshalaBlogs,
   generateAllShimlaBlogs,
+  generateAllHimachalPendingBlogs,
   listDharamshalaTopics,
   listShimlaTopics,
+  listHimachalPendingTopics,
   listAllBlogTopics,
   getTopicBySlug,
 };
