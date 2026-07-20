@@ -75,6 +75,18 @@ export async function centerGaDashboard(params?: { days?: number; sync?: string 
   return res.data;
 }
 
+export async function centerGaProperties() {
+  const res = await apiGet<
+    Array<{
+      accountName: string;
+      accountId: string;
+      propertyName: string;
+      propertyId: string;
+    }>
+  >("/seo/center/ga/properties");
+  return res.data ?? [];
+}
+
 export async function centerGaSync(days = 28) {
   const res = await apiPost<Record<string, unknown>>("/seo/center/ga/sync", { days });
   return res.data;

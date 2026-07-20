@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/toast";
 import { getErrorMessage } from "@/lib/api/admin";
 import {
   centerGaDashboard,
+  centerGaProperties,
   centerGaSync,
   centerIntegrations,
   centerUpdateIntegrations,
@@ -28,12 +29,21 @@ function isValidGa4Id(value: string) {
   return /^G-[A-Z0-9]+$/.test(normalizeGa4Id(value));
 }
 
+type GaProperty = {
+  accountName: string;
+  accountId: string;
+  propertyName: string;
+  propertyId: string;
+};
+
 export default function AnalyticsPage() {
   const [dash, setDash] = useState<Record<string, unknown> | null>(null);
   const [measurementId, setMeasurementId] = useState("");
   const [propertyId, setPropertyId] = useState("");
   const [enabled, setEnabled] = useState(false);
   const [gtmActive, setGtmActive] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState("");
+  const [properties, setProperties] = useState<GaProperty[]>([]);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -42,18 +52,23 @@ export default function AnalyticsPage() {
       setDash(d);
       const ga4 = (i?.ga4 || {}) as Record<string, unknown>;
       const gtm = (i?.gtm || {}) as Record<string, unknown>;
+      const google = (i?.google || {}) as Record<string, unknown>;
       setMeasurementId(String(ga4.measurementId || ""));
       setPropertyId(
-        String(
-          ga4.propertyId ||
-            (i?.google as Record<string, unknown> | undefined)?.ga4PropertyId ||
-            "",
-        ),
+        String(ga4.propertyId || google.ga4PropertyId || "").replace(/^properties\//, ""),
       );
       setEnabled(Boolean(ga4.enabled));
       setGtmActive(Boolean(gtm.enabled && gtm.containerId));
+      setGoogleEmail(String(google.email || ""));
     } catch (err) {
       toast.error(getErrorMessage(err, "Failed to load Analytics"));
+    }
+
+    try {
+      const props = await centerGaProperties();
+      setProperties(props);
+    } catch {
+      setProperties([]);
     }
   }, []);
 
@@ -69,15 +84,20 @@ export default function AnalyticsPage() {
       toast.error("Enter a valid Measurement ID like G-XXXXXXXX");
       return;
     }
+    const cleanPropertyId = propertyId.trim().replace(/^properties\//, "");
+    if (cleanPropertyId && !/^\d{6,12}$/.test(cleanPropertyId)) {
+      toast.error("Property ID must be numbers only (from GA4 Admin → Property settings), not G-…");
+      return;
+    }
     setBusy(true);
     try {
       await centerUpdateIntegrations({
         ga4: {
           enabled: enabled && valid,
           measurementId: valid ? normalized : "",
-          propertyId: propertyId.trim(),
+          propertyId: cleanPropertyId,
         },
-        googleProperty: { ga4PropertyId: propertyId.trim() },
+        googleProperty: { ga4PropertyId: cleanPropertyId },
       });
       toast.success(enabled && valid ? "GA4 enabled on the live site" : "Analytics settings saved");
       await load();
@@ -95,7 +115,12 @@ export default function AnalyticsPage() {
       toast.success("GA4 synced");
       await load();
     } catch (err) {
-      toast.error(getErrorMessage(err, "Sync failed — connect Google + set property ID"));
+      toast.error(
+        getErrorMessage(
+          err,
+          "Sync failed — check Property ID access for the connected Google account",
+        ),
+      );
     } finally {
       setBusy(false);
     }
@@ -137,7 +162,7 @@ export default function AnalyticsPage() {
               <option value="0">No</option>
             </select>
           </AdminField>
-          <AdminField label="Measurement ID (G-XXXX)">
+          <AdminField label="Measurement ID (G-XXXX) — for site tracking">
             <input
               className={adminInputClass}
               placeholder="G-XXXXXXXX"
@@ -148,15 +173,43 @@ export default function AnalyticsPage() {
               <p className="mt-1 text-xs text-red-600">Format must be G- followed by letters/numbers.</p>
             ) : null}
           </AdminField>
-          <AdminField label="GA4 Property ID (numbers only, for Data API)">
+          <AdminField label="GA4 Property ID (numbers only — for Sync)">
             <input
               className={adminInputClass}
               placeholder="123456789"
               value={propertyId}
               onChange={(e) => setPropertyId(e.target.value)}
             />
+            <p className="mt-1 text-[11px] text-[#6B7280]">
+              Not the G- ID. Find it in GA4 → Admin → Property settings → Property ID.
+            </p>
           </AdminField>
         </div>
+
+        {properties.length > 0 ? (
+          <div className="mt-3">
+            <AdminField label="Pick a property your Google account can access">
+              <select
+                className={adminInputClass}
+                value={propertyId}
+                onChange={(e) => setPropertyId(e.target.value)}
+              >
+                <option value="">Select property…</option>
+                {properties.map((p) => (
+                  <option key={p.propertyId} value={p.propertyId}>
+                    {p.propertyName} ({p.propertyId}) — {p.accountName}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+          </div>
+        ) : (
+          <p className="mt-3 rounded-xl border border-[#E8ECF1] bg-[#F9FAFB] px-3 py-2 text-xs text-[#4B5563]">
+            No GA4 properties listed for{" "}
+            <strong>{googleEmail || "the connected Google account"}</strong>. Either reconnect Google, or
+            give that account Viewer access on the property.
+          </p>
+        )}
 
         {gtmActive ? (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -169,31 +222,21 @@ export default function AnalyticsPage() {
           <li className="flex gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden />
             <span>
-              Create a GA4 property at{" "}
-              <a
-                href="https://analytics.google.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-[#16A34A] hover:underline"
-              >
-                analytics.google.com
-              </a>{" "}
-              for <strong>{siteConfig.url}</strong>
+              Site tracking uses <strong>Measurement ID (G-…)</strong>. Sync uses{" "}
+              <strong>numeric Property ID</strong>.
             </span>
           </li>
           <li className="flex gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden />
-            <span>Copy Measurement ID (Admin → Data streams → Web) starting with <strong>G-</strong>.</span>
-          </li>
-          <li className="flex gap-2">
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden />
-            <span>Paste it above, enable, and save. Public pages load gtag after interactive.</span>
+            <span>
+              Connected Google ({googleEmail || "—"}) must be added under GA4 → Admin → Property access
+              management.
+            </span>
           </li>
           <li className="flex gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden />
             <span>
-              Optional: connect Google in SEO Center and set numeric Property ID, then Sync for dashboard
-              charts.
+              Stream URL should match <strong>{siteConfig.url}</strong>.
             </span>
           </li>
         </ol>

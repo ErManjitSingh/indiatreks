@@ -57,6 +57,7 @@ router.post("/gsc/inspect", ...staff, validate(inspectUrlBodySchema), seoCenterC
 
 /* Analytics */
 router.get("/ga/dashboard", ...staff, seoCenterController.gaDashboard);
+router.get("/ga/properties", ...staff, seoCenterController.gaProperties);
 router.post("/ga/sync", ...staff, validate(syncDaysBodySchema), seoCenterController.gaSync);
 
 /* Core Web Vitals */

@@ -121,6 +121,11 @@ export const gaSync = asyncHandler(async (req: Request, res: Response) => {
   return sendSuccess(res, data, "Analytics synced");
 });
 
+export const gaProperties = asyncHandler(async (_req: Request, res: Response) => {
+  const data = await googleAnalyticsDataService.listAccessibleProperties();
+  return sendSuccess(res, data);
+});
+
 export const cwvLatest = asyncHandler(async (req: Request, res: Response) => {
   const strategy = req.query.strategy === "desktop" ? "desktop" : "mobile";
   const data = await pageSpeedService.getLatest(strategy);
