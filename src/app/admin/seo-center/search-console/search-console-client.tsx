@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
@@ -17,6 +17,7 @@ import {
   SeoPanel,
   SeoPerformanceChart,
   SeoSimpleTable,
+  SeoTablePagination,
 } from "@/components/admin/seo-center/seo-center-ui";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
@@ -38,6 +39,9 @@ function num(v: unknown) {
   return typeof v === "number" ? v : Number(v || 0);
 }
 
+const QUERIES_PAGE_SIZE = 5;
+const PAGES_PAGE_SIZE = 10;
+
 export default function SearchConsolePage() {
   const params = useSearchParams();
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
@@ -51,6 +55,8 @@ export default function SearchConsolePage() {
   const [busy, setBusy] = useState(false);
   const [pushResult, setPushResult] = useState<Record<string, unknown> | null>(null);
   const [submitAllResult, setSubmitAllResult] = useState<Array<Record<string, unknown>>>([]);
+  const [queriesPage, setQueriesPage] = useState(1);
+  const [pagesPage, setPagesPage] = useState(1);
 
   const load = useCallback(async () => {
     try {
@@ -58,6 +64,8 @@ export default function SearchConsolePage() {
       setStatus(s);
       setDash(d);
       setProperty(String(s?.searchConsoleProperty || d?.propertyUrl || ""));
+      setQueriesPage(1);
+      setPagesPage(1);
     } catch (err) {
       toast.error(getErrorMessage(err, "Failed to load Search Console"));
     }
@@ -190,6 +198,16 @@ export default function SearchConsolePage() {
   const topQueries = (dash?.topQueries || []) as Array<Record<string, unknown>>;
   const sitemaps = (dash?.sitemaps || []) as Array<Record<string, unknown>>;
   const connectedProperties = (dash?.connectedProperties || []) as Array<Record<string, unknown>>;
+
+  const pagedQueries = useMemo(() => {
+    const start = (queriesPage - 1) * QUERIES_PAGE_SIZE;
+    return topQueries.slice(start, start + QUERIES_PAGE_SIZE);
+  }, [topQueries, queriesPage]);
+
+  const pagedPages = useMemo(() => {
+    const start = (pagesPage - 1) * PAGES_PAGE_SIZE;
+    return topPages.slice(start, start + PAGES_PAGE_SIZE);
+  }, [topPages, pagesPage]);
 
   return (
     <div className="space-y-5">
@@ -337,24 +355,23 @@ export default function SearchConsolePage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SeoPerformanceChart title="Performance Over Time" />
-        <SeoPanel
-          title="Top Queries"
-          action={
-            <Button variant="outline" className="h-8 px-2.5 text-xs" disabled>
-              View All
-            </Button>
-          }
-        >
+        <SeoPanel title="Top Queries">
           <SeoSimpleTable
             headers={["Query", "Clicks", "Impressions", "CTR", "Position"]}
             empty="No data available yet"
-            rows={topQueries.slice(0, 12).map((q) => [
+            rows={pagedQueries.map((q) => [
               String(q.query || ""),
               num(q.clicks),
               num(q.impressions),
               `${(num(q.ctr) * 100).toFixed(2)}%`,
               num(q.position).toFixed(1),
             ])}
+          />
+          <SeoTablePagination
+            page={queriesPage}
+            pageSize={QUERIES_PAGE_SIZE}
+            total={topQueries.length}
+            onPageChange={setQueriesPage}
           />
         </SeoPanel>
       </div>
@@ -467,13 +484,19 @@ export default function SearchConsolePage() {
       <SeoPanel title="Top Landing Pages">
         <SeoSimpleTable
           headers={["Page", "Clicks", "Impressions", "CTR", "Position"]}
-          rows={topPages.slice(0, 25).map((p) => [
+          rows={pagedPages.map((p) => [
             String(p.page || ""),
             num(p.clicks),
             num(p.impressions),
             `${(num(p.ctr) * 100).toFixed(2)}%`,
             num(p.position).toFixed(1),
           ])}
+        />
+        <SeoTablePagination
+          page={pagesPage}
+          pageSize={PAGES_PAGE_SIZE}
+          total={topPages.length}
+          onPageChange={setPagesPage}
         />
       </SeoPanel>
 

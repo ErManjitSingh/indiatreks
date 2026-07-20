@@ -328,6 +328,54 @@ export function SeoSimpleTable({
   );
 }
 
+export function SeoTablePagination({
+  page,
+  pageSize,
+  total,
+  onPageChange,
+}: {
+  page: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+}) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (total <= pageSize) return null;
+
+  const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const to = Math.min(page * pageSize, total);
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B7280]">
+      <p>
+        Showing <span className="font-semibold text-[#374151]">{from}–{to}</span> of{" "}
+        <span className="font-semibold text-[#374151]">{total}</span>
+      </p>
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+          className="rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 font-semibold text-[#374151] transition hover:bg-[#F9FAFB] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Prev
+        </button>
+        <span className="px-1 font-semibold text-[#374151]">
+          {page} / {totalPages}
+        </span>
+        <button
+          type="button"
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+          className="rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 font-semibold text-[#374151] transition hover:bg-[#F9FAFB] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function SeoPerformanceChart({
   title = "Performance Over Time",
   labels,
