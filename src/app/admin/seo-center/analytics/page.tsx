@@ -211,6 +211,15 @@ export default function AnalyticsPage() {
           </p>
         )}
 
+        {googleEmail &&
+        googleEmail.toLowerCase() !== "indiaholidaydestinations.in@gmail.com" ? (
+          <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            Connected Google is <strong>{googleEmail}</strong>. Analytics property{" "}
+            <strong>indiaholidaydestinations.in@gmail.com</strong> se linked hai. SEO Center → Search
+            Console me Disconnect → Connect karo aur wohi Gmail choose karo, phir Sync try karo.
+          </p>
+        ) : null}
+
         {gtmActive ? (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
             GTM is also active. Prefer firing GA4 from either this direct tag <strong>or</strong> a GA4

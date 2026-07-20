@@ -257,6 +257,19 @@ export default function SearchConsolePage() {
                 <strong className="text-[#111827]">{String(status?.redirectUri || "—")}</strong>
               </p>
             </div>
+            <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              Analytics / Search Console ke liye{" "}
+              <strong>indiaholidaydestinations.in@gmail.com</strong> se connect karo. Agar dusra Gmail
+              dikhe to <strong>Disconnect</strong> → <strong>Connect Google Account</strong> dabao aur
+              sahi account choose karo.
+            </p>
+            {status?.connected &&
+            String(status.email || "").toLowerCase() !== "indiaholidaydestinations.in@gmail.com" ? (
+              <p className="mt-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                Abhi galat account connected hai ({String(status.email)}). Reconnect with
+                indiaholidaydestinations.in@gmail.com, warna GA4 Sync fail ho sakta hai.
+              </p>
+            ) : null}
             {status?.lastError ? (
               <p className="mt-3 text-sm text-amber-700">{String(status.lastError)}</p>
             ) : null}

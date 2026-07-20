@@ -37,6 +37,7 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().optional().default(""),
   GOOGLE_CALLBACK_URL: z.string().optional().default(""),
   GOOGLE_OAUTH_REDIRECT_URI: z.string().optional().default(""),
+  GOOGLE_LOGIN_HINT: z.string().optional().default("indiaholidaydestinations.in@gmail.com"),
   GOOGLE_PAGESPEED_API_KEY: z.string().optional().default(""),
   SESSION_SECRET: z.string().optional().default(""),
   TOKEN_ENCRYPTION_KEY: z.string().optional().default(""),

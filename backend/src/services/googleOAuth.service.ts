@@ -64,12 +64,16 @@ async function getAuthorizeUrl(userId?: string) {
     nonce: crypto.randomBytes(8).toString("hex"),
     ts: String(Date.now()),
   });
+  const loginHint =
+    (env.GOOGLE_LOGIN_HINT || "").trim() || "indiaholidaydestinations.in@gmail.com";
   return client.generateAuthUrl({
     access_type: "offline",
-    prompt: "consent",
+    // Force account chooser so staff can switch away from personal Gmail.
+    prompt: "select_account consent",
     scope: SCOPES,
     state,
     include_granted_scopes: true,
+    login_hint: loginHint,
   });
 }
 
