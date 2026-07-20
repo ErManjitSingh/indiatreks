@@ -80,7 +80,17 @@ async function updateIntegrations(input: Record<string, unknown>) {
     Object.assign(doc.ga4, input.ga4);
   }
   if (input.gtm && typeof input.gtm === "object") {
-    Object.assign(doc.gtm, input.gtm);
+    const gtm = input.gtm as Record<string, unknown>;
+    doc.gtm = doc.gtm || { enabled: false };
+    if (gtm.enabled != null) doc.gtm.enabled = Boolean(gtm.enabled);
+    if (gtm.containerId != null) {
+      const id = String(gtm.containerId)
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+      doc.gtm.containerId = /^GTM-[A-Z0-9]+$/.test(id) ? id : "";
+      if (!doc.gtm.containerId) doc.gtm.enabled = false;
+    }
   }
   if (input.clarity && typeof input.clarity === "object") {
     Object.assign(doc.clarity, input.clarity);

@@ -163,7 +163,19 @@ async function getAnalyticsConfig() {
 }
 
 async function updateAnalyticsConfig(data: Partial<IAnalyticsConfig>) {
-  return AnalyticsConfigModel.findOneAndUpdate({ key: "default" }, data, {
+  const payload: Partial<IAnalyticsConfig> = { ...data };
+  if (data.gtm) {
+    const id = String(data.gtm.containerId || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, "");
+    const valid = /^GTM-[A-Z0-9]+$/.test(id);
+    payload.gtm = {
+      enabled: Boolean(data.gtm.enabled) && valid,
+      containerId: valid ? id : "",
+    };
+  }
+  return AnalyticsConfigModel.findOneAndUpdate({ key: "default" }, payload, {
     new: true,
     upsert: true,
     setDefaultsOnInsert: true,

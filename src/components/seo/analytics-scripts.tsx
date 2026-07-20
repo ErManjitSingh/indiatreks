@@ -33,6 +33,10 @@ function useIdleGate(delayMs = 4000) {
   return ready;
 }
 
+/**
+ * Deferred marketing pixels (GA4 standalone, Meta, Clarity).
+ * GTM is handled separately by GoogleTagManager for correct early install.
+ */
 export function AnalyticsScripts() {
   const idleReady = useIdleGate(4500);
   const [config, setConfig] = useState<AnalyticsPublic | null>(null);
@@ -57,25 +61,17 @@ export function AnalyticsScripts() {
 
   if (!config) return null;
 
-  const gtmId = config.gtm?.enabled ? config.gtm.containerId : undefined;
+  const gtmEnabled = Boolean(config.gtm?.enabled && config.gtm?.containerId);
   // Skip standalone GA4 when GTM already owns tags (avoids double-loading).
   const gaId =
-    !gtmId && config.ga4?.enabled ? config.ga4.measurementId : undefined;
+    !gtmEnabled && config.ga4?.enabled ? config.ga4.measurementId : undefined;
   const pixelId = config.metaPixel?.enabled ? config.metaPixel.pixelId : undefined;
   const clarityId = config.clarity?.enabled ? config.clarity.projectId : undefined;
 
+  if (!gaId && !pixelId && !clarityId) return null;
+
   return (
     <>
-      {gtmId ? (
-        <Script id="gtm-init" strategy="lazyOnload">{`
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${gtmId}');
-        `}</Script>
-      ) : null}
-
       {gaId ? (
         <>
           <Script

@@ -4,7 +4,7 @@ import { ConditionalSiteChrome } from "@/components/layout/conditional-site-chro
 import { fontBody, fontBrush, fontDisplay, fontHeading } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import { fetchBootstrap } from "@/lib/api/content";
-import { fetchSeoBootstrap } from "@/lib/api/seo";
+import { fetchPublicAnalyticsConfig, fetchSeoBootstrap } from "@/lib/api/seo";
 import { createMetadata } from "@/lib/seo";
 import { AppProviders } from "@/providers";
 import "@/styles/globals.css";
@@ -83,7 +83,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const bootstrap = await fetchBootstrap();
+  const [bootstrap, seo, analyticsConfig] = await Promise.all([
+    fetchBootstrap(),
+    fetchSeoBootstrap(),
+    fetchPublicAnalyticsConfig(),
+  ]);
+  const analytics =
+    (analyticsConfig as { gtm?: { enabled?: boolean; containerId?: string } } | null) ??
+    (seo?.analytics as { gtm?: { enabled?: boolean; containerId?: string } } | undefined) ??
+    {};
+  const gtmContainerId =
+    analytics.gtm?.enabled && analytics.gtm?.containerId
+      ? String(analytics.gtm.containerId)
+      : process.env.NEXT_PUBLIC_GTM_ID || null;
 
   return (
     <html lang="en-IN" suppressHydrationWarning>
@@ -92,7 +104,9 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <AppProviders bootstrap={bootstrap}>
-          <ConditionalSiteChrome>{children}</ConditionalSiteChrome>
+          <ConditionalSiteChrome gtmContainerId={gtmContainerId}>
+            {children}
+          </ConditionalSiteChrome>
         </AppProviders>
       </body>
     </html>

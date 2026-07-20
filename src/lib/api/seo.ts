@@ -29,6 +29,21 @@ export async function fetchSeoBootstrap() {
   return serverGet<Record<string, unknown>>("/seo/bootstrap");
 }
 
+/** Shorter cache for analytics tags so GTM/GA changes appear quickly */
+export async function fetchPublicAnalyticsConfig() {
+  try {
+    const res = await fetch(`${resolveApiBaseUrl()}/analytics/config`, {
+      next: { revalidate: 60 },
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as ApiSuccess<Record<string, unknown>>;
+    return json.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchProgrammaticSeoPage(slug: string) {
   return serverGet<SeoDoc>(`/seo/programmatic/by-slug/${slug}`);
 }
