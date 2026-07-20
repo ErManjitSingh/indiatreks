@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site";
+
 export { cn } from "@/lib/utils";
 
 export function formatCurrency(
@@ -43,7 +45,7 @@ export function truncate(value: string, length: number): string {
 }
 
 export function absoluteUrl(path = ""): string {
-  const base = "https://treks.indiaholidaydestinations.com";
+  const base = siteConfig.url.replace(/\/$/, "");
   if (!path) return base;
   return path.startsWith("http") ? path : `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

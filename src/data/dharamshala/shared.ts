@@ -10,7 +10,7 @@ import type {
 export const DHARAMSHALA_REGION = "Dharamshala";
 export const DHARAMSHALA_STATE = "Himachal Pradesh";
 export const DHARAMSHALA_COUNTRY = "India";
-export const SITE_ORIGIN = "https://treks.indiaholidaydestinations.com";
+export const SITE_ORIGIN = "https://treks.indiaholidaydestination.com";
 
 export const regionalLogistics = {
   nearestHospital:

@@ -141,7 +141,7 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
-          <p>treks.indiaholidaydestinations.com</p>
+          <p>treks.indiaholidaydestination.com</p>
         </div>
       </Container>
     </footer>
