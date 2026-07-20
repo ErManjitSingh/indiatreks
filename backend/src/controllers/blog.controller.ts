@@ -4,6 +4,7 @@ import { sendSuccess, sendPaginated } from "../utils/response";
 import { blogService } from "../services/blog.service";
 import { aiBlogGeneratorService } from "../services/aiBlogGenerator.service";
 import { isStaffUser } from "../middlewares/auth";
+import { invalidateBootstrapCache } from "./content.controller";
 
 export const listBlogs = asyncHandler(async (req: Request, res: Response) => {
   const isAdmin = isStaffUser(req);
@@ -94,15 +95,18 @@ export const getBlogById = asyncHandler(async (req: Request, res: Response) => {
 
 export const createBlog = asyncHandler(async (req: Request, res: Response) => {
   const blog = await blogService.create(req.body);
+  invalidateBootstrapCache();
   return sendSuccess(res, blog, "Blog post created", 201);
 });
 
 export const updateBlog = asyncHandler(async (req: Request, res: Response) => {
   const blog = await blogService.update((req.params.id as string), req.body);
+  invalidateBootstrapCache();
   return sendSuccess(res, blog, "Blog post updated");
 });
 
 export const deleteBlog = asyncHandler(async (req: Request, res: Response) => {
   await blogService.softDelete((req.params.id as string));
+  invalidateBootstrapCache();
   return sendSuccess(res, null, "Blog post deleted");
 });

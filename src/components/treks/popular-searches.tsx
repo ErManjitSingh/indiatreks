@@ -1,11 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { trekImages } from "@/constants/trek-images";
-import { popularTrekSearches } from "@/data/trek-listing-meta";
 
-const chipImages = [
+export type PopularSearchItem = {
+  label: string;
+  href: string;
+  image?: string;
+};
+
+const fallbackChipImages = [
   trekImages.mountains1,
   trekImages.mountains2,
   trekImages.mountains3,
@@ -19,10 +26,11 @@ const chipImages = [
   trekImages.camp2,
 ] as const;
 
-export function PopularSearches() {
+export function PopularSearches({ items = [] }: { items?: PopularSearchItem[] }) {
+  if (!items.length) return null;
+
   return (
     <div className="bg-transparent py-1 md:bg-[#F7F8F6] md:py-3.5">
-      {/* Mobile — circular chips */}
       <div className="md:hidden">
         <div className="mb-3 flex items-center justify-between px-4">
           <h2 className="font-heading text-[15px] font-bold text-[#122016]">Popular Searches</h2>
@@ -32,12 +40,12 @@ export function PopularSearches() {
         </div>
         <div className="-mx-0 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <ul className="flex w-max gap-4">
-            {popularTrekSearches.map((item, index) => (
+            {items.map((item, index) => (
               <li key={item.label} className="w-[4.5rem]">
                 <Link href={item.href} className="flex flex-col items-center gap-1.5 text-center">
                   <span className="relative block h-14 w-14 overflow-hidden rounded-full ring-2 ring-[#E8ECE6]">
                     <Image
-                      src={chipImages[index % chipImages.length]}
+                      src={item.image || fallbackChipImages[index % fallbackChipImages.length]}
                       alt=""
                       fill
                       sizes="56px"
@@ -54,12 +62,11 @@ export function PopularSearches() {
         </div>
       </div>
 
-      {/* Desktop — pill chips */}
       <Container className="hidden flex-wrap items-center gap-2 md:flex">
         <span className="mr-1 text-[11px] font-semibold tracking-[0.14em] text-[#6B7280] uppercase">
           Popular searches
         </span>
-        {popularTrekSearches.map((item) => (
+        {items.map((item) => (
           <Link
             key={item.label}
             href={item.href}

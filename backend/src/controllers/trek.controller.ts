@@ -4,6 +4,7 @@ import { sendSuccess, sendPaginated } from "../utils/response";
 import { trekService } from "../services/trek.service";
 import { logAudit } from "../middlewares/audit";
 import { isStaffReader } from "../middlewares/auth";
+import { invalidateBootstrapCache } from "./content.controller";
 
 export const listTreks = asyncHandler(async (req: Request, res: Response) => {
   const isAdmin = isStaffReader(req, "treks.read");
@@ -32,6 +33,7 @@ export const getRelatedTreks = asyncHandler(async (req: Request, res: Response) 
 
 export const createTrek = asyncHandler(async (req: Request, res: Response) => {
   const trek = await trekService.create(req.body);
+  invalidateBootstrapCache();
   await logAudit({ req, action: "create", resource: "Trek", resourceId: String(trek._id) });
   return sendSuccess(res, trek, "Trek created", 201);
 });
@@ -43,17 +45,20 @@ export const getTrekById = asyncHandler(async (req: Request, res: Response) => {
 
 export const updateTrek = asyncHandler(async (req: Request, res: Response) => {
   const trek = await trekService.update((req.params.id as string), req.body);
+  invalidateBootstrapCache();
   await logAudit({ req, action: "update", resource: "Trek", resourceId: (req.params.id as string) });
   return sendSuccess(res, trek, "Trek updated");
 });
 
 export const deleteTrek = asyncHandler(async (req: Request, res: Response) => {
   await trekService.softDelete((req.params.id as string));
+  invalidateBootstrapCache();
   await logAudit({ req, action: "delete", resource: "Trek", resourceId: (req.params.id as string) });
   return sendSuccess(res, null, "Trek deleted");
 });
 
 export const restoreTrek = asyncHandler(async (req: Request, res: Response) => {
   const trek = await trekService.restore((req.params.id as string));
+  invalidateBootstrapCache();
   return sendSuccess(res, trek, "Trek restored");
 });

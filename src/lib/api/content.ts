@@ -27,6 +27,7 @@ export type SiteBootstrap = {
   faqs?: unknown[];
   testimonials?: unknown[];
   blogs?: unknown[];
+  treks?: unknown[];
   media?: Array<{ url: string; alt?: string; publicId?: string }>;
   meta?: { trekCount?: number };
 };

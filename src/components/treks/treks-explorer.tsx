@@ -129,6 +129,26 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
     return { destinations, states, regions, difficultyCounts, durationCounts };
   }, [treks]);
 
+  const popularSearchItems = useMemo(() => {
+    const byPopularity = [...treks].sort(
+      (a, b) => (b.popularity || b.reviewCount || 0) - (a.popularity || a.reviewCount || 0),
+    );
+    const items: Array<{ label: string; href: string; image?: string }> = [];
+    const seen = new Set<string>();
+    for (const trek of byPopularity) {
+      if (items.length >= 10) break;
+      const key = trek.slug;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      items.push({
+        label: trek.title,
+        href: `/treks/${trek.slug}`,
+        image: trek.images[0],
+      });
+    }
+    return items;
+  }, [treks]);
+
   const listTreks = visibleTreks;
   const listClass =
     filters.view === "list"
@@ -176,7 +196,7 @@ export function TreksExplorer({ initialTreks }: TreksExplorerProps) {
       />
 
       <div className="pt-5 md:pt-6">
-        <PopularSearches />
+        <PopularSearches items={popularSearchItems} />
       </div>
 
       {/* Mobile sticky listing header */}

@@ -3,9 +3,6 @@
 import type { TrekFiltersState, TrekTypeTag, SuitableFor } from "@/types/trek-listing";
 import type { DifficultyLevel, Season } from "@/types";
 import {
-  trekListingDestinations,
-  trekListingRegions,
-  trekListingStates,
   TREK_ALTITUDE_BOUNDS,
   TREK_PRICE_BOUNDS,
 } from "@/data/trek-listing-meta";
@@ -66,11 +63,9 @@ export function TrekFiltersPanel({
   durationCounts,
 }: TrekFiltersPanelProps) {
   const update = (patch: Partial<TrekFiltersState>) => onChange({ ...filters, ...patch });
-  const destinationOptions = destinations?.length
-    ? destinations
-    : [...trekListingDestinations];
-  const stateOptions = states?.length ? states : [...trekListingStates];
-  const regionOptions = regions?.length ? regions : [...trekListingRegions];
+  const destinationOptions = destinations?.length ? destinations : [];
+  const stateOptions = states?.length ? states : [];
+  const regionOptions = regions?.length ? regions : [];
 
   return (
     <aside

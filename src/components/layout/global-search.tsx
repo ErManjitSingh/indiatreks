@@ -7,27 +7,50 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalContent, ModalDescription, ModalHeader, ModalTitle } from "@/components/ui/modal";
 import { SearchBox } from "@/components/ui/search-box";
+import { fetchAllTreks } from "@/lib/api/treks";
 import { useUiStore } from "@/lib/store";
-import { useSiteContent } from "@/providers/site-content-provider";
+import type { TrekListingItem } from "@/types/trek-listing";
 
 export function GlobalSearch() {
   const router = useRouter();
   const { searchOpen, setSearchOpen } = useUiStore();
-  const { featuredTreks } = useSiteContent();
   const [query, setQuery] = useState("");
+  const [treks, setTreks] = useState<TrekListingItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!searchOpen) setQuery("");
+    if (!searchOpen) {
+      setQuery("");
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    void (async () => {
+      try {
+        const items = await fetchAllTreks();
+        if (!cancelled) setTreks(items);
+      } catch {
+        if (!cancelled) setTreks([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [searchOpen]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return featuredTreks.filter((trek) => {
-      const haystack = `${trek.name} ${trek.location} ${trek.difficulty}`.toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [featuredTreks, query]);
+    return treks
+      .filter((trek) => {
+        const haystack =
+          `${trek.title} ${trek.destinationName} ${trek.region} ${trek.state} ${trek.difficulty}`.toLowerCase();
+        return haystack.includes(q);
+      })
+      .slice(0, 12);
+  }, [treks, query]);
 
   return (
     <Modal open={searchOpen} onOpenChange={setSearchOpen}>
@@ -43,7 +66,10 @@ export function GlobalSearch() {
           autoFocus
         />
         <div className="mt-2 max-h-64 space-y-1 overflow-y-auto">
-          {query && results.length === 0 ? (
+          {loading && query ? (
+            <p className="px-2 py-6 text-center text-sm text-muted-foreground">Searching…</p>
+          ) : null}
+          {!loading && query && results.length === 0 ? (
             <p className="px-2 py-6 text-center text-sm text-muted-foreground">No treks matched.</p>
           ) : null}
           {results.map((trek) => (
@@ -57,8 +83,10 @@ export function GlobalSearch() {
               }}
             >
               <span>
-                <span className="block font-semibold text-foreground">{trek.name}</span>
-                <span className="text-xs text-muted-foreground">{trek.location}</span>
+                <span className="block font-semibold text-foreground">{trek.title}</span>
+                <span className="text-xs text-muted-foreground">
+                  {trek.destinationName || trek.region || trek.state}
+                </span>
               </span>
               <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
             </button>

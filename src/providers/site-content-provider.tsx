@@ -7,9 +7,12 @@ import {
   type ReactNode,
 } from "react";
 
-import type { SiteBootstrap } from "@/lib/api/content";
+import { BLUR_DATA_URL } from "@/constants/media";
+import type {
+  BlogCard,
+  FeaturedTrekCard,
+} from "@/data/homepage";
 import {
-  featuredTreks,
   destinationShowcases,
   heroSearchOptions,
   popularDestinations,
@@ -18,16 +21,19 @@ import {
   fixedDepartures,
   galleryPhotos,
   testimonials,
-  latestBlogs,
   homeFaqs,
   heroMedia,
   trustBadges,
   adventureStats,
 } from "@/data/homepage";
 import { siteConfig } from "@/config/site";
+import type { SiteBootstrap } from "@/lib/api/content";
+import { resolveMediaUrl } from "@/lib/resolve-media-url";
+import { formatNumber } from "@/utils";
+import type { DifficultyLevel } from "@/types";
 
 type HomepageBundle = {
-  featuredTreks: typeof featuredTreks;
+  featuredTreks: FeaturedTrekCard[];
   destinationShowcases: typeof destinationShowcases;
   popularDestinations: typeof popularDestinations;
   heroSearchOptions: typeof heroSearchOptions;
@@ -36,7 +42,7 @@ type HomepageBundle = {
   fixedDepartures: typeof fixedDepartures;
   galleryPhotos: typeof galleryPhotos;
   testimonials: typeof testimonials;
-  latestBlogs: typeof latestBlogs;
+  latestBlogs: BlogCard[];
   homeFaqs: typeof homeFaqs;
   heroMedia: typeof heroMedia;
   trustBadges: typeof trustBadges;
@@ -71,8 +77,8 @@ const staticSite = {
   whatsapp: siteConfig.whatsapp,
 };
 
-const staticHomepage: HomepageBundle = {
-  featuredTreks,
+const emptyHomepage: HomepageBundle = {
+  featuredTreks: [],
   destinationShowcases,
   popularDestinations,
   heroSearchOptions,
@@ -81,7 +87,7 @@ const staticHomepage: HomepageBundle = {
   fixedDepartures,
   galleryPhotos,
   testimonials,
-  latestBlogs,
+  latestBlogs: [],
   homeFaqs,
   heroMedia,
   trustBadges,
@@ -92,11 +98,9 @@ function pickArray<T>(cms: readonly T[] | undefined, fallback: readonly T[]): T[
   return cms?.length ? [...cms] : [...fallback];
 }
 
-function mapBootstrapBlogs(
-  blogs: SiteBootstrap["blogs"] | undefined,
-): typeof latestBlogs | undefined {
-  if (!Array.isArray(blogs) || !blogs.length) return undefined;
-  const mapped = blogs
+function mapBootstrapBlogs(blogs: SiteBootstrap["blogs"] | undefined): BlogCard[] {
+  if (!Array.isArray(blogs) || !blogs.length) return [];
+  return blogs
     .map((raw, index) => {
       const b = raw as Record<string, unknown>;
       const slug = String(b.slug ?? "");
@@ -115,23 +119,60 @@ function mapBootstrapBlogs(
         readingTimeMinutes: Number(b.readingTimeMinutes ?? 8),
         author,
         publishedAt: String(b.publishedAt ?? ""),
-        image: String(b.coverImage || b.image || "/images/og-default.jpg"),
+        image: resolveMediaUrl(String(b.coverImage || b.image || "")) || "/images/og-default.jpg",
         views: Number(b.views ?? 0),
-      };
+      } satisfies BlogCard;
     })
-    .filter(Boolean) as typeof latestBlogs;
-  return mapped.length ? mapped : undefined;
+    .filter(Boolean) as BlogCard[];
+}
+
+function mapBootstrapTreks(treks: SiteBootstrap["treks"] | undefined): FeaturedTrekCard[] {
+  if (!Array.isArray(treks) || !treks.length) return [];
+  return treks
+    .map((raw, index) => {
+      const t = raw as Record<string, unknown>;
+      const slug = String(t.slug ?? "");
+      const title = String(t.title ?? "");
+      if (!slug || !title) return null;
+      const days = Number(t.durationDays ?? 1);
+      const nights = Number(t.durationNights ?? 0);
+      const duration =
+        nights > 0 ? `${days}D / ${nights}N` : `${days} Day${days === 1 ? "" : "s"}`;
+      const heroes = Array.isArray(t.heroImages) ? (t.heroImages as string[]) : [];
+      const seasons = Array.isArray(t.bestSeasons) ? (t.bestSeasons as string[]) : [];
+      const alt = Number(t.maxAltitude ?? 0);
+      return {
+        id: String(t._id ?? slug ?? `trek-${index}`),
+        slug,
+        name: title,
+        location: String(t.destinationName || t.region || t.state || "Himalayas"),
+        difficulty: (t.difficulty as DifficultyLevel) || "moderate",
+        duration,
+        altitude: alt ? `${formatNumber(alt)} ft` : "—",
+        bestSeason: seasons.length
+          ? seasons.map((s) => s.slice(0, 1).toUpperCase() + s.slice(1)).join(", ")
+          : "Year round",
+        rating: Number(t.rating ?? 0) || 4.5,
+        reviewCount: Number(t.reviewCount ?? 0),
+        priceInr: Number(t.basePriceInr ?? 0),
+        seatsLeft: Number(t.seatsLeft ?? 0),
+        image: resolveMediaUrl(heroes[0] || "") || "/images/og-default.jpg",
+        blurDataURL: BLUR_DATA_URL,
+      } satisfies FeaturedTrekCard;
+    })
+    .filter(Boolean) as FeaturedTrekCard[];
 }
 
 function pickHomepage(bootstrap: SiteBootstrap | null): HomepageBundle {
   const homepage = (bootstrap?.homepage ?? {}) as Record<string, unknown>;
   const cmsHero = homepage.heroSearchOptions as Partial<typeof heroSearchOptions> | undefined;
   const liveBlogs = mapBootstrapBlogs(bootstrap?.blogs);
+  const liveTreks = mapBootstrapTreks(bootstrap?.treks);
+
   return {
-    featuredTreks: pickArray(
-      homepage.featuredTreks as typeof featuredTreks | undefined,
-      featuredTreks,
-    ),
+    // Treks & blogs: API only — never fall back to static mock catalogs
+    featuredTreks: liveTreks,
+    latestBlogs: liveBlogs,
     destinationShowcases: pickArray(
       homepage.destinationShowcases as typeof destinationShowcases | undefined,
       destinationShowcases,
@@ -167,9 +208,6 @@ function pickHomepage(bootstrap: SiteBootstrap | null): HomepageBundle {
       homepage.testimonials as typeof testimonials | undefined,
       testimonials,
     ),
-    latestBlogs: liveBlogs?.length
-      ? liveBlogs
-      : pickArray(homepage.latestBlogs as typeof latestBlogs | undefined, latestBlogs),
     homeFaqs: pickArray(homepage.homeFaqs as typeof homeFaqs | undefined, homeFaqs),
     heroMedia: (homepage.heroMedia as typeof heroMedia) ?? heroMedia,
     trustBadges: pickArray(
@@ -216,7 +254,7 @@ export function useSiteContent() {
     return {
       bootstrap: null,
       site: staticSite,
-      ...staticHomepage,
+      ...emptyHomepage,
       logoSrc: "/icons/logo.png",
     } satisfies SiteContentContextValue;
   }

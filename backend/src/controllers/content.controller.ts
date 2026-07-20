@@ -24,7 +24,7 @@ export function invalidateBootstrapCache() {
 }
 
 async function buildBootstrap(): Promise<BootstrapPayload> {
-  const [settings, destinations, faqs, testimonials, blogs, trekCount] = await Promise.all([
+  const [settings, destinations, faqs, testimonials, blogs, treks, trekCount] = await Promise.all([
     SettingModel.find({
       group: { $in: ["site", "homepage", "navigation", "facets", "media"] },
     })
@@ -46,10 +46,17 @@ async function buildBootstrap(): Promise<BootstrapPayload> {
       .limit(12)
       .lean()
       .catch(() => []),
-    BlogModel.find({ status: "published" })
+    BlogModel.find({ status: "published", deletedAt: null })
       .select("slug title excerpt coverImage category tags publishedAt readingTimeMinutes author views")
       .sort({ publishedAt: -1 })
-      .limit(8)
+      .limit(12)
+      .lean(),
+    TrekModel.find({ status: "published", deletedAt: null })
+      .select(
+        "slug title summary destinationName state region difficulty bestSeasons durationDays durationNights maxAltitude basePriceInr rating reviewCount heroImages badges trekTypes seatsLeft popularity publishedAt createdAt",
+      )
+      .sort({ popularity: -1, publishedAt: -1 })
+      .limit(40)
       .lean(),
     TrekModel.countDocuments({ status: "published", deletedAt: null }),
   ]);
@@ -66,6 +73,7 @@ async function buildBootstrap(): Promise<BootstrapPayload> {
     faqs,
     testimonials,
     blogs,
+    treks,
     media: [],
     meta: { trekCount },
   };
