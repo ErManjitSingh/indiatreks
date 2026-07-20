@@ -1,7 +1,8 @@
 "use client";
 
+import { ImagePlus, Trash2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   AdminSeoFields,
@@ -21,10 +22,18 @@ import {
   adminCreateBlog,
   adminGenerateBlog,
   adminUpdateBlog,
+  adminUploadMedia,
   arrayToLines,
   getErrorMessage,
   type AdminDoc,
 } from "@/lib/api/admin";
+import { resolveMediaUrl } from "@/lib/resolve-media-url";
+
+type GalleryItem = {
+  url: string;
+  alt: string;
+  caption: string;
+};
 
 type BlogFormState = {
   title: string;
@@ -32,7 +41,7 @@ type BlogFormState = {
   excerpt: string;
   content: string;
   coverImage: string;
-  gallery: string;
+  gallery: GalleryItem[];
   category: string;
   tags: string;
   status: string;
@@ -78,26 +87,20 @@ function faqToString(value: unknown) {
     .join("\n");
 }
 
-function parseGallery(value: string) {
-  return value
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [url, alt, caption] = line.split("|").map((part) => part.trim());
-      return { url: url || "", alt, caption };
-    })
-    .filter((row) => row.url);
-}
-
-function galleryToString(value: unknown) {
-  if (!Array.isArray(value)) return "";
+function parseGallery(value: unknown): GalleryItem[] {
+  if (!Array.isArray(value)) return [];
   return value
     .map((item) => {
       const row = item as { url?: string; alt?: string; caption?: string };
-      return `${row.url || ""} | ${row.alt || ""} | ${row.caption || ""}`;
+      const url = resolveMediaUrl(String(row.url || ""));
+      if (!url) return null;
+      return {
+        url,
+        alt: String(row.alt || ""),
+        caption: String(row.caption || ""),
+      };
     })
-    .join("\n");
+    .filter(Boolean) as GalleryItem[];
 }
 
 function fromDoc(doc?: AdminDoc | null): BlogFormState {
@@ -107,8 +110,8 @@ function fromDoc(doc?: AdminDoc | null): BlogFormState {
     slug: String(doc?.slug ?? ""),
     excerpt: String(doc?.excerpt ?? ""),
     content: String(doc?.content ?? ""),
-    coverImage: String(doc?.coverImage ?? ""),
-    gallery: galleryToString(doc?.gallery),
+    coverImage: resolveMediaUrl(String(doc?.coverImage ?? "")),
+    gallery: parseGallery(doc?.gallery),
     category: String(doc?.category ?? ""),
     tags: tagsToString(doc?.tags) || arrayToLines(doc?.tags),
     status: String(doc?.status ?? "draft"),
@@ -128,7 +131,7 @@ function toPayload(form: BlogFormState) {
     excerpt: form.excerpt,
     content: form.content,
     coverImage: form.coverImage,
-    gallery: parseGallery(form.gallery),
+    gallery: form.gallery.filter((item) => item.url),
     category: form.category,
     tags: parseTags(form.tags),
     status: form.status,
@@ -146,7 +149,85 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
   const [form, setForm] = useState<BlogFormState>(() => fromDoc(initial));
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const coverFileRef = useRef<HTMLInputElement>(null);
+  const galleryFileRef = useRef<HTMLInputElement>(null);
   const isEdit = Boolean(initial?._id);
+
+  async function uploadFiles(files: FileList | File[], folder = "blogs") {
+    const list = Array.from(files);
+    if (!list.length) return [] as string[];
+    const urls: string[] = [];
+    for (const file of list) {
+      const media = await adminUploadMedia(file, folder, form.title || file.name);
+      const url = resolveMediaUrl(String(media?.url ?? ""));
+      if (url) urls.push(url);
+    }
+    return urls;
+  }
+
+  async function onCoverUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files;
+    if (!files?.length) return;
+    setCoverUploading(true);
+    try {
+      const urls = await uploadFiles(files, "blogs/covers");
+      if (!urls[0]) throw new Error("Upload returned no URL");
+      setForm((prev) => ({ ...prev, coverImage: urls[0] }));
+      toast.success("Cover image uploaded");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Cover upload failed"));
+    } finally {
+      setCoverUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  async function onGalleryUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files;
+    if (!files?.length) return;
+    setGalleryUploading(true);
+    try {
+      const urls = await uploadFiles(files, "blogs/gallery");
+      if (!urls.length) throw new Error("Upload returned no URL");
+      setForm((prev) => ({
+        ...prev,
+        gallery: [
+          ...prev.gallery,
+          ...urls.map((url) => ({
+            url,
+            alt: form.title || "Blog gallery image",
+            caption: "",
+          })),
+        ],
+      }));
+      toast.success(urls.length === 1 ? "Gallery image uploaded" : `${urls.length} gallery images uploaded`);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Gallery upload failed"));
+    } finally {
+      setGalleryUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  function removeCover() {
+    setForm((prev) => ({ ...prev, coverImage: "" }));
+  }
+
+  function removeGalleryItem(index: number) {
+    setForm((prev) => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateGalleryMeta(index: number, key: "alt" | "caption", value: string) {
+    setForm((prev) => ({
+      ...prev,
+      gallery: prev.gallery.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
+    }));
+  }
 
   async function generateWithAi() {
     setGenerating(true);
@@ -163,8 +244,10 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
         slug: String(article.slug || prev.slug),
         excerpt: String(article.excerpt || prev.excerpt),
         content: String(article.content || prev.content),
-        coverImage: String(article.coverImage || prev.coverImage),
-        gallery: galleryToString(article.gallery),
+        coverImage: resolveMediaUrl(String(article.coverImage || prev.coverImage)),
+        gallery: parseGallery(article.gallery).length
+          ? parseGallery(article.gallery)
+          : prev.gallery,
         category: String(article.category || prev.category),
         tags: Array.isArray(article.tags) ? article.tags.map(String).join(", ") : prev.tags,
         readingTimeMinutes: String(article.readingTimeMinutes || prev.readingTimeMinutes),
@@ -239,26 +322,146 @@ export function BlogForm({ initial }: { initial?: AdminDoc | null }) {
             Show in featured blog sections
           </label>
         </AdminField>
-        <AdminField label="Cover image URL">
-          <input className={adminInputClass} value={form.coverImage} onChange={(e) => set("coverImage", e.target.value)} />
-        </AdminField>
         <AdminField label="Reading time (minutes)">
           <input type="number" min={1} className={adminInputClass} value={form.readingTimeMinutes} onChange={(e) => set("readingTimeMinutes", e.target.value)} />
         </AdminField>
         <AdminField label="Author name">
           <input className={adminInputClass} value={form.authorName} onChange={(e) => set("authorName", e.target.value)} />
         </AdminField>
-        <AdminField label="Tags (comma or one per line)">
+        <AdminField label="Tags (comma or one per line)" className="md:col-span-2">
           <input className={adminInputClass} value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="trekking, himalaya" />
         </AdminField>
+      </div>
+
+      <div className="space-y-5 rounded-2xl border border-[#d8e0d4] bg-white p-5 shadow-sm">
+        <div>
+          <h2 className="font-heading text-lg font-bold text-[#111827]">Cover & Gallery</h2>
+          <p className="mt-1 text-sm text-[#6b7280]">
+            Upload images from your device. PNG, JPG, WEBP supported.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-[#111827]">Cover image</p>
+          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[#d1d5db] bg-[#f9fafb] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#16a34a] shadow-sm">
+                <ImagePlus className="h-5 w-5" aria-hidden />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#111827]">Upload cover picture</p>
+                <p className="text-xs text-[#6b7280]">One main image for blog cards and hero</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={coverFileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                className="hidden"
+                disabled={coverUploading}
+                onChange={(e) => void onCoverUpload(e)}
+              />
+              <button
+                type="button"
+                disabled={coverUploading}
+                onClick={() => coverFileRef.current?.click()}
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#22c55e] px-4 text-sm font-bold text-white transition hover:bg-[#16a34a] disabled:opacity-60"
+              >
+                <Upload className="h-4 w-4" aria-hidden />
+                {coverUploading ? "Uploading…" : "Upload cover"}
+              </button>
+              {form.coverImage ? (
+                <button
+                  type="button"
+                  onClick={removeCover}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#e5e7eb] bg-white px-3 text-sm font-semibold text-[#374151] hover:bg-[#f9fafb]"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden />
+                  Remove
+                </button>
+              ) : null}
+            </div>
+          </div>
+          {form.coverImage ? (
+            <div className="relative aspect-[16/9] max-w-xl overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f9fafb]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={form.coverImage} alt="Cover preview" className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <p className="text-sm text-[#6b7280]">No cover image yet.</p>
+          )}
+        </div>
+
+        <div className="space-y-3 border-t border-[#eef2ee] pt-5">
+          <p className="text-sm font-semibold text-[#111827]">Gallery images</p>
+          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[#d1d5db] bg-[#f9fafb] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-[#111827]">Upload gallery photos</p>
+              <p className="mt-0.5 text-xs text-[#6b7280]">Multiple files supported</p>
+            </div>
+            <div>
+              <input
+                ref={galleryFileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                multiple
+                className="hidden"
+                disabled={galleryUploading}
+                onChange={(e) => void onGalleryUpload(e)}
+              />
+              <button
+                type="button"
+                disabled={galleryUploading}
+                onClick={() => galleryFileRef.current?.click()}
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#22c55e] px-4 text-sm font-bold text-white transition hover:bg-[#16a34a] disabled:opacity-60"
+              >
+                <Upload className="h-4 w-4" aria-hidden />
+                {galleryUploading ? "Uploading…" : "Upload gallery images"}
+              </button>
+            </div>
+          </div>
+
+          {form.gallery.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {form.gallery.map((item, index) => (
+                <div key={`${item.url}-${index}`} className="space-y-2 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-2">
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-white">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.url} alt={item.alt || "Gallery"} className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-white"
+                      onClick={() => removeGalleryItem(index)}
+                      title="Remove"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" aria-hidden />
+                    </button>
+                  </div>
+                  <input
+                    className={adminInputClass}
+                    value={item.alt}
+                    onChange={(e) => updateGalleryMeta(index, "alt", e.target.value)}
+                    placeholder="Alt text"
+                  />
+                  <input
+                    className={adminInputClass}
+                    value={item.caption}
+                    onChange={(e) => updateGalleryMeta(index, "caption", e.target.value)}
+                    placeholder="Caption (optional)"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-[#6b7280]">No gallery images yet.</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4 rounded-2xl border border-[#d8e0d4] bg-white p-5 shadow-sm">
         <AdminField label="Excerpt">
           <textarea className={adminTextareaClass} value={form.excerpt} onChange={(e) => set("excerpt", e.target.value)} />
-        </AdminField>
-        <AdminField label="Gallery (url | alt | caption per line)">
-          <textarea className={adminTextareaClass} value={form.gallery} onChange={(e) => set("gallery", e.target.value)} />
         </AdminField>
         <AdminField label="Content (Markdown)">
           <textarea className={`${adminTextareaClass} min-h-[320px] font-mono text-sm`} value={form.content} onChange={(e) => set("content", e.target.value)} rows={18} />
