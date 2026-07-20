@@ -161,7 +161,7 @@ async function getDashboardStats() {
     TrekModel.find({ deletedAt: null, status: "published" })
       .sort({ rating: -1, reviewCount: -1, createdAt: -1 })
       .limit(5)
-      .select("title slug region destinationName rating reviewCount heroImages images")
+      .select("title slug region destinationName rating reviewCount heroImages gallery")
       .lean(),
     BlogModel.find({ deletedAt: null })
       .sort({ views: -1, publishedAt: -1, createdAt: -1 })
@@ -267,7 +267,13 @@ async function getDashboardStats() {
           Number(t.reviewCount || 0) > 0
             ? `${Number(t.rating || 0).toFixed(1)} · ${t.reviewCount} reviews`
             : "Published",
-        image: String(t.heroImages?.[0] || t.images?.[0] || ""),
+        image: String(
+          t.heroImages?.[0] ||
+            (typeof t.gallery?.[0] === "string"
+              ? t.gallery[0]
+              : (t.gallery?.[0] as { url?: string } | undefined)?.url) ||
+            "",
+        ),
       }));
 
   const contentSeries = fillDailySeries(30, trekDaily, blogDaily, destinationDaily);
