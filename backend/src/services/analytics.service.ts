@@ -267,13 +267,7 @@ async function getDashboardStats() {
           Number(t.reviewCount || 0) > 0
             ? `${Number(t.rating || 0).toFixed(1)} · ${t.reviewCount} reviews`
             : "Published",
-        image: String(
-          t.heroImages?.[0] ||
-            (typeof t.gallery?.[0] === "string"
-              ? t.gallery[0]
-              : (t.gallery?.[0] as { url?: string } | undefined)?.url) ||
-            "",
-        ),
+        image: String(t.heroImages?.[0] || t.gallery?.[0]?.src || ""),
       }));
 
   const contentSeries = fillDailySeries(30, trekDaily, blogDaily, destinationDaily);
