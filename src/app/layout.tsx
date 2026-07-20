@@ -92,10 +92,14 @@ export default async function RootLayout({
     (analyticsConfig as {
       gtm?: { enabled?: boolean; containerId?: string };
       ga4?: { enabled?: boolean; measurementId?: string };
+      metaPixel?: { enabled?: boolean; pixelId?: string };
+      clarity?: { enabled?: boolean; projectId?: string };
     } | null) ??
     (seo?.analytics as {
       gtm?: { enabled?: boolean; containerId?: string };
       ga4?: { enabled?: boolean; measurementId?: string };
+      metaPixel?: { enabled?: boolean; pixelId?: string };
+      clarity?: { enabled?: boolean; projectId?: string };
     } | undefined) ??
     {};
   const gtmContainerId =
@@ -106,6 +110,14 @@ export default async function RootLayout({
     analytics.ga4?.enabled && analytics.ga4?.measurementId
       ? String(analytics.ga4.measurementId)
       : process.env.NEXT_PUBLIC_GA4_ID || null;
+  const metaPixelId =
+    analytics.metaPixel?.enabled && analytics.metaPixel?.pixelId
+      ? String(analytics.metaPixel.pixelId)
+      : null;
+  const clarityId =
+    analytics.clarity?.enabled && analytics.clarity?.projectId
+      ? String(analytics.clarity.projectId)
+      : null;
 
   return (
     <html lang="en-IN" suppressHydrationWarning>
@@ -117,6 +129,8 @@ export default async function RootLayout({
           <ConditionalSiteChrome
             gtmContainerId={gtmContainerId}
             ga4MeasurementId={ga4MeasurementId}
+            metaPixelId={metaPixelId}
+            clarityId={clarityId}
           >
             {children}
           </ConditionalSiteChrome>

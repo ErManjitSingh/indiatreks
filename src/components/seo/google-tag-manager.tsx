@@ -17,6 +17,27 @@ function normalizeGtmId(value?: string | null) {
   return /^GTM-[A-Z0-9]+$/.test(id) ? id : "";
 }
 
+function useIdleReady(delayMs = 2500) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const enable = () => setReady(true);
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: delayMs });
+    } else {
+      timeoutId = setTimeout(enable, delayMs);
+    }
+    return () => {
+      if (idleId != null && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [delayMs]);
+  return ready;
+}
+
 function GtmRouteTracker({ containerId }: { containerId: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -41,39 +62,15 @@ export function GoogleTagManager({
 }: {
   containerId?: string | null;
 }) {
+  const idleReady = useIdleReady(2500);
   const envId = normalizeGtmId(process.env.NEXT_PUBLIC_GTM_ID);
-  const [fetchedId, setFetchedId] = useState("");
+  const containerId = normalizeGtmId(containerIdProp) || envId;
 
-  useEffect(() => {
-    if (normalizeGtmId(containerIdProp) || envId) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/v1/analytics/config", { credentials: "omit" });
-        if (!res.ok) return;
-        const json = (await res.json()) as {
-          data?: { gtm?: { enabled?: boolean; containerId?: string } };
-        };
-        const gtm = json.data?.gtm;
-        const id = gtm?.enabled ? normalizeGtmId(gtm.containerId) : "";
-        if (!cancelled) setFetchedId(id);
-      } catch {
-        // optional
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [containerIdProp, envId]);
-
-  const containerId =
-    normalizeGtmId(containerIdProp) || envId || normalizeGtmId(fetchedId);
-
-  if (!containerId) return null;
+  if (!containerId || !idleReady) return null;
 
   return (
     <>
-      <Script id="gtm-init" strategy="afterInteractive">{`
+      <Script id="gtm-init" strategy="lazyOnload">{`
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=

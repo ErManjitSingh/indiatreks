@@ -194,8 +194,14 @@ export default function SearchConsolePage() {
 
   const totals = (dash?.totals || {}) as Record<string, unknown>;
   const coverage = (dash?.coverage || {}) as Record<string, unknown>;
-  const topPages = (dash?.topPages || []) as Array<Record<string, unknown>>;
-  const topQueries = (dash?.topQueries || []) as Array<Record<string, unknown>>;
+  const topPages = useMemo(
+    () => (dash?.topPages || []) as Array<Record<string, unknown>>,
+    [dash],
+  );
+  const topQueries = useMemo(
+    () => (dash?.topQueries || []) as Array<Record<string, unknown>>,
+    [dash],
+  );
   const sitemaps = (dash?.sitemaps || []) as Array<Record<string, unknown>>;
   const connectedProperties = (dash?.connectedProperties || []) as Array<Record<string, unknown>>;
 

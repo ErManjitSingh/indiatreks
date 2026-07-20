@@ -85,6 +85,9 @@ const nextConfig: NextConfig = {
       "@tanstack/react-virtual",
       "sonner",
       "class-variance-authority",
+      "react-markdown",
+      "remark-gfm",
+      "axios",
     ],
   },
   async rewrites() {

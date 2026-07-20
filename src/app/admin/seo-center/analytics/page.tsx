@@ -222,8 +222,9 @@ export default function AnalyticsPage() {
 
         {gtmActive ? (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-            GTM is also active. Prefer firing GA4 from either this direct tag <strong>or</strong> a GA4
-            Configuration tag inside GTM — not both — to avoid double counting.
+            GTM is active on the public site, so direct gtag is skipped to avoid double counting. Add a{" "}
+            <strong>GA4 Configuration</strong> tag inside GTM with this Measurement ID, then publish the
+            container.
           </p>
         ) : null}
 

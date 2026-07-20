@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   ArrowRight,
   BadgeCheck,
@@ -23,12 +24,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ComponentType } from "react";
 
-import { BlogsSection } from "@/components/home/blogs-section";
-import { HomeTrekCollections } from "@/components/home/home-trek-collections";
 import { budgetLabelToPriceRange } from "@/lib/trek-filters";
 import { getDestinationShowcaseHref } from "@/lib/destination-links";
 import { BLUR_DATA_URL } from "@/constants/media";
 import { useSiteContent } from "@/providers/site-content-provider";
+
+const BlogsSection = dynamic(
+  () => import("@/components/home/blogs-section").then((m) => m.BlogsSection),
+  {
+    loading: () => <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-muted" />,
+  },
+);
+
+const HomeTrekCollections = dynamic(
+  () =>
+    import("@/components/home/home-trek-collections").then((m) => m.HomeTrekCollections),
+  {
+    loading: () => <div className="mx-auto h-72 max-w-6xl animate-pulse rounded-2xl bg-muted" />,
+  },
+);
 
 const heroImage = "/images/heroes/home-mobile-hero.jpg";
 const serviceChips: Array<{

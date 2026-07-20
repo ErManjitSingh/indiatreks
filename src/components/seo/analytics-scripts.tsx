@@ -3,12 +3,12 @@
 import Script from "next/script";
 import { useEffect, useState } from "react";
 
-type AnalyticsPublic = {
+type PixelConfig = {
   metaPixel?: { enabled?: boolean; pixelId?: string };
   clarity?: { enabled?: boolean; projectId?: string };
 };
 
-function useIdleGate(delayMs = 4000) {
+function useIdleGate(delayMs = 5000) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     let idleId: number | undefined;
@@ -33,36 +33,46 @@ function useIdleGate(delayMs = 4000) {
 
 /**
  * Deferred marketing pixels (Meta, Clarity).
- * GTM + GA4 are handled by dedicated early-load components.
+ * Prefer server-passed config to avoid an extra analytics/config fetch.
  */
-export function AnalyticsScripts() {
-  const idleReady = useIdleGate(4500);
-  const [config, setConfig] = useState<AnalyticsPublic | null>(null);
+export function AnalyticsScripts({
+  metaPixelId,
+  clarityId,
+}: {
+  metaPixelId?: string | null;
+  clarityId?: string | null;
+}) {
+  const idleReady = useIdleGate(5000);
+  const [fetched, setFetched] = useState<PixelConfig | null>(null);
 
   useEffect(() => {
     if (!idleReady) return;
+    if (metaPixelId || clarityId) return;
     let cancelled = false;
     (async () => {
       try {
         const res = await fetch("/api/v1/analytics/config", { credentials: "omit" });
         if (!res.ok) return;
-        const json = (await res.json()) as { data?: AnalyticsPublic };
-        if (!cancelled) setConfig(json.data ?? null);
+        const json = (await res.json()) as { data?: PixelConfig };
+        if (!cancelled) setFetched(json.data ?? null);
       } catch {
-        // analytics is optional
+        // optional
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [idleReady]);
+  }, [idleReady, metaPixelId, clarityId]);
 
-  if (!config) return null;
+  if (!idleReady) return null;
 
-  const pixelId = config.metaPixel?.enabled ? config.metaPixel.pixelId : undefined;
-  const clarityId = config.clarity?.enabled ? config.clarity.projectId : undefined;
+  const pixelId =
+    metaPixelId ||
+    (fetched?.metaPixel?.enabled ? fetched.metaPixel.pixelId : undefined);
+  const clarity =
+    clarityId || (fetched?.clarity?.enabled ? fetched.clarity.projectId : undefined);
 
-  if (!pixelId && !clarityId) return null;
+  if (!pixelId && !clarity) return null;
 
   return (
     <>
@@ -81,13 +91,13 @@ export function AnalyticsScripts() {
         `}</Script>
       ) : null}
 
-      {clarityId ? (
+      {clarity ? (
         <Script id="ms-clarity" strategy="lazyOnload">{`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "${clarityId}");
+          })(window, document, "clarity", "script", "${clarity}");
         `}</Script>
       ) : null}
     </>
